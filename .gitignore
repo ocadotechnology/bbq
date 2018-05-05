@@ -1,0 +1,7 @@
+*.iml
+*.pyc
+.idea
+*.DS_Store
+target
+lib
+node_modules
