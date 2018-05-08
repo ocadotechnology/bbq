@@ -1,0 +1,35 @@
+{
+ "kind": "bigquery#table",
+ "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/MTQ5MDM3MDU3MjE2Mg\"",
+ "id": "project-id:dataset_id.partitioned_table_partitions_view",
+ "selfLink": "https://www.googleapis.com/bigquery/v2/projects/project-id/datasets/dataset_id/tables/partitioned_table_partitions_view",
+ "tableReference": {
+  "projectId": "test-project",
+  "datasetId": "test-dataset",
+  "tableId": "test-view"
+ },
+ "schema": {
+  "fields": [
+   {
+    "name": "partition_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "f0_",
+    "type": "INTEGER",
+    "mode": "REQUIRED"
+   }
+  ]
+ },
+ "numBytes": "0",
+ "numLongTermBytes": "0",
+ "numRows": "0",
+ "creationTime": "1490370572162",
+ "lastModifiedTime": "1490370572162",
+ "type": "VIEW",
+ "view": {
+  "query": "SELECT\n  partition_id, 1490370260477 \nFROM\n  [dataset_id.partitioned_table$__PARTITIONS_SUMMARY__]",
+  "useLegacySql": true
+ }
+}

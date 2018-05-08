@@ -1,0 +1,17 @@
+language: python
+python:
+    - "2.7"
+before_install:
+    - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-155.0.0-linux-x86_64.tar.gz
+    - tar -xzf google-cloud-sdk-155.0.0-linux-x86_64.tar.gz
+    - ./google-cloud-sdk/install.sh --quiet
+    - ./google-cloud-sdk/bin/gcloud components install app-engine-python --quiet
+    - pip install -r requirements.txt
+    - pip install -t lib -r requirements.txt
+    - pip install -r requirements_tests.txt
+    - pip install coveralls
+    - pip install pylint
+script:
+    - find . -name "*.py" -path "./*" -not \( -path "./lib/*" -o -path "./google-cloud-sdk/*" \) | xargs pylint --reports=yes --rcfile=.pylintrc && coverage run --source=bbq test_runner.py --test-path tests/ -v ./google-cloud-sdk
+after_success:
+  coveralls

@@ -1,0 +1,34 @@
+{
+ "kind": "bigquery#table",
+ "etag": "\"-AzRU5skO4l0G5c75S4R78a9UuM/MTQ5MDM3MDY3MjE4MA\"",
+ "id": "project-id:dataset_id.empty_partitioned_table",
+ "selfLink": "https://www.googleapis.com/bigquery/v2/projects/project-id/datasets/dataset_id/tables/empty_partitioned_table",
+ "tableReference": {
+  "projectId": "project-id",
+  "datasetId": "dataset_id",
+  "tableId": "empty_partitioned_table"
+ },
+ "schema": {
+  "fields": [
+   {
+    "name": "id",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "name",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   }
+  ]
+ },
+ "timePartitioning": {
+  "type": "DAY"
+ },
+ "numBytes": "0",
+ "numLongTermBytes": "0",
+ "numRows": "0",
+ "creationTime": "1490370672180",
+ "lastModifiedTime": "1490370672180",
+ "type": "TABLE"
+}

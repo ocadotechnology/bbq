@@ -1,0 +1,45 @@
+{
+  "kind": "bigquery#queryResponse",
+  "schema": {
+    "fields": [
+      {
+        "name": "tableId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "datasetId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "projectId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "jobReference": {
+    "projectId": "project-id",
+    "jobId": "job_JxRRZYUr3xVCrvvcxzUec7NyOto"
+  },
+  "totalRows": "1",
+  "rows": [
+    {
+      "f": [
+        {
+          "v": "O_PRODUCT_SUPPLIER_20151127"
+        },
+        {
+          "v": "test_set"
+        },
+        {
+          "v": "project-dev"
+        }
+      ]
+    }
+  ],
+  "totalBytesProcessed": "2061498188",
+  "jobComplete": true,
+  "cacheHit": false
+}

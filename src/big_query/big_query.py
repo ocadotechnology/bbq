@@ -1,0 +1,356 @@
+import json
+import logging
+
+import googleapiclient.discovery
+import httplib2
+from apiclient.errors import HttpError, Error
+from oauth2client.client import GoogleCredentials
+
+from commons.decorators.cached import cached
+from commons.decorators.log_time import log_time, measure_time_and_log
+from commons.decorators.retry import retry
+from src.configuration import configuration
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.table_reference import TableReference
+
+
+class TableNotFoundException(Exception):
+    pass
+
+
+class DatasetNotFoundException(Exception):
+    pass
+
+
+class BigQuery(object):  # pylint: disable=R0904
+    def __init__(self):
+        self.http = self._create_http()
+        self.service = googleapiclient.discovery.build(
+            'bigquery',
+            'v2',
+            credentials=GoogleCredentials.get_application_default(),
+            http=self.http,
+            cache_discovery=self._cache_discovery()
+        )
+
+    @staticmethod
+    def _create_http():
+        return httplib2.Http(timeout=60)
+
+    @staticmethod
+    def _cache_discovery():
+        return True
+
+    def list_project_ids(self):
+        request = self.service.projects().list()
+        while request is not None:
+            with measure_time_and_log('Request for projects list'):
+                projects = request.execute()
+
+            for project in projects['projects']:
+                yield project['projectReference']['projectId']
+
+            request = self.service.projects().list_next(request, projects)
+
+    def list_dataset_ids(self, project_id):
+        request = self.service.datasets().list(projectId=project_id)
+        while request is not None:
+            with measure_time_and_log('Request for dataset table list'):
+                datasets = request.execute(num_retries=5)
+
+            if 'datasets' in datasets:
+                for dataset in datasets['datasets']:
+                    yield dataset['datasetReference']['datasetId']
+            request = self.service.datasets().list_next(request, datasets)
+
+    def for_each_table(self, project_id, dataset_id, func):
+        for table_id in self.list_table_ids(project_id, dataset_id):
+            func(project_id, dataset_id, table_id)
+
+    def list_table_ids(self, project_id, dataset_id):
+        request = self.service.tables().list(
+            projectId=project_id, datasetId=dataset_id
+        )
+        while request is not None:
+            tables = request.execute()
+            if 'tables' in tables:
+                for table in tables['tables']:
+                    if 'tableReference' not in table:
+                        logging.info('tableReference not in table,  '
+                                     'table= "%s"',
+                                     json.dumps(table))
+                    if 'tableId' not in table['tableReference']:
+                        logging.info('tableId not in table reference, '
+                                     'tableReference = "%s"',
+                                     json.dumps(table["tableReference"]))
+                    yield table['tableReference']['tableId']
+            request = self.service.tables().list_next(request, tables)
+
+    @retry(Error, tries=3, delay=2, backoff=2)
+    def list_tables(self, project_id, dataset_id, page_token=None,
+                    max_results=1000):
+        return self.service.tables().list(
+            projectId=project_id, datasetId=dataset_id,
+            maxResults=max_results, pageToken=page_token
+        ).execute()
+
+    @log_time
+    def list_table_partitions(self, project_id, dataset_id, table_id):
+        query = self.create_partition_query(project_id, dataset_id,
+                                            table_id)
+        query_job = self.__sync_query(query=query, use_legacy_sql=True)
+
+        results = []
+        page_token = None
+
+        while True:
+            page = self.service.jobs().getQueryResults(
+                pageToken=page_token,
+                **query_job['jobReference']).execute(num_retries=2)
+
+            results.extend(page.get('rows', []))
+
+            page_token = page.get('pageToken')
+            if not page_token:
+                break
+        partitions = [
+            {'partitionId': _partition['f'][0]['v'],
+             'creationTime': _partition['f'][1]['v'],
+             'lastModifiedTime': _partition['f'][2]['v']}
+            for _partition in results
+        ]
+        return partitions
+
+    @staticmethod
+    def create_partition_query(project_id, dataset_id, table_id):
+        return "SELECT partition_id, FORMAT_UTC_USEC(creation_time*1000) AS " \
+               "creation_time, FORMAT_UTC_USEC(last_modified_time*1000)" \
+               " AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]" \
+            .format(project_id, dataset_id, table_id)
+
+    @log_time
+    def fetch_random_table(self):
+        query_results = self.__sync_query(
+            query=self.random_table_from_project_query(),
+            use_legacy_sql=True)
+
+        if query_results and 'totalRows' in query_results \
+                and int(query_results['totalRows']) > 0:
+            results = []
+            results.extend(query_results.get('rows', []))
+            first_row = results[0]
+            project_id = first_row['f'][2]['v']
+            dataset_id = first_row['f'][1]['v']
+            table_id = first_row['f'][0]['v']
+            table_reference = TableReference(project_id, dataset_id, table_id)
+        else:
+            raise RandomizationError(
+                "No results returned from randomization query")
+        return table_reference
+
+    @staticmethod
+    def random_table_from_project_query():
+        return "SELECT tableId, datasetId, projectId FROM [{}]"\
+            .format(configuration.restoration_daily_test_random_table_view)
+
+    def __sync_query(self, query, timeout=30000, use_legacy_sql=False):
+        query_data = {
+            'query': query,
+            'timeoutMs': timeout,
+            'useLegacySql': use_legacy_sql
+        }
+        return self.service.jobs().query(
+            projectId=configuration.backup_project_id,
+            body=query_data).execute(num_retries=3)
+
+    def get_table_or_partition(self, project_id, dataset_id, table_id,
+                               partition_id):
+        table_metadata = self.get_table(project_id, dataset_id,
+                                        BigQuery.get_table_id_with_partition_id(
+                                            table_id, partition_id))
+        return BigQueryTableMetadata(table_metadata)
+
+    def get_table_by_reference(self, reference):
+        return self.get_table_or_partition(project_id=reference.project_id,
+                                           dataset_id=reference.dataset_id,
+                                           table_id=reference.table_id,
+                                           partition_id=reference.partition_id)
+
+    @staticmethod
+    def get_table_id_with_partition_id(table_id, partition_id):
+        return table_id + ('' if partition_id is None else '$' + partition_id)
+
+    @retry(HttpError, tries=6, delay=2, backoff=2)
+    def get_table(self, project_id, dataset_id, table_id, log_table=True):
+        logging.info("Getting table '%s'",
+                     TableReference(project_id, dataset_id, table_id))
+        try:
+            table = self.service.tables().get(
+                projectId=project_id, datasetId=dataset_id, tableId=table_id
+            ).execute(num_retries=3)
+
+            if log_table and table:
+                table_copy = table.copy()
+                if 'schema' in table_copy:
+                    del table_copy['schema']
+                logging.info("Table: " + json.dumps(table_copy))
+
+            return table
+        except HttpError as ex:
+            if ex.resp.status == 404:
+                logging.warning(
+                    "Table '%s' Not Found",
+                    TableReference(project_id, dataset_id, table_id)
+                )
+                return None
+            elif ex.resp.status == 400:
+                error_message = "Received 400 error while retrieving {}" \
+                    .format(TableReference(project_id, dataset_id, table_id))
+                logging.exception(error_message)
+                return None
+            else:
+                raise ex
+
+    @cached(time=300)
+    def get_table_cached(self, project_id, dataset_id, table_id,
+                         log_table=True):
+        return self.get_table(project_id, dataset_id, table_id, log_table)
+
+    @retry(HttpError, tries=6, delay=2, backoff=2)
+    def get_dataset(self, project_id, dataset_id):
+        try:
+            dataset = self.service.datasets().get(
+                projectId=project_id, datasetId=dataset_id
+            ).execute(num_retries=3)
+
+            logging.info("Dataset: " + json.dumps(dataset))
+            return dataset
+        except HttpError as ex:
+            if ex.resp.status == 404:
+                logging.warning(
+                    "Dataset '%s:%s' Not Found", project_id, dataset_id
+                )
+                return None
+            logging.info('Can\'t fetch dataset: %s', ex.resp)
+            raise ex
+
+    @cached(time=300)
+    def get_dataset_cached(self, project_id, dataset_id):
+        return self.get_dataset(project_id, dataset_id)
+
+    def insert_job(self, project_id, body):
+        response = self.service.jobs().insert(
+            projectId=project_id, body=body
+        ).execute()
+        logging.info('Insert job response: ' + json.dumps(response))
+        return response['jobReference']['jobId']
+
+    def get_job(self, project_id, job_id):
+        return self.service.jobs().get(
+            projectId=project_id, jobId=job_id
+        ).execute(num_retries=3)
+
+    @retry(Error, tries=3, delay=2, backoff=2)
+    def create_empty_partitioned_table(self, table_reference):
+        logging.info(
+            "Creating empty daily partitioned table: %s",
+            table_reference
+        )
+        body = {
+            'tableReference': {
+                'projectId': table_reference.project_id,
+                'datasetId': table_reference.dataset_id,
+                'tableId': table_reference.table_id,
+            },
+            'timePartitioning': {
+                'type': 'DAY'
+            }
+        }
+        try:
+            self.service.tables().insert(
+                projectId=table_reference.project_id,
+                datasetId=table_reference.dataset_id,
+                body=body
+            ).execute()
+        except HttpError as error:
+            if error.resp.status == 409:
+                logging.info('Table already exists %s', table_reference)
+            else:
+                raise
+
+    # @refactor - boolean argument
+    @retry(Error, tries=6, delay=2, backoff=2)
+    def create_dataset(
+            self, project_id, dataset_id, location, table_expiration_in_ms=False
+    ):
+        logging.info(
+            "Creating dataset %s / %s (location: %s)",
+            project_id, dataset_id, location
+        )
+        body = {
+            'datasetReference': {
+                'projectId': project_id,
+                'datasetId': dataset_id
+            },
+            'location': location
+        }
+
+        if table_expiration_in_ms and \
+                isinstance(table_expiration_in_ms,
+                           (int, long)):  # pylint: disable=E0602
+            body['defaultTableExpirationMs'] = table_expiration_in_ms
+
+        try:
+            self.service.datasets().insert(
+                projectId=project_id, body=body
+            ).execute()
+        except HttpError as error:
+            if error.resp.status == 409:
+                logging.info('Dataset %s / %s already exists',
+                             project_id, dataset_id)
+            else:
+                raise
+
+    @retry(Error, tries=6, delay=2, backoff=2)
+    def delete_table(self, table_reference):
+        try:
+            logging.info("Deleting table '%s'", table_reference)
+            self.service.tables().delete(
+                datasetId=table_reference.get_dataset_id(),
+                projectId=table_reference.get_project_id(),
+                tableId=table_reference.get_table_id()).execute()
+        except HttpError as ex:
+            if ex.resp.status == 404:
+                raise TableNotFoundException("Table '{}' Not Found".format(
+                    table_reference))
+            else:
+                raise ex
+
+    def get_dataset_location(self, project_id, dataset_id):
+        dataset = self.get_dataset(project_id, dataset_id)
+        if not dataset:
+            raise DatasetNotFoundException(
+                'Dataset Not Found: {}:{}'.format(
+                    project_id, dataset_id
+                )
+            )
+        return dataset.get('location')
+
+    @retry(HttpError, tries=6, delay=2, backoff=2)
+    def disable_partition_expiration(self, project_id, dataset_id, table_id):
+        logging.info("Disabling partition expiration for table %s:%s.%s",
+                     project_id, dataset_id, table_id)
+        table_data = {
+            "timePartitioning": {
+                "expirationMs": None,
+            }
+        }
+        self.service.tables().patch(
+            projectId=project_id,
+            datasetId=dataset_id,
+            tableId=table_id,
+            body=table_data).execute()
+
+
+class RandomizationError(BaseException):
+    pass

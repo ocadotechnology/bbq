@@ -1,0 +1,30 @@
+{
+  "kind": "bigquery#queryResponse",
+  "schema": {
+    "fields": [
+      {
+        "name": "tableId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "datasetId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "projectId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "jobReference": {
+    "projectId": "project-id",
+    "jobId": "job_qU1Eg2Bv6XjMyN6NgdgRjLat9dQ"
+  },
+  "totalRows": "0",
+  "totalBytesProcessed": "2061498188",
+  "jobComplete": true,
+  "cacheHit": false
+}

@@ -1,0 +1,48 @@
+{
+  "kind": "bigquery#tableList",
+  "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/-o6_2DHl7BpgpqBgGu-usf6T3u0\"",
+  "nextPageToken": "table_id_5",
+  "tables": [
+    {
+      "kind": "bigquery#table",
+      "id": "project-id:dataset_id.table_id_2",
+      "tableReference": {
+        "projectId": "project-id",
+        "datasetId": "dataset_id",
+        "tableId": "table_id_2"
+      },
+      "type": "TABLE"
+    },
+    {
+      "kind": "bigquery#table",
+      "id": "project-id:dataset_id.table_id_3",
+      "tableReference": {
+        "projectId": "project-id",
+        "datasetId": "dataset_id",
+        "tableId": "table_id_3"
+      },
+      "type": "TABLE"
+    },
+    {
+      "kind": "bigquery#table",
+      "id": "project-id:dataset_id.table_id_4",
+      "tableReference": {
+        "projectId": "project-id",
+        "datasetId": "dataset_id",
+        "tableId": "table_id_4"
+      },
+      "type": "TABLE"
+    },
+    {
+      "kind": "bigquery#table",
+      "id": "project-id:dataset_id.table_id_5",
+      "tableReference": {
+        "projectId": "project-id",
+        "datasetId": "dataset_id",
+        "tableId": "table_id_5"
+      },
+      "type": "TABLE"
+    }
+  ],
+  "totalItems": 5
+}

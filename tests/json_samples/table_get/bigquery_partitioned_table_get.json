@@ -1,0 +1,35 @@
+{
+ "kind": "bigquery#table",
+ "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/MTQ5MDM2OTI0MTIzOQ\"",
+ "id": "test-project:test-dataset.test-table",
+ "selfLink": "https://www.googleapis.com/bigquery/v2/projects/project-id/datasets/dataset_id/tables/partitioned_table",
+ "tableReference": {
+  "projectId": "test-project",
+  "datasetId": "test-dataset",
+  "tableId": "test-table"
+ },
+ "schema": {
+  "fields": [
+   {
+    "name": "id",
+    "type": "INTEGER",
+    "mode": "REQUIRED"
+   },
+   {
+    "name": "name",
+    "type": "STRING",
+    "mode": "REQUIRED"
+   }
+  ]
+ },
+ "timePartitioning": {
+  "type": "DAY"
+ },
+ "numBytes": "276",
+ "numLongTermBytes": "0",
+ "numRows": "15",
+ "creationTime": "1490369241239",
+ "lastModifiedTime": "1490730245179",
+ "type": "TABLE",
+ "location": "EU"
+}

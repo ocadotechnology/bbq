@@ -1,0 +1,13 @@
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "invalid",
+    "message": "Cannot read partition information from a table that is not partitioned: project-id:dataset_id.partitioned_table_partitions_view$20170820"
+   }
+  ],
+  "code": 400,
+  "message": "Cannot read partition information from a table that is not partitioned: project-id:dataset_id.partitioned_table_partitions_view$20170820"
+ }
+}

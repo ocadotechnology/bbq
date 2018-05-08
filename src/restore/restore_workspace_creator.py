@@ -1,0 +1,49 @@
+class RestoreWorkspaceCreator(object):
+
+    def __init__(self, big_query):
+        self.BQ = big_query
+
+    def create_workspace(self, source_table_reference,
+                         target_table_reference):
+
+        self.__create_target_dataset_if_not_exists(
+            source_table_reference,
+            target_table_reference)
+
+        self.__create_empty_partitioned_table_if_not_exists(
+            target_table_reference)
+
+    def __create_target_dataset_if_not_exists(self, source_table_reference,
+                                              target_table_reference):
+        if not self.__has_dataset_cached(target_table_reference):
+            self.__create_target_dataset(source_table_reference,
+                                         target_table_reference)
+
+    def __has_dataset_cached(self, target_table_reference):
+        return self.BQ.get_dataset_cached(target_table_reference.project_id,
+                                          target_table_reference.dataset_id) is not None
+
+    def __create_target_dataset(self, source_table_reference,
+                                target_table_reference):
+        location = self.BQ.get_dataset_location(
+            source_table_reference.project_id,
+            source_table_reference.dataset_id)
+        table_expiration = (3600000 * 24 * 7)  # 7 days
+        self.BQ.create_dataset(
+            target_table_reference.project_id,
+            target_table_reference.dataset_id,
+            location,
+            table_expiration
+        )
+
+    def __create_empty_partitioned_table_if_not_exists(self,
+                                                       target_table_reference):
+        if target_table_reference.is_partition() and self.BQ.get_table_cached(
+                target_table_reference.project_id,
+                target_table_reference.dataset_id,
+                target_table_reference.table_id) is None:
+            self.BQ.create_empty_partitioned_table(target_table_reference)
+
+    @staticmethod
+    def create_default_target_dataset_id(project_id, dataset_id):
+        return '{}___{}'.format(project_id, dataset_id).replace('-', '_')

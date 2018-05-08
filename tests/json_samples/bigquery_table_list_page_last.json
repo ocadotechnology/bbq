@@ -1,0 +1,17 @@
+{
+  "kind": "bigquery#tableList",
+  "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/t-yaB3LQa0CJrm8hrZF9KJX5awY\"",
+  "tables": [
+    {
+      "kind": "bigquery#table",
+      "id": "project-id:dataset_id.table_id_8",
+      "tableReference": {
+        "projectId": "project-id",
+        "datasetId": "dataset_id",
+        "tableId": "table_id_8"
+      },
+      "type": "TABLE"
+    }
+  ],
+  "totalItems": 5
+}

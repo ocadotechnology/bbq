@@ -1,0 +1,15 @@
+{
+  "kind": "bigquery#dataset",
+  "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/tQtKt9rhlWYbS5zNrAtTO7dzbcc\"",
+  "id": "created_dataset_id",
+  "selfLink": "https://www.googleapis.com/bigquery/v2/projects/project-id/datasets/dataset_id",
+  "datasetReference": {
+    "datasetId": "dataset_id"
+  },
+  "labels": {
+    "label_1": "label_1"
+  },
+  "creationTime": "1490369241239",
+  "lastModifiedTime": "1490370096229",
+  "location": "US"
+}

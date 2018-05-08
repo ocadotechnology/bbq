@@ -1,0 +1,35 @@
+{
+  "kind": "bigquery#projectList",
+  "etag": "\"smpMas70-D1-zV2oEH0ud6qY21c/vDJVxTVZmPghaQghdFPiZGWyFHo\"",
+  "nextPageToken": "3",
+  "projects": [
+    {
+      "kind": "bigquery#project",
+      "id": "project-id",
+      "numericId": "456745675476",
+      "projectReference": {
+        "projectId": "project-id"
+      },
+      "friendlyName": "BETA Platform"
+    },
+    {
+      "kind": "bigquery#project",
+      "id": "project-id",
+      "numericId": "546745674567546",
+      "projectReference": {
+        "projectId": "project-id"
+      },
+      "friendlyName": "Project Friendly Name 1"
+    },
+    {
+      "kind": "bigquery#project",
+      "id": "project-id",
+      "numericId": "64567567456765756",
+      "projectReference": {
+        "projectId": "project-id"
+      },
+      "friendlyName": "Project Friendly Name 2"
+    }
+  ],
+  "totalItems": 4
+}
