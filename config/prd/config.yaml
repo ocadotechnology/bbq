@@ -1,0 +1,12 @@
+copy_jobs:
+  copy_job_result_check_countdown_in_sec: 60  # ONE MINUTE
+
+backup_settings:
+  backup_worker_max_countdown_in_sec: 25200  # SEVEN_HOURS_IN_SECONDS
+  custom_project_list: ['a-project-to-backup']
+  projects_to_skip: ['a-project-to-skip']
+
+project_settings:
+  backup_project_id: 'your-project-name'
+  restoration_project_id: 'your-project-name'
+  authorized_requestor_service_accounts: ['sa-eligible-to-read-data@your-project-name.iam.gserviceaccount.com']
