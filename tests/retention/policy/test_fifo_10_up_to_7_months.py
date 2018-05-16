@@ -5,7 +5,6 @@ from freezegun import freeze_time
 
 from mock import patch
 from src.backup.datastore.Backup import Backup
-from src.backup.datastore.Table import Table
 from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
 from src.table_reference import TableReference
 from tests.utils.backup_utils import create_backup_daily_sequence, create_backup
@@ -20,24 +19,6 @@ class TestFifo10UpTo7Months(unittest.TestCase):
 
     def tearDown(self):
         patch.stopall()
-
-    @patch('src.big_query.big_query.BigQuery.get_table_by_reference.return_value.table_exists.return_value', True) # nopep8 pylint: disable=C0301
-    @patch('src.big_query.big_query.BigQuery.get_table_by_reference')
-    @freeze_time("2017-08-20")
-    def test_should_delete_all_but_newest_one_backup_when_all_are_older_than_7_months(self, _):  # nopep8 pylint: disable=C0301
-        # given
-        reference = TableReference('example-project-id', 'example-dataset-id',
-                                   'example-table-id')
-        newest_backup = create_backup(datetime(2016, 12, 2))
-        backup_to_delete = create_backup(datetime(2016, 12, 1))
-
-        # when
-        eligible_for_deletion = self.under_test \
-            .get_backups_eligible_for_deletion(backups=[backup_to_delete,
-                                                        newest_backup],
-                                               table_reference=reference)
-        # then
-        self.sortAndAssertListEqual([backup_to_delete], eligible_for_deletion)
 
     @freeze_time("2017-08-20")
     def test_should_delete_only_backups_which_are_older_than_7_months_and_are_above_10th_version(self):  # nopep8 pylint: disable=C0301
