@@ -109,7 +109,7 @@ class TestRestoreTestHandler(unittest.TestCase):
 
         self.under_test.get('/restore/test')
         put_gcs_file_content.assert_called_once_with(
-            'end2end_testing',
+            'a-gcs-bucket',
             'restore-test-status.json',
             '{"status": "success", "restore_response": {"status": "success", "size_in_bytes": 6565, "rows_count": 99}, "tableReference": "myproject123:d1.t1"}',      # nopep8 pylint: disable=C0301
             'application/json')
@@ -141,7 +141,7 @@ class TestRestoreTestHandler(unittest.TestCase):
 
         # then
         put_gcs_file_content.assert_called_once_with(
-            'end2end_testing',
+            'a-gcs-bucket',
             'restore-test-status.json',
             '{"status": "failed", "restore_response": {"status": "failed", "data": {"size_in_bytes": 6565, "rows_count": 99}}, "tableReference": "myproject123:d1.t1"}',      # nopep8 pylint: disable=C0301
             'application/json')
@@ -172,7 +172,7 @@ class TestRestoreTestHandler(unittest.TestCase):
         # then
         self.assertEquals(500, response.status_int)
         put_gcs_file_content.assert_called_once_with(
-            'end2end_testing',
+            'a-gcs-bucket',
             'restore-test-status.json',
             '{"status": "failed", "restore_response": {"status": "success", "size_in_bytes": 6565, "rows_count": 1000}, "tableReference": "myproject123:d1.t1"}',      # nopep8 pylint: disable=C0301
             'application/json')

@@ -1,0 +1,16 @@
+cron:
+- description: daily backup job
+  url: /cron/backup
+  schedule: every day 02:00
+  retry_parameters:
+    job_retry_limit: 5
+- description: execute retention policy
+  url: /cron/retention
+  schedule: every day 14:07
+- description: backup datastore metadata
+  url: /_ah/datastore_admin/backup.create?name=datastore_backup&kind=Backup&kind=Table&filesystem=gs&gs_bucket_name=project-bbq_datastore_backup_eu
+  schedule: every day 9:00
+  target: ah-builtin-python-bundle
+- description: execute daily restore test
+  url: /restore/test
+  schedule: every 7 hours from 06:15 to 13:15
