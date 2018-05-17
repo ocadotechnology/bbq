@@ -5,6 +5,7 @@ from freezegun import freeze_time
 
 from mock import patch
 from src.backup.datastore.Backup import Backup
+from src.backup.datastore.Table import Table
 from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
 from src.table_reference import TableReference
 from tests.utils.backup_utils import create_backup_daily_sequence, create_backup
@@ -57,8 +58,9 @@ class TestFifo10UpTo7Months(unittest.TestCase):
 
     @patch('src.big_query.big_query.BigQuery.get_table_by_reference.return_value.table_exists.return_value', True) # nopep8 pylint: disable=C0301
     @patch('src.big_query.big_query.BigQuery.get_table_by_reference')
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2017, 8, 19)))
     @freeze_time("2017-08-20")
-    def test_should_leave_youngest_backup_from_the_same_day_when_source_data_exists(self, _):  # nopep8 pylint: disable=C0301
+    def test_should_leave_youngest_backup_from_the_same_day_when_source_data_exists(self, _, _1):  # nopep8 pylint: disable=C0301
         # given
         reference = TableReference('example-project-id', 'example-dataset-id',
                                    'example-table-id')
@@ -77,28 +79,28 @@ class TestFifo10UpTo7Months(unittest.TestCase):
             eligible_for_deletion
         )
 
-    # @patch('src.big_query.big_query.BigQuery.get_table_by_reference.return_value.table_exists.return_value', False) # nopep8 pylint: disable=C0301
-    # @patch('src.big_query.big_query.BigQuery.get_table_by_reference')
-    # @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2017, 1, 19)))
-    # @freeze_time("2017-08-20")
-    # def test_remove_all_backups_if_source_table_doesnt_exists_for_min_7_months(self, _, _1):  # nopep8 pylint: disable=C0301
-    #     # given
-    #     reference = TableReference('example-project-id', 'example-dataset-id',
-    #                                'example-table-id')
-    #     b1 = create_backup(datetime(2017, 1, 17))
-    #     b2 = create_backup(datetime(2017, 1, 18))
-    #     backups = [b1, b2]
-    #     backups_expected_for_deletion = [b1, b2]
-    #
-    #     # when
-    #     eligible_for_deletion = self.under_test \
-    #         .get_backups_eligible_for_deletion(backups=list(backups),
-    #                                            table_reference=reference)
-    #     # then
-    #     self.sortAndAssertListEqual(
-    #         backups_expected_for_deletion,
-    #         eligible_for_deletion
-    #     )
+    @patch('src.big_query.big_query.BigQuery.get_table_by_reference.return_value.table_exists.return_value', False) # nopep8 pylint: disable=C0301
+    @patch('src.big_query.big_query.BigQuery.get_table_by_reference')
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2017, 1, 19)))
+    @freeze_time("2017-08-20")
+    def test_remove_all_backups_if_source_table_doesnt_exists_for_min_7_months(self, _, _1):  # nopep8 pylint: disable=C0301
+        # given
+        reference = TableReference('example-project-id', 'example-dataset-id',
+                                   'example-table-id')
+        b1 = create_backup(datetime(2017, 1, 17))
+        b2 = create_backup(datetime(2017, 1, 18))
+        backups = [b1, b2]
+        backups_expected_for_deletion = [b1, b2]
+
+        # when
+        eligible_for_deletion = self.under_test \
+            .get_backups_eligible_for_deletion(backups=list(backups),
+                                               table_reference=reference)
+        # then
+        self.sortAndAssertListEqual(
+            backups_expected_for_deletion,
+            eligible_for_deletion
+        )
 
     @freeze_time("2017-08-20")
     def test_should_remove_above_last_10_backups(self):
