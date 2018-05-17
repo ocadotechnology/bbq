@@ -14,9 +14,8 @@ class Fifo10UpTo7Months(object):
     def __init__(self):
         self.filters = [MostRecentDailyBackupFilter(),
                         TenBackupVersionsFilter(),
-                        YoungerThan7MonthsFilter()
-                        # , GracePeriodAfterDeletionFilter()
-                        ]
+                        YoungerThan7MonthsFilter(),
+                        GracePeriodAfterDeletionFilter()]
 
     def get_backups_eligible_for_deletion(self, backups, table_reference):
         backups_to_retain = backups
