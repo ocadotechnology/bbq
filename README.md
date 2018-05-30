@@ -20,4 +20,24 @@ In such scenario we're not able to restore data using BigQuery build-in features
 
 Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
-* store multiple versions of our data for several months, not days.
+* store multiple versions of our data for several months, not days,
+* easily restore multiple (i.e. thousands) tables at the same time.
+
+# Features
+
+Main BBQ features include:
+* daily backup of single or partitioned tables:
+  * only modified data is backed up using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table),
+  * multiple backup versions are supported,
+  * every partition is treated as a separate table (i.e. BBQ copies only modified partitions),
+  * if source table has expiration time set, it's cleared from the backup,
+* retention - automatic deletion of old backups based on age and/or number of versions,
+* restore - BBQ can restore multiple tables/datasets at the same time.
+
+BBQ doesn't support backing up:
+* [external data sources](https://cloud.google.com/bigquery/external-data-sources),
+* Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
+* Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)  
+
+Caveats:
+* Modifying partitioned table description triggers backing up all partitions as last modified time is updated for every partition
