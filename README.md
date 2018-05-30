@@ -31,8 +31,11 @@ Main BBQ features include:
   * multiple backup versions are supported,
   * every partition is treated as a separate table (i.e. BBQ copies only modified partitions),
   * if source table has expiration time set, it's cleared from the backup,
+  * can manage hundreds of thousands backups.
 * retention - automatic deletion of old backups based on age and/or number of versions,
-* restore - BBQ can restore multiple tables/datasets at the same time.
+* restore - BBQ can restore:
+  * whole datasets,
+  * selected tables/partitions/versions.
 
 BBQ doesn't support backing up:
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
@@ -41,3 +44,4 @@ BBQ doesn't support backing up:
 
 Caveats:
 * Modifying partitioned table description triggers backing up all partitions as last modified time is updated for every partition
+* There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
