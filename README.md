@@ -18,14 +18,14 @@ However when tables are deleted there are [some limitations](https://cloud.googl
 Some of our apps dynamically create datasets and tables if they are missing. If some table/dataset is deleted (unintentionally), then empty table can be automatically recreated.
 In such scenario we're not able to restore data using BigQuery build-in features.
 
-Our motivation for building BBQ was to:
+#### Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
 * store multiple versions of our data for several months, not days,
 * easily restore multiple (i.e. thousands) tables at the same time.
 
 # Features
 
-Main BBQ features include:
+#### Main BBQ features include:
 * daily backup of single or partitioned tables:
   * only modified data is backed up using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table),
   * multiple backup versions are supported,
@@ -37,11 +37,11 @@ Main BBQ features include:
   * whole datasets,
   * selected tables/partitions/versions.
 
-BBQ doesn't support backing up:
+#### BBQ doesn't support backing up:
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)  
 
-Caveats:
+#### Caveats
 * Modifying partitioned table description triggers backing up all partitions as last modified time is updated for every partition
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
