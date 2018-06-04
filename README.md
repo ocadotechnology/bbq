@@ -49,3 +49,20 @@ In such scenario we're not able to restore data using BigQuery build-in features
 # High level architecture
 
 ![Architecture diagram](bbq-architecture-diagram.png)
+
+BBQ consists of:
+- multiple source projects - BBQ backups data from them,
+- BBQ project - main project where GAE runs and backups are stored,
+- Restoration project - destination project, where data is restored.
+
+BBQ have 3 distinct processes:
+- backups - create backup tables of source tables,
+- retention - prunes backups based on selected rules,
+- restore - copies selected backup data into restore project. 
+
+Here's how backup process works, step by step:
+- App Engine cron triggers a daily run,
+- BBQ crawls Big Query tables from all projects/datasets to which it has access,
+- It creates a "table check" task for each table and schedules it for execution in App Engine Task Queue,
+- "table check" task retrieves table metadata. In case of partitioned table, this tasks splits and reschedules into multiple "table check" tasks, one for every partition. After retrieving metadata, "table check" task checks backup state of table/partition in Datastore. If ```lastModifiedTime``` from Datastore is older than ```lastModifiedTime``` of source table, then "backup' task is scheduled,
+- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.  
