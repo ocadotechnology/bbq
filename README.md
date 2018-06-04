@@ -45,3 +45,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 #### Caveats
 * Modifying partitioned table description triggers backing up all partitions as last modified time is updated for every partition
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
+
+# High level architecture
+
+![Architecture diagram](bbq-architecture-diagram.png)
