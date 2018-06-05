@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h2>Restore table</h2>
+<script type="text/javascript">
+  function OnSubmitForm() {
+    var params = {
+      'target_dataset_id': document.restoreTableForm.targetDatasetId.value,
+      'restoration_date': document.restoreTableForm.restorationDate.value,
+      'partition_id': document.restoreTableForm.partitionId.value
+    };
+
+    var url = '/restore/table/' + document.restoreTableForm.projectId.value + '/'
+        + document.restoreTableForm.datasetId.value + '/' + document.restoreTableForm.tableId.value
+        + "?" + encodeQueryData(params);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", url, true);
+    xhttp.timeout = 1000 * 3600;
+
+    xhttp.onload = function () {
+      document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
+          undefined, 2);
+      makeUrlsClickable();
+    };
+    xhttp.ontimeout = function (e) {
+      document.getElementById("response").innerHTML = "Request timeout: " + e;
+    };
+    console.log(url);
+    xhttp.send();
+    return false;
+  }
+</script>
+
+<form name="restoreTableForm" onsubmit="return OnSubmitForm();">
+  Source project id <br><input type="text" name="projectId" value="" required><br>
+  Source dataset id <br><input type="text" name="datasetId" value="" required><br>
+  Source table id <br><input type="text" name="tableId" value="" required><br>
+  Source table partition id <br><input type="number" min="9999999" max="100000000"
+                                       name="partitionId" value=""><br>
+  Target dataset id <br><input type="text" name="targetDatasetId" value=""><br>
+  Restoration date <br><input type="date" name="restorationDate" value=""><br>
+  <br>
+  <input type="submit" value="Submit">
+</form>
+
+<br><strong>Response:</strong> <br>
+<pre id="response"></pre>
+
+{% endblock %}

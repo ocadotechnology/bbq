@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h2>Restore dataset</h2>
+<script type="text/javascript">
+  function OnSubmitForm() {
+    var params = {
+      'targetDatasetId': document.restoreDatasetForm.targetDatasetId.value,
+      'maxPartitionDays': document.restoreDatasetForm.max_partition_days.value
+    };
+
+    var url = '/restore/project/' + document.restoreDatasetForm.projectId.value + '/dataset/'
+        + document.restoreDatasetForm.datasetId.value + '?' + encodeQueryData(params);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", url, true);
+    xhttp.timeout = 1000 * 3600;
+
+    xhttp.onload = function () {
+      document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
+          undefined, 2);
+      makeUrlsClickable();
+    };
+    xhttp.ontimeout = function (e) {
+      document.getElementById("response").innerHTML = "Request timeout: " + e;
+    };
+
+    xhttp.send();
+    return false;
+  }
+</script>
+
+
+<form name="restoreDatasetForm" onsubmit="return OnSubmitForm();">
+  Source project id:<br> <input type="text" name="projectId" value="" required><br>
+  Source dataset id:<br> <input type="text" name="datasetId" value="" required><br>
+  Target dataset id:<br> <input type="text" name="targetDatasetId" value=""><br>
+  Max partition days:<br> <input type="number" min="1" name="max_partition_days" value=""><br>
+  <br>
+  <input type="submit" value="Submit">
+</form>
+
+<br><strong>Response:</strong> <br>
+<pre id="response"></pre>
+
+{% endblock %}

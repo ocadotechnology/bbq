@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h2>Restore custom backup list</h2>
+<script type="text/javascript">
+  function OnSubmitForm() {
+    var params = {
+      'targetDatasetId': document.restoreListForm.targetDatasetId.value
+    };
+
+    var url = '/restore/list?' + encodeQueryData(params);
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", url, true);
+    xhttp.timeout = 1000 * 3600;
+    xhttp.onload = function () {
+      document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
+          undefined, 2);
+      makeUrlsClickable();
+
+    };
+    xhttp.ontimeout = function (e) {
+      document.getElementById("response").innerHTML = "Request timeout: " + e;
+    };
+
+    xhttp.send(document.restoreListForm.requestBody.value);
+    return false;
+  }
+</script>
+
+
+<form name="restoreListForm" onsubmit="return OnSubmitForm();">
+  Target dataset id (optional):<br> <input type="text" name="targetDatasetId" value=""><br>
+  Backup list:<br><textarea name="requestBody" rows="50" cols="100" required></textarea>
+  <br>
+  <input type="submit" value="Submit">
+</form>
+
+<br><strong>Response:</strong> <br>
+<pre id="response"></pre>
+
+{% endblock %}
