@@ -76,3 +76,9 @@ There might be 0 to 36 hours delay between source table change and executing bac
 ## Retention process  
 
 ![Retention process](docs/images/bbq_retention_process.gif)
+
+- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.  
+
+# Setup
+<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
+<img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
