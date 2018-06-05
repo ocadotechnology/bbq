@@ -60,6 +60,10 @@ BBQ have 3 distinct processes:
 - retention - prunes backups based on selected rules,
 - restore - copies selected backup data into restore project. 
 
+## Backup process
+
+![Backup process](docs/images/bbq_backup_process.gif)
+
 Here's how backup process works, step by step:
 - App Engine cron triggers a daily run,
 - BBQ crawls Big Query tables from all projects/datasets to which it has access,
@@ -67,9 +71,7 @@ Here's how backup process works, step by step:
 - "table check" task retrieves table metadata. In case of partitioned table, this tasks splits and reschedules into multiple "table check" tasks, one for every partition. After retrieving metadata, "table check" task checks backup state of table/partition in Datastore. If ```lastModifiedTime``` from Datastore is older than ```lastModifiedTime``` of source table, then "backup' task is scheduled,
 - "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.
 
-## Backup process
-
-![Backup process](docs/images/bbq_backup_process.gif)
+There might be 0 to 36 hours delay between source table change and executing backup copy job.
 
 ## Retention process  
 
