@@ -4,3 +4,4 @@ GoogleAppEngineCloudStorageClient==1.9.22.1
 python-dateutil==2.6.0
 jsonpickle==0.9.5
 stringcase==1.2.0
+jinja2==2.10
