@@ -48,7 +48,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 
 # High level architecture
 
-![Architecture diagram](bbq-architecture-diagram.png)
+![Architecture diagram](docs/images/bbq-architecture-diagram.png)
 
 BBQ consists of:
 - multiple source projects - BBQ backups data from them,
@@ -65,4 +65,12 @@ Here's how backup process works, step by step:
 - BBQ crawls Big Query tables from all projects/datasets to which it has access,
 - It creates a "table check" task for each table and schedules it for execution in App Engine Task Queue,
 - "table check" task retrieves table metadata. In case of partitioned table, this tasks splits and reschedules into multiple "table check" tasks, one for every partition. After retrieving metadata, "table check" task checks backup state of table/partition in Datastore. If ```lastModifiedTime``` from Datastore is older than ```lastModifiedTime``` of source table, then "backup' task is scheduled,
-- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.  
+- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.
+
+## Backup process
+
+![Backup process](docs/images/bbq_backup_process.gif)
+
+## Retention process  
+
+![Retention process](docs/images/bbq_retention_process.gif)
