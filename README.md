@@ -18,14 +18,14 @@ However when tables are deleted there are [some limitations](https://cloud.googl
 It is common that data streaming solutions require destination resource to be always present. If such resource (dataset or table entity) is deleted, intentionally or not, then default would be to re-create the same, but empty entity.
 In such scenario we're not able to restore data using BigQuery build-in features.
 
-#### Our motivation for building BBQ was to:
+### Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
 * be able to restore to multiple versions of our data with history going back several months, not days,
 * restore data at scale (i.e. thousands of tables at the same time) which can be part of Disaster Recovery plan.
 
 # Features
 
-#### Main BBQ features include:
+### Main BBQ features include:
 * highly scalable daily backup of BigQuery tables (hundreds of thousands backups),
   * both single and partitioned tables are supported,
 * simple, access-based whitelisting strategy. BBQ will backup tables it has access to via service account,
@@ -34,13 +34,13 @@ In such scenario we're not able to restore data using BigQuery build-in features
   * whole datasets,
   * selected tables/partitions/versions.
 
-#### BBQ will not backup:
+### BBQ will not backup:
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)
 * data in table streaming buffer. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* ([Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert))
 
-#### Known caveats
+### Known caveats
 * Modification of table metadata, including table description triggers new backups being created. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
 
