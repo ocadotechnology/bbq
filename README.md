@@ -51,16 +51,14 @@ In such scenario we're not able to restore data using BigQuery build-in features
 BBQ consists of:
 - multiple source projects - BBQ backups data from them,
 - BBQ project - main project where GAE runs and backups are stored,
-- Restoration project - destination project, where data is restored.
+- Restoration project - into which data is restored.
 
-BBQ have 3 distinct processes:
+BBQ allows to perform 3 operations:
 - backups - create backup tables of source tables,
 - retention - prunes backups based on selected rules,
 - restore - copies selected backup data into restore project. 
 
-BBQ is using Datastore as the main database. We have 2 entities:
-* ```Table``` - containing metadata about source tables (i.e. project, dataset, table, last checked timestamp, etc.)
-* ```Backup``` - maps to ```Table``` and contains metadata about backup table.
+BBQ is using Datastore as the main database.
 
 ## Backup process
 
