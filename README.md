@@ -26,12 +26,9 @@ In such scenario we're not able to restore data using BigQuery build-in features
 # Features
 
 #### Main BBQ features include:
-* daily backup of single or partitioned tables:
-  * only modified data is backed up using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table),
-  * multiple backup versions are supported,
-  * every partition is treated as a separate table (i.e. BBQ copies only modified partitions),
-  * if source table has expiration time set, it's cleared from the backup,
-  * can manage hundreds of thousands backups.
+* highly scalable daily backup of BigQuery tables (hundreds of thousands backups),
+  * both single and partitioned tables are supported,
+* simple, access-based whitelisting strategy. BBQ will backup tables it has access to via service account,
 * retention - automatic deletion of old backups based on age and/or number of versions,
 * restore - BBQ can restore:
   * whole datasets,
@@ -40,7 +37,8 @@ In such scenario we're not able to restore data using BigQuery build-in features
 #### BBQ will not backup:
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
-* Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)  
+* Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)
+* data in table streaming buffer. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* [Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert)
 
 #### Known caveats
 * Modification of table metadata, including table description triggers new backups being created. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
@@ -64,21 +62,15 @@ BBQ have 3 distinct processes:
 
 ![Backup process](docs/images/bbq_backup_process.gif)
 
-Here's how backup process works, step by step:
-- App Engine cron triggers a daily run,
-- BBQ crawls Big Query tables from all projects/datasets to which it has access,
-- It creates a "table check" task for each table and schedules it for execution in App Engine Task Queue,
-- "table check" task retrieves table metadata. In case of partitioned table, this tasks splits and reschedules into multiple "table check" tasks, one for every partition. After retrieving metadata, "table check" task checks backup state of table/partition in Datastore. If ```lastModifiedTime``` from Datastore is older than ```lastModifiedTime``` of source table, then "backup' task is scheduled,
-- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.
-
-There might be 0 to 36 hours delay between source table change and executing backup copy job.
+BBQ initially creates backups for all source tables, to which it has access. If source table will be modified, BBQ will create a backup within 36 hours. 
+Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) in the same location as source data. BBQ can hold multiple versions of the same source table.
+Every partitioned table is treated as a separate table (i.e. BBQ copies only modified partitions). When source table has expiration time set, it's cleared from the backup (so that backup won't expire automatically).
 
 ## Retention process  
 
 ![Retention process](docs/images/bbq_retention_process.gif)
 
-- "backup" task inserts a copy job to copy table from source project to BBQ project. When this job successfully completes, backup table metadata are stored in Datastore.  
-
 # Setup
+
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
