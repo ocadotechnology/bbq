@@ -85,6 +85,3 @@ That's why there is a need to have GCP project with enabled BigQuery.
      pip install -r requirements_test.txt
   ```
 * Run command
-
-
-    
