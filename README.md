@@ -58,6 +58,10 @@ BBQ have 3 distinct processes:
 - retention - prunes backups based on selected rules,
 - restore - copies selected backup data into restore project. 
 
+BBQ is using Datastore as the main database. We have 2 entities:
+* ```Table``` - containing metadata about source tables (i.e. project, dataset, table, last checked timestamp, etc.)
+* ```Backup``` - maps to ```Table``` and contains metadata about backup table.
+
 ## Backup process
 
 ![Backup process](docs/images/bbq_backup_process.gif)
@@ -70,7 +74,15 @@ Every partitioned table is treated as a separate table (i.e. BBQ copies only mod
 
 ## Retention process  
 
-![Retention process](docs/images/bbq_retention_process.gif)
+Every day retention process scans all backups to find and delete backups matching specific criteria within given source table/partition:
+* if there are multiple backups per day, the most recent is retained. Multiple backups per day are created in rare cases (e.g. when task queue task is executed more than one time),
+* if there are more than 10 backups for given table/partition, the 10 most recent are retained,
+* if all backups are older than 7 months, then most recent is retained,
+* if there are backups younger than 7 months, then all others are deleted, 
+* if source table is deleted, then the last backup is deleted after 7 months.
+ 
+### Example of 10 versions retention
+![Retention process](docs/images/bbq_retention_process_10_versions.gif)
 
 # Setup
 
