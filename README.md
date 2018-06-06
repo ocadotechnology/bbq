@@ -3,11 +3,11 @@
 
 # Backup Big Query (BBQ)
 
-BBQ (read: barbecue) is a GAE python based app which creates daily backups of BigQuery modified tables.
+BBQ (read: barbecue) is a python app that runs on GAE and creates daily backups of BigQuery tables.
 
 # Motivation
 
-[Google BigQuery](https://cloud.google.com/bigquery/) is fast, highly scalable, cost-effective and a fully-managed enterprise data warehouse for analytics at any scale. BigQuery automatically replicates data and keeps a 7-day history of changes.
+[Google BigQuery](https://cloud.google.com/bigquery/) is fast, highly scalable, cost-effective and fully-managed enterprise data warehouse for analytics at any scale. BigQuery automatically replicates data and keeps a 7-day history of changes.
 
 Restoring data from existing table can be done using [snapshot decorators](https://cloud.google.com/bigquery/table-decorators#snapshot_decorators).
 However when tables are deleted there are [some limitations](https://cloud.google.com/bigquery/docs/managing-tables#undeletetable): 
@@ -15,13 +15,13 @@ However when tables are deleted there are [some limitations](https://cloud.googl
 > * You cannot reference a deleted table if a table bearing the same ID in the dataset was created after the deletion time.
 > * You cannot reference a deleted table if the encapsulating dataset was also deleted/recreated since the table deletion event.
 
-Some of our apps dynamically create datasets and tables if they are missing. If some table/dataset is deleted (unintentionally), then empty table can be automatically recreated.
+It is common that data streaming solutions require destination resource to be always present. If such resource (dataset or table entity) is deleted, intentionally or not, then default would be to re-create the same, but empty entity.
 In such scenario we're not able to restore data using BigQuery build-in features.
 
 #### Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
-* store multiple versions of our data for several months, not days,
-* easily restore multiple (i.e. thousands) tables at the same time.
+* be able to restore to multiple versions of our data with history going back several months, not days,
+* restore data at scale (i.e. thousands of tables at the same time) which can be part of Disaster Recovery plan.
 
 # Features
 
@@ -37,13 +37,13 @@ In such scenario we're not able to restore data using BigQuery build-in features
   * whole datasets,
   * selected tables/partitions/versions.
 
-#### BBQ doesn't support backing up:
+#### BBQ will not backup:
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)  
 
-#### Caveats
-* Modifying partitioned table description triggers backing up all partitions as last modified time is updated for every partition
+#### Known caveats
+* Modification of table metadata, including table description triggers new backups being created. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
 
 # High level architecture
