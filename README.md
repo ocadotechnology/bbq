@@ -38,7 +38,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)
-* data in table streaming buffer. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* [Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert)
+* data in table streaming buffer. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* ([Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert))
 
 #### Known caveats
 * Modification of table metadata, including table description triggers new backups being created. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
