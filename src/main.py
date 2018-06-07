@@ -45,4 +45,4 @@ app = webapp2.WSGIApplication([
   ('/ui/restoreDataset', RestoreDatasetUIHandler),
   ('/ui/restoreList', RestoreListUIHandler),
   ('/ui/restoreTable', RestoreTableUIHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)

@@ -1,7 +1,7 @@
 import webapp2
 
-from src.environment import Environment
 from src.backup.table_backup import TableBackup
+from src.configuration import configuration
 from src.table_reference import TableReference
 from src.tasks import Tasks
 
@@ -27,4 +27,4 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/tasks/backups/table/<project_id:[^/]+>/<dataset_id:'
                   '[^/]+>/<table_id:[^/]+>/<partition_id:[^/]+>',
                   TableBackupHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)
