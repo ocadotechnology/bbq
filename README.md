@@ -70,6 +70,12 @@ Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/mana
 BBQ can hold multiple versions of the same source table.
 Every partitioned table is treated as a separate table (i.e. BBQ copies only modified partitions). When source table has expiration time set, it's cleared from the backup (so that backup won't expire automatically).
 
+## Restore process
+
+Backups are restored in a separate GCP project. BBQ doesn't restore data in the source table for 2 reasons:
+* security - BBQ only reads other projects data. It shouldn't have write access to source data, because then single app/user would have write access both to source data and backups. Such situation only inreases the risk of losing all data,
+* consistency - BBQ doesn't know if restored data should append or replace source data. It's up to the user to finish restoration based on his specific needs.
+
 ## Retention process  
 
 Every day retention process scans all backups to find and delete backups matching specific criteria within given source table/partition:
