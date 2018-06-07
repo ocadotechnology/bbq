@@ -27,7 +27,7 @@ Then you could follow below steps:
   
   Note: If it is your first App Engine deploy, App Engine instance needs to be created and you will need to choose preferred localisation. 
 * Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*\<your-project-id\>@appspot.gserviceaccount.com*) to each project which should be backed up
-  * The easiest and fastest way is to grant permission at organization or folder level (but you can still control what should be backed up on project level)
+  * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects under.
 
 * Congratulations! BBQ is running now. The backup process will start on time defined in *cron.yaml* file. 
 To enforce start now, GET */<your-project-id/>.appspot.com/cron/backup*
