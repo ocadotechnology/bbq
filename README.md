@@ -20,7 +20,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 
 ### Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
-* be able to restore to multiple versions of our data with history going back several months, not days,
+* be able to restore to multiple versions of our data,
 * restore data at scale (i.e. thousands of tables at the same time) which can be part of Disaster Recovery plan.
 
 # Features
@@ -40,7 +40,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)
 
 ### Known caveats
-* Modification of table metadata, including table description triggers new backups being created. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
+* Modification of table metadata (including table description) qualifies table to be backed up at the next cycle. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support
 * Data in table streaming buffer will be backed up on the next run, once the buffer is flushed. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* ([Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert)). 
 
