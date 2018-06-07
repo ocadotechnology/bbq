@@ -90,3 +90,13 @@ To install BBQ in GCP, click button below or follow [Setup.md](./SETUP.md) doc.
 
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
+
+# Usage
+
+## How to run backups
+Backup process is scheduled periodically for all specified projects.
+ * Check [config.yaml](./config/config.yaml) to specify which projects to backup and [cron.yaml](cron.yaml) to configure schedule time.
+
+However, you may also invoke backup process manually in several ways:
+* Enforce cron start **GET** *\<**your-project-id**\>.appspot.com/cron/backup*
+* Execute task to backup specific dataset **POST** *\<**your-project-id**\>.appsport.com/tasks/backups/dataset?projectId=<**project-id**>&datasetId=<**dataset-id**>*
