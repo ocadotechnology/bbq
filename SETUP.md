@@ -3,29 +3,19 @@
     * see [creating a project and enabling the bigquery api](https://cloud.google.com/bigquery/docs/enable-transfer-service#creating_a_project_and_enabling_the_bigquery_api)
 
 ### Instalation steps
-The easiest way is to use Google Cloud Shell - click button. It opens GCShell and clones this repository.
- 
+
+The easiest way is to use Google Cloud Shell - click button below. It opens GCShell and clones the repository. 
+
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
 
+<br>
+  
   * Note: It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
 Then you could follow below steps:
-* Open [config.yaml](./config/prd/config.yaml) and paste properly filled template: 
-  ```
-  copy_jobs:
-    copy_job_result_check_countdown_in_sec: 60  # ONE MINUTE
-  
-  backup_settings:
-    backup_worker_max_countdown_in_sec: 25200  # SEVEN_HOURS_IN_SECONDS
-    custom_project_list: []
-    projects_to_skip: ['<your-project-name>']
-  
-  project_settings:
-    backup_project_id: '<your-project-name>'
-    restoration_project_id: '<your-project-name>'
-    authorized_requestor_service_accounts: [] 
-  ```
+* Open [config.yaml](./config/prd/config.yaml) and change all "**<your-project-name>**" to your previously created project id. 
+
 * Install dependency requirements
   ```bash
   pip install -t lib -r requirements.txt
@@ -75,8 +65,6 @@ That's why there is a need to have GCP project with enabled BigQuery.
 
 
 #### Running unit tests
-
-
 
 * Clone repository
 * Install dependency requirements
