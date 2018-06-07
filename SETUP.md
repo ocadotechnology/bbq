@@ -1,6 +1,6 @@
 ### Prerequisites
-  * Ownership of the GCP project with assigned billing and enabled BigQuery (backups will be stored in that project).
-    * see [creating a project and enabling the bigquery api](https://cloud.google.com/bigquery/docs/enable-transfer-service#creating_a_project_and_enabling_the_bigquery_api)
+  * Ownership of the GCP project with assigned billing (backups will be stored in that project).
+    * see [creating a project in GCP](https://support.google.com/cloud/answer/6251787?hl=en#) doc
 
 ### Instalation steps
 
