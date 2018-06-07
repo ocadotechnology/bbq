@@ -75,6 +75,6 @@ That's why there is a need to have GCP project with enabled BigQuery.
   ```
 * Run command
   ```bash
-  python /Users/mateusz.radko/IdeaProjects/bbq_os/test_runner.py --test-path tests/ -v --test-pattern "test*.py" <path to google cloud sdk> 
+  python test_runner.py --test-path tests/ -v --test-pattern "test*.py" <path to google cloud sdk> 
   ```
 
