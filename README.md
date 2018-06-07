@@ -87,5 +87,6 @@ Every day retention process scans all backups to find and delete backups matchin
 
 # Setup
 To install BBQ in GCP, click button below or follow [Setup.md](./SETUP.md) doc.
+
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
