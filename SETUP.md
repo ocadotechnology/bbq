@@ -21,10 +21,10 @@ Then you could follow below steps:
   pip install -t lib -r requirements.txt
   ```
 *  Deploy App Engine application
-  ```bash
-  cd ..
-  gcloud app deploy --project "<your-project-id>" bbq/app.yaml bbq/config/cron.yaml bbq/config/prd/queue.yaml bbq/config/index.yaml
-  ```
+   ```bash
+   cd ..
+   gcloud app deploy --project "<your-project-id>" bbq/app.yaml bbq/config/cron.yaml bbq/config/prd/queue.yaml bbq/config/index.yaml
+   ```
   
   Note: If it is your first App Engine deploy, App Engine instance needs to be created and you will need to choose preferred localisation. 
 * Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*<your-project-id>@appsport.gserviceaccount.com*) to each project which should be backed up
