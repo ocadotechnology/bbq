@@ -49,6 +49,8 @@ That's why there is a need to have GCP project with enabled BigQuery.
 
 #### Steps
 
+* Install Google Cloud SDK (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
+
 * Follow first steps from installation guide. Exception: edit *./config/**local**/config.yaml*
 
 * The BBQ will use your personal google account (see at [gcloud auth](https://cloud.google.com/sdk/gcloud/reference/auth/)), so grant yourself BigQuery Data Viewer IAM role in project that you will backup and Editor role on main backup project where backups will be stored.
@@ -68,7 +70,11 @@ That's why there is a need to have GCP project with enabled BigQuery.
 * Clone repository
 * Install dependency requirements
   ```bash
-     pip install -t lib -r requirements.txt
-     pip install -r requirements_test.txt
+  pip install -t lib -r requirements.txt
+  pip install -r requirements_test.txt
   ```
 * Run command
+  ```bash
+  python /Users/mateusz.radko/IdeaProjects/bbq_os/test_runner.py --test-path tests/ -v --test-pattern "test*.py" <path to google cloud sdk> 
+  ```
+
