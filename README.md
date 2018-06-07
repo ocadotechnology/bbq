@@ -83,6 +83,6 @@ Every day retention process scans all backups to find and delete backups matchin
 ![Retention process](docs/images/bbq_retention_process_10_versions.gif)
 
 
-#[Setup](./SETUP.md)
+# [Setup](./SETUP.md)
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
