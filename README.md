@@ -82,6 +82,9 @@ Every day retention process scans all backups to find and delete backups matchin
 ### Example of 10 versions retention
 ![Retention process](docs/images/bbq_retention_process_10_versions.gif)
 
+### Example of 7 months old backup deletion and source deletion grace period 
+
+![Retention process](docs/images/bbq_retention_process_7 months.gif)
 
 # [Setup](./SETUP.md)
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
