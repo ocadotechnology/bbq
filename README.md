@@ -3,7 +3,7 @@
 
 # Backup Big Query (BBQ)
 
-BBQ (read: barbecue) is a python app that runs on GAE and creates daily backups of BigQuery tables.
+BBQ (read: barbecue) is a python app that runs on Google App Engine (GAE) and creates daily backups of BigQuery tables.
 
 # Motivation
 
