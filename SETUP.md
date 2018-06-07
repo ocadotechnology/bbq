@@ -14,7 +14,7 @@ The easiest way is to use Google Cloud Shell - click button below. It opens GCSh
   * Note: It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
 Then you could follow below steps:
-* Open [config.yaml](./config/prd/config.yaml) and change all "**\<your-project-name\>**" to your previously created project id. 
+* Open [config.yaml](./config/prd/config.yaml) and change all **\<your-project-id\>** to your previously created project id. 
 
 * Install dependency requirements
   ```bash

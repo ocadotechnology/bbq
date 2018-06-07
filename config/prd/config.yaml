@@ -4,8 +4,8 @@ copy_jobs:
 backup_settings:
   backup_worker_max_countdown_in_sec: 25200  # SEVEN_HOURS_IN_SECONDS
   custom_project_list: []
-  projects_to_skip: ['<your-project-name>']
+  projects_to_skip: ['<your-project-id>']
 
 project_settings:
-  backup_project_id: '<your-project-name>'
-  restoration_project_id: '<your-project-name>'
+  backup_project_id: '<your-project-id>'
+  restoration_project_id: '<your-project-id>'
