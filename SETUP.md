@@ -22,8 +22,7 @@ Then you could follow below steps:
   ```
 *  Deploy App Engine application
    ```bash
-   cd ..
-   gcloud app deploy --project "<your-project-id>" bbq/app.yaml bbq/config/cron.yaml bbq/config/prd/queue.yaml bbq/config/index.yaml
+   gcloud app deploy --project "<your-project-id>" app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
    ```
   
   Note: If it is your first App Engine deploy, App Engine instance needs to be created and you will need to choose preferred localisation. 
