@@ -1,8 +1,8 @@
 import webapp2
 
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.configuration import configuration
 from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService
 
@@ -36,4 +36,4 @@ app = webapp2.WSGIApplication([
         '/schedule/restore/jobs/<restoration_job_id:.*>',
         RestorationJobStatusAuthenticatedHandler
     )
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)

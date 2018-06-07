@@ -1,17 +1,18 @@
 import json
 import logging
+
 import webapp2
 
 from commons.decorators.retry import retry
 from commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.big_query.big_query import BigQuery
 from src.big_query.big_query_table import BigQueryTable
+from src.configuration import configuration
 from src.error_reporting import ErrorReporting
 from src.table_reference import TableReference
 
@@ -124,4 +125,4 @@ class AfterBackupActionHandler(JsonHandler):
 app = webapp2.WSGIApplication([webapp2.Route(
     '/callback/backup-created/<project_id>/<dataset_id>/<table_id>',
     AfterBackupActionHandler
-)], debug=Environment.is_debug_mode_allowed())
+)], debug=configuration.debug_mode)

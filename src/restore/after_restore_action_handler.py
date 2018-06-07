@@ -1,6 +1,4 @@
 import json
-import logging
-from datetime import datetime
 
 import webapp2
 from google.appengine.ext import ndb
@@ -8,8 +6,8 @@ from google.appengine.ext import ndb
 from commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
+from src.configuration import configuration
 from src.restore.datastore.restore_item import RestoreItem
 
 
@@ -55,4 +53,4 @@ class AfterRestoreActionHandler(JsonHandler):
 app = webapp2.WSGIApplication([webapp2.Route(
     '/callback/restore-finished/',
     AfterRestoreActionHandler
-)], debug=Environment.is_debug_mode_allowed())
+)], debug=configuration.debug_mode)
