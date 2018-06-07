@@ -3,10 +3,10 @@
     * see [creating a project and enabling the bigquery api](https://cloud.google.com/bigquery/docs/enable-transfer-service#creating_a_project_and_enabling_the_bigquery_api)
 
 ### Instalation steps
+The easiest way is to use Google Cloud Shell - click button. It opens GCShell and clones this repository.
+ 
 <a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
 <img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
-
-The easiest way is to use Google Cloud Shell - click button.It opens GCShell and clones this repository. 
 
   * Note: It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
