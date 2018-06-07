@@ -2,9 +2,9 @@ import logging
 
 import webapp2
 
-from src.environment import Environment
-from src.tasks import Tasks
 from src.big_query.big_query import BigQuery
+from src.configuration import configuration
+from src.tasks import Tasks
 
 
 class DatasetBackupHandler(webapp2.RequestHandler):
@@ -41,4 +41,4 @@ class DatasetBackupHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/tasks/backups/dataset', DatasetBackupHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)

@@ -1,11 +1,12 @@
-import webapp2
 from datetime import datetime
+
+import webapp2
 
 from commons.exceptions import ParameterValidationException
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
+from src.configuration import configuration
 from src.restore.big_query_table_restorer import DatasetNotFoundException, \
     RestoreTableException
 from src.restore.restore_service import RestoreService, \
@@ -102,4 +103,4 @@ app = webapp2.WSGIApplication([
         '/restore/schedule/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>',
         TableRestoreAuthenticatedHandler,
     )
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)

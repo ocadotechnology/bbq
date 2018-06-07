@@ -3,8 +3,8 @@ import logging
 import jsonpickle
 import webapp2
 
-from src.environment import Environment
 from src.backup.copy_job_async.result_check.result_check import ResultCheck
+from src.configuration import configuration
 
 
 class ResultCheckHandler(webapp2.RequestHandler):
@@ -26,4 +26,4 @@ class ResultCheckHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([webapp2.Route(
     '/tasks/copy_job_async/result_check',
     ResultCheckHandler
-)], debug=Environment.is_debug_mode_allowed())
+)], debug=configuration.debug_mode)
