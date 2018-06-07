@@ -4,12 +4,12 @@ copy_jobs:
 backup_settings:
   backup_worker_max_countdown_in_sec: 0
   custom_project_list: []
-  projects_to_skip: ['<your-project-name>']
+  projects_to_skip: ['<your-project-id>']
 
 project_settings:
-  backup_project_id: '<your-project-name>'
-  restoration_project_id: '<your-project-name>'
-  authorized_requestor_service_accounts: ['sa-eligible-to-read-data@your-project-name.iam.gserviceaccount.com']
+  backup_project_id: '<your-project-id>'
+  restoration_project_id: '<your-project-id>'
+  authorized_requestor_service_accounts: ['sa-eligible-to-read-data@your-project-id.iam.gserviceaccount.com']
 
 tests:
   restoration_daily_test_results_gcs_bucket: 'a-gcs-bucket'
