@@ -8,10 +8,10 @@ import webapp2
 from commons.exceptions import ParameterValidationException, \
     JsonNotParseableException
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
 from src.big_query.validators import WrongDatasetNameException
+from src.configuration import configuration
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \
     BackupListRestoreService, BackupItem, BackupListRestoreRequest
@@ -120,4 +120,4 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/schedule/restore/list',
                   BackupListRestoreAuthenticatedHandler),
 
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)
