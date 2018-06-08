@@ -14,22 +14,22 @@ The easiest way is to use Google Cloud Shell - click button below. It opens GCSh
   * Note: It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
 Then you could follow below steps:
-* Open [config.yaml](./config/prd/config.yaml) and change all **\<your-project-id\>** to your previously created project id. 
+1. Open [config.yaml](./config/prd/config.yaml) and change all **\<your-project-id\>** to your previously created project id. 
 
-* Install dependency requirements
-  ```bash
-  pip install -t lib -r requirements.txt
-  ```
-*  Deploy App Engine application
-   ```bash
-   gcloud app deploy --project "<your-project-id>" app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
-   ```
+1. Install dependency requirements
+      ```bash
+      pip install -t lib -r requirements.txt
+      ```
+1.  Deploy App Engine application
+       ```bash
+       gcloud app deploy --project "<your-project-id>" app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
+       ```
   
-  Note: If it is your first App Engine deploy, App Engine instance needs to be created and you will need to choose preferred localisation. 
-* Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*\<your-project-id\>@appspot.gserviceaccount.com*) to each project which should be backed up
-  * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
+    Note: If it is your first App Engine deploy, App Engine instance needs to be created and you will need to choose preferred localisation. 
+1. Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*\<your-project-id\>@appspot.gserviceaccount.com*) to each project which should be backed up
+      * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
 
-* Congratulations! BBQ is running now. The backup process will start on time defined in *cron.yaml* file. 
+1. Congratulations! BBQ is running now. The backup process will start on time defined in *cron.yaml* file. 
 To enforce start now, GET *\<your-project-id\>.appspot.com/cron/backup*
 
 ### Advanced setup
