@@ -82,7 +82,7 @@ All backups that was invoked on local application will end up in this project.
 1. Install dependency requirements
       ```bash
       pip install -t lib -r requirements.txt
-      pip install -r requirements_test.txt
+      pip install -r requirements_tests.txt
       ```
 1. Run command
       ```bash
