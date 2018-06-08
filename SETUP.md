@@ -34,10 +34,10 @@ To enforce start now, GET *\<your-project-id\>.appspot.com/cron/backup*
 
 ### Advanced setup
   * It is possible to manage what projects will be backed up using project IAMs and also using config.yaml file.
-      * **custom_project_list** - list of projects to backup (or empty to include all), but still **BigQuery Data Viewer** role for AE service account needs to be given for each of mentioned project
-      * **projects_to_skip** - list of projects to skip always (it's recommended to skip BBQ project itself)
-      * **backup_project_id** - project id where backups will be stored (it's recommended to be BBQ project itself)
-      * **restoration_project_id** - project id where data after restoration will be stored
+      * **custom_project_list** - list of projects to backup. If empty, BBQ will backup everything it has read (**BigQuery Data Viewer**) access to. If list is provided you still need to grant **BigQuery Data Viewer** role for BBQ service account for each mentioned projects.
+      * **projects_to_skip** - list of projects to skip (it's recommended to skip BBQ project itself). It is useful when you grant **BigQuery Data Viewer** for BBQ service account for the whole organization or folder and want to exclude some of the projects.
+      * **backup_project_id** - project id where backups will be stored (it can also be the same project on which BBQ runs)
+      * **restoration_project_id** - project into which data will be restored by default (you can also define restoration destination directly while executing restoration)
       
 
 
