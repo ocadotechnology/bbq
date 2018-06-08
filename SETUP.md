@@ -44,8 +44,9 @@ To enforce start now, GET *\<your-project-id\>.appspot.com/cron/backup*
 ### Local environment setup
 
 Note: App Engine SDK has useful feature which allows to run App Engine application on your local computer. 
-Unfortunately, in BBQ application apart of AppEngine, BigQuery is used, which cannot be emulated on local. 
-That's why there is a need to have GCP project with enabled BigQuery.
+Unfortunatelly, it does not provide any emulator for BigQuery so it is not possible to have BigQuery locally. 
+Therefore, in order to have application working locally we need to have GCP project with BigQuery enabled.
+All backups that was invoked on local application will end up in this project.
 
 #### Steps
 
