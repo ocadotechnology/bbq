@@ -100,9 +100,10 @@ To install BBQ in GCP, click button below or follow [Setup.md](./SETUP.md) doc.
 # Usage
 
 ## How to run backups
-Backup process is scheduled periodically for all specified projects.
- * Check [config.yaml](./config/config.yaml) to specify which projects to backup and [cron.yaml](cron.yaml) to configure schedule time.
+Backup process is scheduled periodically for all specified projects (check [config.yaml](./config/prd/config.yaml) to specify which projects to backup and [cron.yaml](./config/prd/cron.yaml) to configure schedule time).
 
-However, you may also invoke backup process manually in several ways:
-* Enforce cron start **GET** *\<**your-project-id**\>.appspot.com/cron/backup*
-* Execute task to backup specific dataset **POST** *\<**your-project-id**\>.appsport.com/tasks/backups/dataset?projectId=<**project-id**>&datasetId=<**dataset-id**>*
+However, you may also invoke backup process manually from [Cloud Console](https://console.cloud.google.com/appengine/cronjobs).
+
+It's worth to underline that:
+* Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/prd/config.yaml),
+* It is possible to check the progress via [task queues](https://console.cloud.google.com/appengine/taskqueues).
