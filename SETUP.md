@@ -52,6 +52,11 @@ All backups that was invoked on local application will end up in this project.
 
 1. Install Google Cloud SDK (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
+1. Clone repository to the localisation of your choice.
+      ```bash
+      git clone git@github.com:ocadotechnology/bbq.git
+      ```
+
 1. Open [./config/local/config.yaml](./config/local/config.yaml) and change all **\<your-project-id\>** to your previously created project id. 
 
 1. Install dependency requirements
