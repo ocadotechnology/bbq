@@ -74,7 +74,7 @@ All backups that was invoked on local application will end up in this project.
       ```
   
 1. Local instance of App Engine application (with own queues, datastore) should be running at: http://localhost:8080  You can also view admin server at: http://localhost:8000
-
+1. To run backup process go to: http://localhost:8080/cron/backup
 
 #### Running unit tests
 
