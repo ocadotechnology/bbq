@@ -68,7 +68,7 @@ BBQ initially creates backups for all source tables, to which it has access. Whe
 Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) in the same location as source data. 
 
 BBQ can hold multiple versions of the same source table.
-Every partition in partitioned table is treated as separate table (i.e. BBQ copies only modified partitions). When source table has expiration time set, it's cleared from the backup (so that backup won't expire automatically).
+Every partition in partitioned table is treated as separate table (i.e. BBQ copies only modified partitions). If source table has expiration time set, it's removed from backup table (so that backup never expires).
 
 ## Restore process
 
