@@ -116,7 +116,7 @@ To install BBQ in GCP, click button below or follow [Setup.md](./SETUP.md) doc.
 
 # Usage
 
-## How to run backups
+## How to run backups?
 Backup process is scheduled periodically for all specified projects (check [config/prd/config.yaml](./config/prd/config.yaml) to specify which projects to backup and [config/cron.yaml](./config/cron.yaml) to configure schedule time).
 
 However, you may also invoke backup process manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
@@ -125,7 +125,7 @@ It's worth to underline that:
 * Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/prd/config.yaml),
 * It is possible to check the progress via [task queues](https://console.cloud.google.com/appengine/taskqueues).
 
-## Review results
+## How to list already created backups?
 In order to find where is stored backup __Y__ for table __X__:
 1. In BBQ project visit [datastore](https://console.cloud.google.com/datastore),
 2. Check __Key literal__ for table _X_:
