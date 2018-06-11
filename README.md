@@ -64,11 +64,11 @@ BBQ is using Datastore as the main database.
 
 ![Backup process](docs/images/bbq_backup_process.gif)
 
-BBQ initially creates backups for all source tables, to which it has access. If source table will be modified, BBQ will create a backup within 36 hours. 
+BBQ initially creates backups for all source tables, to which it has access. When source table is modified, BBQ will create a backup within 36 hours. 
 Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) in the same location as source data. 
 
 BBQ can hold multiple versions of the same source table.
-Every partitioned table is treated as a separate table (i.e. BBQ copies only modified partitions). When source table has expiration time set, it's cleared from the backup (so that backup won't expire automatically).
+Every partition in partitioned table is treated as separate table (i.e. BBQ copies only modified partitions). When source table has expiration time set, it's cleared from the backup (so that backup won't expire automatically).
 
 ## Restore process
 
