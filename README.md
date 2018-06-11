@@ -123,20 +123,20 @@ However, you may also invoke backup process manually from [cron jobs](https://co
 
 It's worth to underline that:
 * Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/prd/config.yaml),
-* It is possible to check the progress via [task queues](https://console.cloud.google.com/appengine/taskqueues).
+* It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
 ## How to list already created backups?
 In order to find where is stored backup __Y__ for table __X__:
-1. In BBQ project visit [datastore](https://console.cloud.google.com/datastore),
-2. Check __Key literal__ for table _X_:
+1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
+1. Check __Key literal__ for table _X_:
     * Select __Table__ kind,
     * Filter entities equal to _X.project_id_, _X.dataset_id_, _X.table_id_ or _X.partition_id_,
     * Find table _X_ from results and copy _Key literal_,
-3. Query backup _Y_:
+1. Query backup _Y_:
     * Select __Backup__ kind,
     * Filter entities by _Key_ that __has ancestor__ _X.Key literal_.
 
 To check the content for given backup __Y__ in Big Query:  
-1. Open [bigquery](https://console.cloud.google.com/bigquery),
-2. Filter tables by _Y.dataset_id_ or _Y.table_id_ in search bar,
-3. Select table and check _Schema_, _Details_ or _Preview_ tab.
+1. Open [Big Query](https://console.cloud.google.com/bigquery),
+1. Filter tables by _Y.dataset_id_ or _Y.table_id_ in search bar,
+1. Select table and check _Schema_, _Details_ or _Preview_ tab.
