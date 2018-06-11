@@ -5,6 +5,17 @@
 
 BBQ (read: barbecue) is a python app that runs on Google App Engine (GAE) and creates daily backups of BigQuery tables.
 
+# Table of contents
+
+* [Motivation](#motivation)
+* [Features](#features)
+* [High level architecture](#high-level-architecture)
+  * [Backup process](#backup-process)
+  * [Restore process](#restore-process)
+  * [Retention process](#retention-process)
+* [Setup](#setup)
+* [Usage](#usage)
+
 # Motivation
 
 [Google BigQuery](https://cloud.google.com/bigquery/) is fast, highly scalable, cost-effective and fully-managed enterprise data warehouse for analytics at any scale. BigQuery automatically replicates data and keeps a 7-day history of changes.
