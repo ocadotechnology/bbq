@@ -58,7 +58,7 @@ BBQ allows to perform 3 operations:
 - restore - copies selected backup data into restore project. 
 - retention - prunes backups based on selected rules,
 
-BBQ is using Datastore as the main database.
+BBQ is using Datastore as the main database to store all metadata about backups.
 
 ## Backup process
 
