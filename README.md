@@ -49,9 +49,9 @@ In such scenario we're not able to restore data using BigQuery build-in features
 ![Architecture diagram](docs/images/bbq-architecture-diagram.png)
 
 BBQ consists of:
-- multiple source projects - BBQ backups data from them,
+- multiple source projects - data of those projects will be backed up,
 - BBQ project - main project where GAE runs and backups are stored,
-- Restoration project - into which data is restored.
+- restoration project - into which data is restored.
 
 BBQ allows to perform 3 operations:
 - backups - create backup tables of source tables,
@@ -65,10 +65,10 @@ BBQ is using Datastore as the main database.
 ![Backup process](docs/images/bbq_backup_process.gif)
 
 BBQ initially creates backups for all source tables, to which it has access. When source table is modified, BBQ will create a backup within 36 hours. 
-Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) in the same location as source data. 
+Backups are created using [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) in the same [location/region](https://cloud.google.com/bigquery/docs/dataset-locations) as source data.
 
 BBQ can hold multiple versions of the same source table.
-Every partition in partitioned table is treated as separate table (i.e. BBQ copies only modified partitions). If source table has expiration time set, it's removed from backup table (so that backup never expires).
+Every partition in partitioned table is treated as separate table (i.e. BBQ copies only modified partitions). If source table has expiration time set, the backup table will not preserve this property (so that backup never expires).
 
 ## Restore process
 
