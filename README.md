@@ -87,6 +87,9 @@ There are few ways in which you may restore data:
 
 Restored data will automatically expire in 7 days (target dataset is created with table default expiration).
 
+### Example of restoring selected partitions from partitioned table 
+![Restore process](docs/images/bbq_restore_process.gif)
+
 #### Copy job limit
 
 There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit during the restoration. This limit can be increased by Google Support.
