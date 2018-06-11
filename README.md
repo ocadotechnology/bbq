@@ -73,8 +73,20 @@ Every partition in partitioned table is treated as separate table (i.e. BBQ copi
 ## Restore process
 
 Backups are restored in a separate GCP project. BBQ doesn't restore data in the source table for 2 reasons:
-* security - BBQ only reads other projects data. It shouldn't have write access to source data, because then single app/user would have write access both to source data and backups. Such situation only inreases the risk of losing all data,
+* security - BBQ only reads other projects data. It shouldn't have write access to source data, because then single app/user would have write access both to source data and backups. Such situation only increases the risk of losing all data,
 * consistency - BBQ doesn't know if restored data should append or replace source data. It's up to the user to finish restoration based on his specific needs.
+
+There are few ways in which you may restore data:
+* restoring whole dataset by specifying project and dataset name. All latest versions of tables in this dataset will be restored in restoration project,
+* restoring list of backups by specifying which source tables and which versions should be restored.
+
+Restored data will automatically expire in 7 days (target dataset is created with table default expiration).
+
+#### Copy job limit
+
+There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit during the restoration. This limit can be increased by Google Support.
+
+Please remember that partitions from partitioned tables are stored as single tables. So if you want to restore dataset, where there was 10 tables with 500 partitions, this results in creating 5000 copy jobs, which is half of total daily quota.
 
 ## Retention process  
 
