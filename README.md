@@ -119,3 +119,14 @@ However, you may also invoke backup process manually from [Cloud Console](https:
 It's worth to underline that:
 * Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/prd/config.yaml),
 * It is possible to check the progress via [task queues](https://console.cloud.google.com/appengine/taskqueues).
+
+## Review results
+In order to see if backup was created and where it landed for table _X_:
+1. In BBQ project visit [datastore](https://console.cloud.google.com/datastore),
+2. Check __Key literal__ for table X:
+    * Select __Table__ kind,
+    * Filter entities equal to _X.project_id_, _X.dataset_id_, _X.table_id_ or _X.partition_id_,
+    * Find table _X_ from results and copy _Key literal_,
+3. Query backups:
+    * Select __Backup__ kind,
+    * Filter entities by _Key_ that __has ancestor__ _X.Key literal_.
