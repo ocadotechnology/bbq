@@ -30,7 +30,7 @@ Then you could follow below steps:
       * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
 
 1. Congratulations! BBQ is running now. The backup process will start on time defined in *cron.yaml* file. 
-To enforce start now, GET *\<your-project-id\>.appspot.com/cron/backup*
+For more details look at *Usage* section in README.md.
 
 ### Advanced setup
   It is possible to manage what projects will be backed up using project IAMs and also using config.yaml file.
