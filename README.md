@@ -88,8 +88,8 @@ Every partition in partitioned table is treated as separate table (i.e. BBQ copi
 
 ## Restore process
 
-Backups are restored in a separate GCP project. BBQ doesn't restore data in the source table for 2 reasons:
-* security - BBQ only reads other projects data. It shouldn't have write access to source data, because then single app/user would have write access both to source data and backups. Such situation only increases the risk of losing all data,
+Backups are restored in a separate GCP project. BBQ doesn't restore data into original source project for 2 reasons:
+* security - BBQ should have read-only access to production data to minimise risk of loosing both production and backup data,
 * consistency - BBQ doesn't know if restored data should append or replace source data. It's up to the user to finish restoration based on his specific needs.
 
 There are few ways in which you may restore data:
