@@ -30,7 +30,15 @@
 
 <form name="restoreListForm" onsubmit="return OnSubmitForm();">
   Target dataset id (optional):<br> <input type="text" name="targetDatasetId" value=""><br>
-  Backup list:<br><textarea name="requestBody" rows="50" cols="100" required></textarea>
+  Backup list<span style="color: red;">*</span>:<br><textarea name="requestBody" placeholder='
+  [
+    {
+      "backupBqKey": "IlRhYmxlIiwgNjE2ODg5NDI1OTU5MzIxNiwgIkJ="
+    },
+    {
+    "backupUrlSafeKey": "ahFlfmRldi1wcm9qZWN0LPPicXIlCxIFVGFibGUYgICAkOaLgAgMCxIGQmFja3VwGICAgICAgJJJJA"
+    }
+  ]' rows="50" cols="100" required></textarea>
   <br>
   <input type="submit" value="Submit">
 </form>

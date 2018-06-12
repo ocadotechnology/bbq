@@ -33,13 +33,13 @@
 </script>
 
 <form name="restoreTableForm" onsubmit="return OnSubmitForm();">
-  Source project id <br><input type="text" name="projectId" value="" required><br>
-  Source dataset id <br><input type="text" name="datasetId" value="" required><br>
-  Source table id <br><input type="text" name="tableId" value="" required><br>
-  Source table partition id <br><input type="number" min="9999999" max="100000000"
+  Source project id<span style="color: red;">*</span>:<br><input type="text" name="projectId" value="" required><br>
+  Source dataset id<span style="color: red;">*</span>:<br><input type="text" name="datasetId" value="" required><br>
+  Source table id<span style="color: red;">*</span>:<br><input type="text" name="tableId" value="" required><br>
+  Source table partition id:<br><input type="number" min="9999999" max="100000000"
                                        name="partitionId" value=""><br>
-  Target dataset id <br><input type="text" name="targetDatasetId" value=""><br>
-  Restoration date <br><input type="date" name="restorationDate" value=""><br>
+  Target dataset id:<br><input type="text" name="targetDatasetId" value=""><br>
+  Restoration date:<br><input type="date" name="restorationDate" value=""><br>
   <br>
   <input type="submit" value="Submit">
 </form>
