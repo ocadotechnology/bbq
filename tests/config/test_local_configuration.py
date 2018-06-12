@@ -36,4 +36,3 @@ class TestDevConfiguration(unittest.TestCase):
 
     def test_should_be_able_to_read__restoration_daily_test_random_table_view(self):
         self.assertEqual(self.dev_configuration.restoration_daily_test_random_table_view, 'project:dataset.table')
-
