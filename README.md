@@ -156,7 +156,7 @@ To check the content for given backup __Y__ in Big Query:
 1. Select table and check _Schema_, _Details_ or _Preview_ tab.
 
 ## How to restore data from backups?
-There are several options to restore data, available from _<your-project-id>_.__appspot.com__ (dropdown tab _Actions_)
-* __Restore table__ (_<your-project-id>.appspot.com_/__ui/restoreTable__)
-* __Restore dataset__ (_<your-project-id>.appspot.com_/__ui/restoreDataset__)
-* __Restore tables from list of backups__ (_<your-project-id>.appspot.com_/__ui/restoreList__)
+There are several options to restore data, available from _\<your-project-id>_.__appspot.com__ (dropdown tab _Actions_)
+* __Restore table__ (_\<your-project-id>.appspot.com_/__ui/restoreTable__)
+* __Restore dataset__ (_\<your-project-id>.appspot.com_/__ui/restoreDataset__)
+* __Restore tables from list of backups__ (_\<your-project-id>.appspot.com_/__ui/restoreList__)
