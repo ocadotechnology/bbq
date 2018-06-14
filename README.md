@@ -174,3 +174,12 @@ There are several options to restore data, available from _\<your-project-id>_._
   }
 ]
 ```
+#### Checking status of restoration process
+ Restore process is asynchronous. To check status of process, follow links returned in response:
+  
+ * **restorationWarningsOnlyStatusEndpoint** - it shows general progress only and only failed copy jobs (if any)
+ 
+ * **restorationStatusEndpoint** - it shows all informations about progress and each copy job.
+ 
+ We advise to use *restorationWarningsOnlyStatusEndpoint* for bigger datasets as the response time is quicker and response size smaller. 
+
