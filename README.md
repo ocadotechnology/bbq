@@ -182,4 +182,3 @@ There are several options to restore data, available from _\<your-project-id>_._
  * **restorationStatusEndpoint** - it shows all informations about progress and each copy job.
  
  We advise to use *restorationWarningsOnlyStatusEndpoint* for bigger datasets as the response time is quicker and response size smaller. 
-
