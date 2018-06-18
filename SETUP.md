@@ -29,16 +29,15 @@ Then you could follow below steps:
       pip install -t lib -r requirements.txt
       ```
 1.  Deploy App Engine application
-       ```bash
-       gcloud app deploy --project ${PROJECT_ID} app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
-       ```
+      ```bash
+      gcloud app deploy --project ${PROJECT_ID} app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
+      ```
   
     Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations).
 1. Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*\<your-project-id\>@appspot.gserviceaccount.com*) to each project which should be backed up, e.g.:
-
-       ```bash
-       gcloud projects add-iam-policy-binding <project-id-to-be-backed-up> --member='serviceAccount:'${PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer'
-       ```
+      ```bash
+      gcloud projects add-iam-policy-binding <project-id-to-be-backed-up> --member='serviceAccount:'${PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer'
+      ```
       * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
 
 1. Congratulations! BBQ is running now. The backup process will start on time defined in [cron.yaml](./config/cron.yaml) file.
