@@ -177,3 +177,4 @@ class TestEnvironment(unittest.TestCase):
         # then
         expected_result = "https://{}.appspot.com".format(project_id)
         self.assertEqual(result, expected_result)
+
