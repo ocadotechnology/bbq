@@ -141,7 +141,7 @@ It's worth to underline that:
 ## How to list already created backups?
 In order to find where is stored backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
-1. Check __Key literal__ for table _X_:
+1. Find __Key literal__ for table _X_:
     * Select __Table__ kind,
     * Filter entities equal to _X.project_id_, _X.dataset_id_, _X.table_id_ or _X.partition_id_,
     * Find table _X_ from results and copy _Key literal_,
