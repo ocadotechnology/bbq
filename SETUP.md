@@ -19,9 +19,9 @@ Then you could follow below steps:
       export PROJECT_ID="<your-project-id>"
       ```
 
-1. Change all **\<your-project-id\>** to your previously created project in [./config/prd/config.yaml](./config/prd/config.yaml) config file.
+1. Change all **\<your-project-id\>** to your previously created project in [config.yaml](./config/config.yaml) config file.
       ```bash
-      sed -i -e "s/<your-project-id>/${PROJECT_ID}/g" config/prd/config.yaml
+      sed -i -e "s/<your-project-id>/${PROJECT_ID}/g" config/config.yaml
       ```
 
 1. Install dependency requirements
@@ -30,7 +30,7 @@ Then you could follow below steps:
       ```
 1.  Deploy App Engine application
       ```bash
-      gcloud app deploy --project ${PROJECT_ID} app.yaml config/cron.yaml config/prd/queue.yaml config/index.yaml
+      gcloud app deploy --project ${PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
       ```
   
     Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations).
@@ -86,7 +86,7 @@ All backups that was invoked on local application will end up in this project.
       export PROJECT_ID="<your-project-id>"
       ```
 
-1. Change all **\<your-project-id\>** to your previously created project id in [./config/local/config.yaml](./config/local/config.yaml).
+1. Change all **\<your-project-id\>** to your previously created project id in [config.yaml](./config/config.yaml).
       ```bash
       sed -i -e "s/<your-project-id>/${PROJECT_ID}/g" config/local/config.yaml
       ```
@@ -98,7 +98,7 @@ All backups that was invoked on local application will end up in this project.
 
 1. Link config files to main application folder (due to lack of possibility to pass full path to dev_appserver.py)
       ```bash
-      ln -s config/local/queue.yaml queue.yaml
+      ln -s config/queue.yaml queue.yaml
       ln -s config/cron.yaml cron.yaml
       ln -s config/index.yaml index.yaml
       ```
