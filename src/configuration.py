@@ -1,7 +1,6 @@
 import logging
-import yaml
 
-from environment import Environment
+import yaml
 
 
 class Configuration(object):
@@ -18,6 +17,10 @@ class Configuration(object):
                 logging.error(
                     'Unable to read \'%s\' config file configuration: %s',
                     config_file, exc)
+
+    @property
+    def debug_mode(self):
+        return self.__project_config['project_settings'].get('debug_mode')
 
     @property
     def copy_job_result_check_countdown_in_sec(self):
@@ -56,12 +59,6 @@ class Configuration(object):
         return self.__project_config['tests'].get('random_table_view')
 
 
-if Environment.is_local():
-    config_file_yaml = "config/local/config.yaml"
-elif Environment.is_dev():
-    config_file_yaml = "config/dev/config.yaml"
-else:
-    config_file_yaml = "config/prd/config.yaml"
-
+config_file_yaml = "config/config.yaml"
 logging.info("Loading configuration from file: '%s'", config_file_yaml)
 configuration = Configuration(config_file_yaml)

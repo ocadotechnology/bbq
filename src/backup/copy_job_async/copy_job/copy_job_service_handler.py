@@ -3,8 +3,8 @@ import logging
 import jsonpickle
 import webapp2
 
-from src.environment import Environment
 from src.backup.copy_job_async.copy_job.copy_job_service import CopyJobService
+from src.configuration import configuration
 
 
 class CopyJobServiceHandler(webapp2.RequestHandler):
@@ -22,4 +22,4 @@ class CopyJobServiceHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/tasks/copy_job_async/copy_job', CopyJobServiceHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)
