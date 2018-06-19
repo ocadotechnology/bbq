@@ -10,7 +10,7 @@ project_settings:
   backup_project_id: '<your-project-id>'
   restoration_project_id: '<your-project-id>'
   authorized_requestor_service_accounts: ['sa-eligible-to-read-data@your-project-id.iam.gserviceaccount.com']
-  debug_mode: True
+  debug_mode: False
 
 tests:
   restoration_daily_test_results_gcs_bucket: 'a-gcs-bucket'
