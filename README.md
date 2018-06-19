@@ -141,7 +141,7 @@ It's worth to underline that:
 ## How to list already created backups?
 In order to find where is stored backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
-1. Check __Key literal__ for table _X_:
+1. Find __Key literal__ for table _X_:
     * Select __Table__ kind,
     * Filter entities equal to _X.project_id_, _X.dataset_id_, _X.table_id_ or _X.partition_id_,
     * Find table _X_ from results and copy _Key literal_,
@@ -159,11 +159,11 @@ There are several options to restore data, available from _\<your-project-id>_._
 * __Restore whole dataset__ (_\<your-project-id>.appspot.com_/__ui/restoreDataset__). Parameters:
     * Source project id: id of project where dataset is placed originally,
     * Source dataset id: original dataset id,
-    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same localisation as backup__.
+    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same location as backup__.
     If _target dataset id_ is not passed, then _source dataset id_ value will be used as a target dataset id in restoration project
     * Max partition days (optional): number of days from partitioned tables will be restored (eg. 30 means that partitions from last 30 days will be restored),
 * __Restore tables from list of backups__ (_\<your-project-id>.appspot.com_/__ui/restoreList__). Parameters:
-    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same localisation as backup__.
+    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same location as backup__.
     If _target dataset id_ is not passed, then source dataset id value of each backup will be used as a target dataset id in restoration project.
     In case of restoring backups from different datasets multiple target datasets will be created.    
     * Backup list: set of backups in __JSON__ format, each of them is designated by the url safe key of backup entity available from [Datastore](https://console.cloud.google.com/datastore). Example:  
