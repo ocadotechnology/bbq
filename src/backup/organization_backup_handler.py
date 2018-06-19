@@ -1,8 +1,8 @@
 import webapp2
 
-from src.environment import Environment
 from src.backup.backup_scheduler import BackupScheduler
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.configuration import configuration
 
 
 class OrganizationBackupHandler(webapp2.RequestHandler):
@@ -23,4 +23,4 @@ class OrganizationBackupAuthenticatedHandler(BbqAuthenticatedHandler,
 app = webapp2.WSGIApplication([
     ('/cron/backup', OrganizationBackupHandler),
     ('/backups/schedule', OrganizationBackupAuthenticatedHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)
