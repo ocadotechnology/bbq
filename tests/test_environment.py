@@ -61,14 +61,6 @@ class TestEnvironment(unittest.TestCase):
         self.assertEqual(result, False)
 
     @patch.object(Environment, 'is_local', return_value=True)
-    def test_that_get_name_return_local_is_local(self, _):
-        # given & when
-        result = Environment.get_name()
-
-        # then
-        self.assertEqual(result, 'Local Development')
-
-    @patch.object(Environment, 'is_local', return_value=True)
     def test_get_domain_return_localhost_if_local(self, _):
         # given
         project_id = 'project_id'

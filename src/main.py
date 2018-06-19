@@ -20,8 +20,7 @@ class BaseHandler(webapp2.RequestHandler):
 class MainPage(BaseHandler):
   def get(self):
     domain = Environment.get_domain(configuration.backup_project_id)
-    self.render_response('index.html', project_id=Environment.get_name(),
-                         domain=domain)
+    self.render_response('index.html', domain=domain)
 
 
 class RestoreDatasetUIHandler(BaseHandler):

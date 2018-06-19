@@ -1,4 +1,3 @@
-import os
 
 
 class Environment(object):
@@ -29,13 +28,6 @@ class Environment(object):
     @classmethod
     def is_local(cls):
         return Environment.is_no_server() or Environment.is_dev_sandbox()
-
-    @classmethod
-    def get_name(cls):
-        if cls.is_local():
-            return "Local Development"
-        else:
-            return "App Engine"
 
     @classmethod
     def get_domain(cls, project_id):
