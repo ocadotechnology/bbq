@@ -5,10 +5,10 @@ import webapp2
 
 from commons.exceptions import ParameterValidationException
 from commons.json_handler import JsonHandler
-from src.environment import Environment
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
 from src.big_query.validators import WrongDatasetNameException
+from src.configuration import configuration
 from src.restore.dataset.dataset_restore_service import \
     DatasetRestoreService
 from src.restore.status.restoration_job_status_service import \
@@ -73,4 +73,4 @@ app = webapp2.WSGIApplication([
      DatasetRestoreHandler),
     webapp2.Route('/schedule/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
      DatasetRestoreAuthenticatedHandler)
-], debug=Environment.is_debug_mode_allowed())
+], debug=configuration.debug_mode)
