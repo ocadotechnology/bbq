@@ -14,12 +14,13 @@ from src.table_reference import TableReference
 class TableRestoreHandler(JsonHandler):
 
     def post(self, project_id, dataset_id, table_id, partition_id=None):
+        table_reference = TableReference(project_id, dataset_id,
+                                         table_id, partition_id)
+
         target_dataset_id = self.request.get('targetDatasetId', None)
         if target_dataset_id:
             validators.validate_dataset_id(target_dataset_id)
 
-        table_reference = TableReference(project_id, dataset_id,
-                                         table_id, partition_id)
         restoration_datetime = self.__get_restoration_datetime()
 
         restore_data = TableRestoreService.restore(
@@ -28,7 +29,7 @@ class TableRestoreHandler(JsonHandler):
         self._finish_with_success(restore_data)
 
     def __get_restoration_datetime(self):
-        restoration_date = self.request.get('restoration_date', None)
+        restoration_date = self.request.get('restorationDate', None)
         if restoration_date:
             self.__validate_restoration_date(restoration_date)
             restoration_date = datetime.strptime(
@@ -55,11 +56,15 @@ class TableRestoreAuthenticatedHandler(BbqAuthenticatedHandler,
 
 app = webapp2.WSGIApplication([
     webapp2.Route(
-        '/restore/table/<project_id>/<dataset_id>/<table_id>/<partition_id:.*>',
+        '/restore/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>/<partition_id:.*>',
         TableRestoreHandler
     ),
     webapp2.Route(
-        '/restore/schedule/table/<project_id>/<dataset_id>/<table_id>/<partition_id:.*>',
+        '/restore/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>',
+        TableRestoreHandler
+    ),
+    webapp2.Route(
+        '/restore/schedule/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>/<partition_id:.*>',
         TableRestoreAuthenticatedHandler
     )
 ], debug=configuration.debug_mode)

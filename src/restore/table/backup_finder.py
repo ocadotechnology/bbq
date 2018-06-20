@@ -1,15 +1,8 @@
 import logging
 from datetime import datetime
 
+from commons.exceptions import NotFoundException
 from src.backup.datastore.Table import Table
-
-
-class TableNotFoundException(Exception):
-    pass
-
-
-class BackupNotFoundException(Exception):
-    pass
 
 
 class BackupFinder(object):
@@ -19,7 +12,7 @@ class BackupFinder(object):
         table_entity = cls.__get_table_entity(table_reference)
         backup = table_entity.last_backup_not_newer_than(not_newer_than)
         if backup is None:
-            raise BackupNotFoundException(
+            raise NotFoundException(
                 'Backup not found for {} before {}'.format(
                     table_reference, not_newer_than))
         logging.info("backup: %s", backup)
@@ -32,7 +25,7 @@ class BackupFinder(object):
                                 table_reference.table_id,
                                 table_reference.partition_id)
         if table is None:
-            raise TableNotFoundException(
+            raise NotFoundException(
                 'Table not found in datastore: {}'.format(table_reference))
         logging.info("Datastore table: %s", table)
         return table

@@ -2,7 +2,10 @@ import os
 
 from datetime import datetime
 
+from commons.exceptions import NotFoundException
 from src.restore.table import table_restore_handler
+from src.restore.table.table_restore_service import TableRestoreService
+from src.table_reference import TableReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 
@@ -20,78 +23,62 @@ class TestTableRestoreHandler(unittest.TestCase):
     def init_webtest(self):
         self.under_test = webtest.TestApp(table_restore_handler.app)
 
-    @patch.object(RestoreService, 'try_to_restore')
-    def test_all_proper_parameters_provided_for_table_restoration(self, try_to_restore):
-        try_to_restore.return_value = {'size_in_bytes': 120, 'rows_count': 12}
+    @patch.object(TableRestoreService, 'restore', return_value={})
+    def test_all_proper_parameters_provided_for_table_restoration(self,
+                                                                  restore):
+        # given & when
+        self.under_test.post(
+            '/restore/table/project-id/dataset_id/table_id/20180101',
+            params={'targetDatasetId': 'target_dataset_id',
+                    'restorationDate': '2017-07-25'}
+        )
 
-        self.under_test.get(
-            '/restore/table/project-id/new_dataset/ttt_sss',
-            params={'target_dataset_id': 'smoke_test_US',
-                    'restoration_date': '2017-07-25'})
+        # then
+        restore.assert_called_once_with(
+            TableReference('project-id', 'dataset_id', 'table_id', '20180101'),
+            'target_dataset_id', datetime(2017, 07, 25, 23, 59, 59)
+        )
 
-        try_to_restore.assert_called_once_with(
-            Restoration(source_project_id='project-id',
-                        source_dataset_id='new_dataset', source_table_id='ttt_sss',
-                        target_dataset_id='smoke_test_US', restoration_date='2017-07-25',
-                        source_partition_id=None))
+    @patch.object(TableRestoreService, 'restore', return_value={})
+    def test_default_parameters_for_table_restoration(self, restore):
+        # given & when
+        self.under_test.post('/restore/table/project-id/dataset_id/table_id')
 
-    @patch.object(RestoreService, 'try_to_restore')
-    def test_default_parameters_for_table_restoration(self, try_to_restore):
-        try_to_restore.return_value = {'size_in_bytes': 120, 'rows_count': 12}
+        # then
+        expected_table_reference = \
+            TableReference('project-id', 'dataset_id', 'table_id')
 
-        self.under_test.get('/restore/table/project-id/new_dataset/ttt_sss')
+        restore.assert_called_once_with(expected_table_reference, None, None)
 
-        try_to_restore.assert_called_once_with(
-            Restoration(source_project_id='project-id',
-                        source_dataset_id='new_dataset', source_table_id='ttt_sss',
-                        target_dataset_id='project_id___new_dataset',
-                        restoration_date=datetime.utcnow().strftime('%Y-%m-%d'),
-                        source_partition_id=None))
+    @patch.object(TableRestoreService, 'restore', return_value={})
+    def test_should_fail_on_wrong_date_format(self, _):
+        # given & when
+        response = self.under_test.post(
+            '/restore/table/project-id/dataset_id/table_id',
+            params={'restorationDate': '20170725'},
+            expect_errors=True
+        )
 
-    @patch.object(RestoreService, 'try_to_restore')
-    def test_should_fail_on_wrong_date_format(self, try_to_restore):
-        try_to_restore.return_value = {'size_in_bytes': 120, 'rows_count': 12}
-        expected_error = '{"status": "failed", "message": "Wrong request ' \
-                         'params provided:Wrong date value format for ' \
-                         'parameter \'restoration_date\'. Should be ' \
-                         '\'YYYY-mm-dd\'", "httpStatus": 400}'
-
-        response = self.under_test.get(
-            '/restore/table/project-id/new_dataset/ttt_sss',
-            params={'restoration_date': '20170725'}, expect_errors=True)
-
+        # then
+        expected_error = '{"status": "failed", "message": ' \
+                         '"Wrong date value format for parameter ' \
+                         '\'restoration_date\'. Should be \'YYYY-mm-dd\'", ' \
+                         '"httpStatus": 400}'
         self.assertEquals(400, response.status_int)
         self.assertEquals(response.body, expected_error)
 
-    @patch.object(RestoreService, 'try_to_restore')
-    def test_all_proper_parameters_provided_for_partition_restoration(self, try_to_restore):
-        try_to_restore.return_value = {'size_in_bytes': 70, 'rows_count': 4}
+    @patch.object(TableRestoreService, 'restore',
+                  side_effect=NotFoundException("Error message"))
+    def test_should_forward_backup_not_found_error(self, _):
+        # given & when
+        response = self.under_test.post(
+            '/restore/table/project-id/dataset_id/table_id',
+            params={'restorationDate': '2017-07-25'},
+            expect_errors=True
+        )
 
-        self.under_test.get(
-            '/restore/table/project-id/new_dataset/ttt_sss',
-            params={
-                'target_dataset_id': 'smoke_test_US',
-                'restoration_date': '2017-07-25',
-                'partition_id': '20170726'
-            })
-
-        try_to_restore.assert_called_once_with(
-            Restoration(source_project_id='project-id',
-                        source_dataset_id='new_dataset', source_table_id='ttt_sss',
-                        target_dataset_id='smoke_test_US', restoration_date='2017-07-25',
-                        source_partition_id='20170726'))
-
-    @patch.object(RestoreService, 'try_to_restore',
-                  side_effect=BackupNotFoundException())
-    def test_should_forward_backup_not_found_error(self, try_to_restore):
-        expected_error = '{"status": "failed", "message": "Backup for table ' \
-                         'project-id:new_dataset.ttt_sss made  does ' \
-                         'not exist.", "httpStatus": 404}'
-
-        response = self.under_test.get(
-            '/restore/table/project-id/new_dataset/ttt_sss',
-            expect_errors=True)
-
+        # then
+        expected_error = '{"status": "failed", "message": "Error message", ' \
+                         '"httpStatus": 404}'
         self.assertEquals(404, response.status_int)
         self.assertEquals(response.body, expected_error)
-
