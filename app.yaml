@@ -21,7 +21,7 @@ handlers:
   secure: always
   login: admin
 - url: /restore/table/.*
-  script: src.restore.table_restore_handler.app
+  script: src.restore.table.table_restore_handler.app
   secure: always
   login: admin
 - url: /restore/project/.*
