@@ -8,7 +8,10 @@ from src.backup.datastore.Table import Table
 class BackupFinder(object):
 
     @classmethod
-    def for_table(cls, table_reference, not_newer_than=datetime.utcnow()):
+    def for_table(cls, table_reference, not_newer_than):
+        if not not_newer_than:
+            not_newer_than = datetime.utcnow()
+
         table_entity = cls.__get_table_entity(table_reference)
         backup = table_entity.last_backup_not_newer_than(not_newer_than)
         if backup is None:
