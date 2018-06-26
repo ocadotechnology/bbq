@@ -24,38 +24,26 @@ class TestTableRestoreHandler(unittest.TestCase):
         self.under_test = webtest.TestApp(table_restore_handler.app)
 
     @patch.object(TableRestoreService, 'restore', return_value={})
-    def test_handle_partition_id(self, restore):
-        # given & when
-        self.under_test.post(
-            '/restore/table/project-id/dataset_id/table_id/20180101',
-        )
-
-        # then
-        expected_table_reference = \
-            TableReference('project-id', 'dataset_id', 'table_id', '20180101')
-        restore.assert_called_once_with(expected_table_reference, None, None)
-
-    @patch.object(TableRestoreService, 'restore', return_value={})
     def test_all_proper_parameters_provided_for_table_restoration(self,
                                                                   restore):
         # given & when
         self.under_test.post(
             '/restore/table/project-id/dataset_id/table_id',
-            params={'targetDatasetId': 'target_dataset_id',
+            params={'partitionId': '20170725',
+                    'targetDatasetId': 'target_dataset_id',
                     'restorationDate': '2017-07-25'}
         )
 
         # then
         restore.assert_called_once_with(
-            TableReference('project-id', 'dataset_id', 'table_id'),
-            'target_dataset_id',
-            datetime(2017, 07, 25, 23, 59, 59)
+            TableReference('project-id', 'dataset_id', 'table_id', '20170725'),
+            'target_dataset_id', datetime(2017, 07, 25, 23, 59, 59)
         )
 
     @patch.object(TableRestoreService, 'restore', return_value={})
     def test_default_parameters_for_table_restoration(self, restore):
         # given & when
-        self.under_test.post('/restore/table/project-id/dataset_id/table_id')
+        self.under_test.post('/restore/table/project-id/dataset_id/table_id?')
 
         # then
         expected_table_reference = \
