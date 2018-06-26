@@ -13,15 +13,16 @@ from src.table_reference import TableReference
 
 class TableRestoreHandler(JsonHandler):
 
-    def post(self, project_id, dataset_id, table_id, partition_id=None):
-        table_reference = TableReference(project_id, dataset_id,
-                                         table_id, partition_id)
-
+    def post(self, project_id, dataset_id, table_id):
+        partition_id = self.request.get('partitionId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         if target_dataset_id:
             validators.validate_dataset_id(target_dataset_id)
 
         restoration_datetime = self.__get_restoration_datetime()
+
+        table_reference = TableReference(project_id, dataset_id,
+                                         table_id, partition_id)
 
         restore_data = TableRestoreService.restore(
             table_reference, target_dataset_id, restoration_datetime
@@ -55,10 +56,6 @@ class TableRestoreAuthenticatedHandler(BbqAuthenticatedHandler,
 
 
 app = webapp2.WSGIApplication([
-    webapp2.Route(
-        '/restore/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>/<partition_id:.*>',
-        TableRestoreHandler
-    ),
     webapp2.Route(
         '/restore/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>',
         TableRestoreHandler
