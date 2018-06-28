@@ -25,7 +25,7 @@ handlers:
   secure: always
   login: admin
 - url: /schedule/restore/project/.*/dataset/.*/table/.*
-  script: src.restore.table_restore_handler.app
+  script: src.restore.table.table_restore_handler.app
   secure: always
 - url: /restore/project/.*/dataset/.*
   script: src.restore.dataset.dataset_restore_handler.app
