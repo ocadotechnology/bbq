@@ -5,7 +5,7 @@ from src.restore.list.backup_list_restore_service import \
     BackupListRestoreRequest, BackupItem, BackupListRestoreService
 from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService
-from src.restore.table.backup_finder import BackupFinder
+from src.backup.datastore.backup_finder import BackupFinder
 
 
 class TableRestoreService(object):

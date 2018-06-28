@@ -5,7 +5,7 @@ from mock import Mock, MagicMock, patch
 
 from src.restore.list.backup_list_restore_service import \
     BackupListRestoreService, BackupListRestoreRequest, BackupItem
-from src.restore.table.backup_finder import BackupFinder
+from src.backup.datastore.backup_finder import BackupFinder
 from src.restore.table.table_restore_service import TableRestoreService
 
 
