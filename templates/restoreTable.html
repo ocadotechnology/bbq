@@ -17,7 +17,7 @@
         + encodeQueryData(params);
 
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", url, true);
+    xhttp.open("GET", url, true);
     xhttp.timeout = 1000 * 3600;
 
     xhttp.onload = function () {
