@@ -4,13 +4,9 @@ copy_jobs:
 backup_settings:
   backup_worker_max_countdown_in_sec: 0
   custom_project_list: []
-  projects_to_skip: ['<your-project-id>']
+  projects_to_skip: ['<your-project-id-for-BBQ-project>']
 
 project_settings:
-  backup_project_id: '<your-project-id>'
-  restoration_project_id: '<your-project-id>'
+  backup_project_id: '<your-project-id-for-BBQ-project>'
+  restoration_project_id: '<your-project-id-for-restoration-project>'
   debug_mode: False
-
-tests:
-  restoration_daily_test_results_gcs_bucket: 'a-gcs-bucket'
-  random_table_view: 'project:dataset.table'
