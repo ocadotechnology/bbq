@@ -13,7 +13,7 @@ from src.table_reference import TableReference
 
 class TableRestoreHandler(JsonHandler):
 
-    def post(self, project_id, dataset_id, table_id):
+    def get(self, project_id, dataset_id, table_id):
         partition_id = self.request.get('partitionId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         if target_dataset_id:
