@@ -10,10 +10,10 @@
       'partitionId': document.restoreTableForm.partitionId.value
     };
 
-    var url = '/restore/table/'
-        + document.restoreTableForm.projectId.value + '/'
-        + document.restoreTableForm.datasetId.value + '/'
-        + document.restoreTableForm.tableId.value + "?"
+    var url = '/restore' +
+        '/project/' + document.restoreTableForm.projectId.value +
+        '/dataset/' + document.restoreTableForm.datasetId.value +
+        '/table/' + document.restoreTableForm.tableId.value + "?"
         + encodeQueryData(params);
 
     var xhttp = new XMLHttpRequest();
