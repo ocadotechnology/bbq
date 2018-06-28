@@ -15,6 +15,10 @@ import webtest
 from mock import patch
 
 
+RESTORE_TABLE_URL = \
+    '/restore/project/project-id/dataset/dataset_id/table/table_id'
+
+
 class TestTableRestoreHandler(unittest.TestCase):
 
     def setUp(self):
@@ -28,7 +32,7 @@ class TestTableRestoreHandler(unittest.TestCase):
                                                                   restore):
         # given & when
         self.under_test.post(
-            '/restore/table/project-id/dataset_id/table_id',
+            RESTORE_TABLE_URL,
             params={'partitionId': '20170725',
                     'targetDatasetId': 'target_dataset_id',
                     'restorationDate': '2017-07-25'}
@@ -43,7 +47,7 @@ class TestTableRestoreHandler(unittest.TestCase):
     @patch.object(TableRestoreService, 'restore', return_value={})
     def test_default_parameters_for_table_restoration(self, restore):
         # given & when
-        self.under_test.post('/restore/table/project-id/dataset_id/table_id?')
+        self.under_test.post(RESTORE_TABLE_URL + '?')
 
         # then
         expected_table_reference = \
@@ -54,7 +58,7 @@ class TestTableRestoreHandler(unittest.TestCase):
     def test_should_fail_on_wrong_date_format(self, _):
         # given & when
         response = self.under_test.post(
-            '/restore/table/project-id/dataset_id/table_id',
+            RESTORE_TABLE_URL,
             params={'restorationDate': '20170725'},
             expect_errors=True
         )
@@ -72,7 +76,7 @@ class TestTableRestoreHandler(unittest.TestCase):
     def test_should_forward_backup_not_found_error(self, _):
         # given & when
         response = self.under_test.post(
-            '/restore/table/project-id/dataset_id/table_id',
+            RESTORE_TABLE_URL,
             params={'restorationDate': '2017-07-25'},
             expect_errors=True
         )

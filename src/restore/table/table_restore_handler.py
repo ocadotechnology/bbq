@@ -57,11 +57,13 @@ class TableRestoreAuthenticatedHandler(BbqAuthenticatedHandler,
 
 app = webapp2.WSGIApplication([
     webapp2.Route(
-        '/restore/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>',
+        '/restore'
+        '/project/<project_id:.*>/dataset/<dataset_id:.*>/table/<table_id:.*>',
         TableRestoreHandler
     ),
     webapp2.Route(
-        '/restore/schedule/table/<project_id:.*>/<dataset_id:.*>/<table_id:.*>/<partition_id:.*>',
+        '/schedule/restore'
+        '/project/<project_id:.*>/dataset/<dataset_id:.*>/table/<table_id:.*>',
         TableRestoreAuthenticatedHandler
     )
 ], debug=configuration.debug_mode)
