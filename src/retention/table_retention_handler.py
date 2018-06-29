@@ -22,6 +22,4 @@ class TableRetentionHandler(webapp2.RequestHandler):
         table_reference = TableReference(project_id, dataset_id, table_id,
                                          partition_id)
 
-        logging.info("Retention will run for table '%s'", table_reference)
-
         self.table_retention.perform_retention(table_reference, table_key)
