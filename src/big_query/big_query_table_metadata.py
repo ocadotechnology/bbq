@@ -99,3 +99,7 @@ class BigQueryTableMetadata(object):
             return TableReference(table_reference['projectId'],
                                   table_reference['datasetId'],
                                   table_reference['tableId'])
+
+    def __eq__(self, o):
+        return type(o) is BigQueryTableMetadata \
+               and self.table_metadata == o.table_metadata
