@@ -20,15 +20,18 @@ handlers:
   script: google.appengine.ext.deferred.deferred.application
   secure: always
   login: admin
-- url: /restore/table/.*
-  script: src.restore.table_restore_handler.app
+- url: /restore/project/.*/dataset/.*/table/.*
+  script: src.restore.table.table_restore_handler.app
   secure: always
   login: admin
-- url: /restore/project/.*
+- url: /schedule/restore/project/.*/dataset/.*/table/.*
+  script: src.restore.table.table_restore_handler.app
+  secure: always
+- url: /restore/project/.*/dataset/.*
   script: src.restore.dataset.dataset_restore_handler.app
   secure: always
   login: admin
-- url: /schedule/restore/project/.*
+- url: /schedule/restore/project/.*/dataset/.*
   script: src.restore.dataset.dataset_restore_handler.app
   secure: always
 - url: /restore/list
@@ -48,9 +51,6 @@ handlers:
   login: admin
 - url: /schedule/restore/jobs/.*
   script: src.restore.status.restoration_job_status_handler.app
-  secure: always
-- url: /restore/schedule/table/.*
-  script: src.restore.table_restore_handler.app
   secure: always
 - url: /restore/test
   script: src.restore.test.restore_test_handler.app

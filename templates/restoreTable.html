@@ -5,14 +5,16 @@
 <script type="text/javascript">
   function OnSubmitForm() {
     var params = {
-      'target_dataset_id': document.restoreTableForm.targetDatasetId.value,
-      'restoration_date': document.restoreTableForm.restorationDate.value,
-      'partition_id': document.restoreTableForm.partitionId.value
+      'targetDatasetId': document.restoreTableForm.targetDatasetId.value,
+      'restorationDate': document.restoreTableForm.restorationDate.value,
+      'partitionId': document.restoreTableForm.partitionId.value
     };
 
-    var url = '/restore/table/' + document.restoreTableForm.projectId.value + '/'
-        + document.restoreTableForm.datasetId.value + '/' + document.restoreTableForm.tableId.value
-        + "?" + encodeQueryData(params);
+    var url = '/restore' +
+        '/project/' + document.restoreTableForm.projectId.value +
+        '/dataset/' + document.restoreTableForm.datasetId.value +
+        '/table/' + document.restoreTableForm.tableId.value + "?"
+        + encodeQueryData(params);
 
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", url, true);
