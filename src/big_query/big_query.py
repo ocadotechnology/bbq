@@ -176,6 +176,13 @@ class BigQuery(object):  # pylint: disable=R0904
                                            table_id=reference.table_id,
                                            partition_id=reference.partition_id)
 
+    @cached(time=300)
+    def get_table_by_reference_cached(self, reference):
+        return self.get_table_or_partition(project_id=reference.project_id,
+                                           dataset_id=reference.dataset_id,
+                                           table_id=reference.table_id,
+                                           partition_id=reference.partition_id)
+
     @staticmethod
     def get_table_id_with_partition_id(table_id, partition_id):
         return table_id + ('' if partition_id is None else '$' + partition_id)
@@ -210,11 +217,6 @@ class BigQuery(object):  # pylint: disable=R0904
                 return None
             else:
                 raise ex
-
-    @cached(time=300)
-    def get_table_cached(self, project_id, dataset_id, table_id,
-                         log_table=True):
-        return self.__get_table(project_id, dataset_id, table_id, log_table)
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):

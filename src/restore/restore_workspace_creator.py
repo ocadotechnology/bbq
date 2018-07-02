@@ -36,12 +36,8 @@ class RestoreWorkspaceCreator(object):
             table_expiration
         )
 
-    def __create_empty_partitioned_table_if_not_exists(self,
-                                                       target_table_reference):
-        if target_table_reference.is_partition() and self.BQ.get_table_cached(
-                target_table_reference.project_id,
-                target_table_reference.dataset_id,
-                target_table_reference.table_id) is None:
+    def __create_empty_partitioned_table_if_not_exists(self, target_table_reference):
+        if target_table_reference.is_partition() and not self.BQ.get_table_by_reference_cached(target_table_reference).table_exists():
             self.BQ.create_empty_partitioned_table(target_table_reference)
 
     @staticmethod
