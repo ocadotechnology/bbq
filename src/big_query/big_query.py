@@ -165,8 +165,8 @@ class BigQuery(object):  # pylint: disable=R0904
 
     def get_table_or_partition(self, project_id, dataset_id, table_id,
                                partition_id):
-        table_metadata = self.get_table(project_id, dataset_id,
-                                        BigQuery.get_table_id_with_partition_id(
+        table_metadata = self.__get_table(project_id, dataset_id,
+                                          BigQuery.get_table_id_with_partition_id(
                                             table_id, partition_id))
         return BigQueryTableMetadata(table_metadata)
 
@@ -181,7 +181,7 @@ class BigQuery(object):  # pylint: disable=R0904
         return table_id + ('' if partition_id is None else '$' + partition_id)
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
-    def get_table(self, project_id, dataset_id, table_id, log_table=True):
+    def __get_table(self, project_id, dataset_id, table_id, log_table=True):
         logging.info("Getting table '%s'",
                      TableReference(project_id, dataset_id, table_id))
         try:
@@ -214,7 +214,7 @@ class BigQuery(object):  # pylint: disable=R0904
     @cached(time=300)
     def get_table_cached(self, project_id, dataset_id, table_id,
                          log_table=True):
-        return self.get_table(project_id, dataset_id, table_id, log_table)
+        return self.__get_table(project_id, dataset_id, table_id, log_table)
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):

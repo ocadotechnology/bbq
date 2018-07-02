@@ -45,7 +45,7 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_get_table_400_responses()
 
         # when
-        table = BigQuery().get_table("project_id", "dataset_id", "table_id")
+        table = BigQuery().__get_table("project_id", "dataset_id", "table_id")
 
         # then
         self.assertIsNone(table)
