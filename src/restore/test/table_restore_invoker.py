@@ -3,6 +3,14 @@ import logging
 
 import httplib2
 
+from commons.decorators.retry import retry
+from src.restore.status.restoration_job_status_service import \
+    RestorationJobStatusService
+
+
+class JobInProgressException(Exception):
+    pass
+
 
 class TableRestoreInvoker(object):
 
@@ -22,8 +30,17 @@ class TableRestoreInvoker(object):
         resp, content = self.http.request(url)  # pylint: disable=W0612
         logging.info("Response: %s", resp)
         resp_data = json.loads(content)
-        logging.info("Restored table details: %s", resp_data)
-        return resp_data
+        return resp_data['restorationJobId']
+
+    @retry(JobInProgressException, tries=10, delay=10, backoff=2)
+    def wait_till_done(self, restoration_job_id):
+        result = RestorationJobStatusService()\
+            .get_restoration_job(restoration_job_id)
+
+        if result["status"]["state"] in "In progress":
+            raise JobInProgressException()
+
+        return result
 
     @staticmethod
     def __build_restore_url(host_url, src_table_reference,
