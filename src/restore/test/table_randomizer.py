@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 from commons.decorators.retry import retry
 from src.big_query.big_query import BigQuery, RandomizationError
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
 class DoesNotMeetSampleCriteriaException(BaseException):
@@ -23,19 +22,10 @@ class TableRandomizer(object):
         logging.info("Randomly selected table for the restore test: %s",
                      table_reference)
 
-        project_id = table_reference.get_project_id()
-        dataset_id = table_reference.get_dataset_id()
-        table_id = table_reference.get_table_id()
+        table_metadata = self.big_query.get_table_by_reference(table_reference)
 
-        table_metadata_payload = self.big_query.get_table(project_id,
-                                                          dataset_id,
-                                                          table_id,
-                                                          log_table=False)
-
-        if table_metadata_payload is None:
+        if not table_metadata.table_exists():
             raise DoesNotMeetSampleCriteriaException("Table not found")
-
-        table_metadata = BigQueryTableMetadata(table_metadata_payload)
 
         if table_metadata.is_external_or_view_type():
             raise DoesNotMeetSampleCriteriaException(
@@ -51,24 +41,22 @@ class TableRandomizer(object):
                           " it. Therefore restoration of this table can fail.")
 
         if table_metadata.is_daily_partitioned() and not table_metadata.is_empty():
-            table_metadata = self.__get_random_partition(dataset_id,
-                                                         project_id,
-                                                         table_id)
+            table_metadata = self.__get_random_partition(table_reference)
             logging.info(
                 "Table is partitioned. Partition chosen to be restored: %s",
                 table_metadata)
 
         return table_metadata
 
-    def __get_random_partition(self, dataset_id, project_id, table_id):
-        partitions = self.big_query.list_table_partitions(project_id,
-                                                          dataset_id,
-                                                          table_id)
+    def __get_random_partition(self, table_reference):
+        partitions = self.big_query.list_table_partitions(table_reference.project_id,
+                                                          table_reference.dataset_id,
+                                                          table_reference.table_id)
         number_of_partitions = len(partitions)
         random_partition = partitions[
             random.randint(0, number_of_partitions - 1)]["partitionId"]
         table_metadata = self.big_query.get_table_or_partition(
-            project_id, dataset_id, table_id, random_partition)
+            table_reference.project_id, table_reference.dataset_id, table_reference.table_id, random_partition)
         return table_metadata
 
     @staticmethod
