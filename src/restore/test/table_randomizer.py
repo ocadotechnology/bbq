@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from commons.decorators.retry import retry
 from src.big_query.big_query import BigQuery, RandomizationError
+from src.table_reference import TableReference
 
 
 class DoesNotMeetSampleCriteriaException(BaseException):
@@ -52,12 +53,17 @@ class TableRandomizer(object):
         partitions = self.big_query.list_table_partitions(table_reference.project_id,
                                                           table_reference.dataset_id,
                                                           table_reference.table_id)
+        random_partition = self.__get_random_item_of_the_list(partitions)
+
+        new_table_reference = TableReference(table_reference.project_id, table_reference.dataset_id, table_reference.table_id, random_partition)
+
+        return self.big_query.get_table_by_reference(new_table_reference)
+
+    def __get_random_item_of_the_list(self, partitions):
         number_of_partitions = len(partitions)
         random_partition = partitions[
             random.randint(0, number_of_partitions - 1)]["partitionId"]
-        table_metadata = self.big_query.get_table_or_partition(
-            table_reference.project_id, table_reference.dataset_id, table_reference.table_id, random_partition)
-        return table_metadata
+        return random_partition
 
     @staticmethod
     def __has_been_modified_since_midnight(table_metadata):

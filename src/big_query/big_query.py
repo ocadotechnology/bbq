@@ -163,25 +163,25 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=configuration.backup_project_id,
             body=query_data).execute(num_retries=3)
 
-    def get_table_or_partition(self, project_id, dataset_id, table_id,
-                               partition_id):
+    def __get_table_or_partition(self, project_id, dataset_id, table_id,
+                                 partition_id):
         table_metadata = self.__get_table(project_id, dataset_id,
                                           BigQuery.get_table_id_with_partition_id(
                                             table_id, partition_id))
         return BigQueryTableMetadata(table_metadata)
 
     def get_table_by_reference(self, reference):
-        return self.get_table_or_partition(project_id=reference.project_id,
-                                           dataset_id=reference.dataset_id,
-                                           table_id=reference.table_id,
-                                           partition_id=reference.partition_id)
+        return self.__get_table_or_partition(project_id=reference.project_id,
+                                             dataset_id=reference.dataset_id,
+                                             table_id=reference.table_id,
+                                             partition_id=reference.partition_id)
 
     @cached(time=300)
     def get_table_by_reference_cached(self, reference):
-        return self.get_table_or_partition(project_id=reference.project_id,
-                                           dataset_id=reference.dataset_id,
-                                           table_id=reference.table_id,
-                                           partition_id=reference.partition_id)
+        return self.__get_table_or_partition(project_id=reference.project_id,
+                                             dataset_id=reference.dataset_id,
+                                             table_id=reference.table_id,
+                                             partition_id=reference.partition_id)
 
     @staticmethod
     def get_table_id_with_partition_id(table_id, partition_id):
