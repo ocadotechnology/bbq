@@ -31,11 +31,7 @@ class RestoreTest(object):
         table_has_been_restored = response["status"]["result"] == "Success"
 
         if table_has_been_restored:
-            restoration_items = response["restorationItems"]
-            assert len(restoration_items) == 1
-            target_table_id = restoration_items[0]['targetTable']
-            self.__check_restored_table_matches_source(target_table_id,
-                                                       src_table)
+            self.__check_restored_table_matches_source(response, src_table)
         else:
             resp_msg = "Restore test failed. " \
                        "Failed to restore a table {}".format(table_reference)

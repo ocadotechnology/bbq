@@ -32,7 +32,7 @@ class TableRestoreInvoker(object):
         resp_data = json.loads(content)
         return resp_data['restorationJobId']
 
-    @retry(JobInProgressException, tries=10, delay=10, backoff=2)
+    @retry(JobInProgressException, tries=6, delay=10, backoff=2)
     def wait_till_done(self, restoration_job_id):
         result = RestorationJobStatusService()\
             .get_restoration_job(restoration_job_id)
