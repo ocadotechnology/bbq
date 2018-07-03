@@ -33,18 +33,17 @@ class TestTableRandomizer(unittest.TestCase):
 
 
     @patch.object(BigQuery,'fetch_random_table')
-    @patch.object(BigQuery,'get_table_by_reference')
     @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
     @patch.object(BigQueryTableMetadata, 'is_external_or_view_type', return_value=False)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
     @patch.object(BigQuery, 'list_table_partitions')
-    @patch.object(BigQuery, 'get_table_or_partition')
+    @patch.object(BigQuery, 'get_table_by_reference')
     @patch.object(random, 'randint', return_value=1)
     def test_return_random_partition_when_table_is_partitioned(
-            self, _, get_table_or_partition, list_table_partitions, _1,
-            get_last_modified_datetime, _2, _3, _4, get_table_by_reference, fetch_random_table):
+            self, _, get_table_by_reference, list_table_partitions, _1,
+            get_last_modified_datetime, _2, _3, _4, fetch_random_table):
         # given
         get_table_by_reference.return_value= BigQueryTableMetadata(None)
 
@@ -63,7 +62,7 @@ class TestTableRandomizer(unittest.TestCase):
         under_test.get_random_table_metadata()
         #
         # # then
-        get_table_or_partition.assert_called_with('p1', 'd1', 't1', "20170909")
+        get_table_by_reference.assert_called_with(TableReference('p1', 'd1', 't1', "20170909"))
 
     @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
