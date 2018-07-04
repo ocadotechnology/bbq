@@ -5,7 +5,7 @@
     
    It is possible to do it from local environment, but it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
-1. Create and enable billing to two GCP projects 
+1. Create and enable billing for two GCP projects 
     * First is the place where BBQ will be deployed and backups will be stored.
     * Second is the place where backups will be temporarily stored after restoration procedure. 
     * see [creating a project in GCP](https://support.google.com/cloud/answer/6251787?hl=en#) doc
