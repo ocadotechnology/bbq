@@ -3,6 +3,7 @@ from unittest import TestCase
 from google.appengine.ext import testbed
 from mock import patch, ANY
 
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 
 from src.table_reference import TableReference
@@ -92,11 +93,12 @@ class TestRestoreWorkspaceCreator(TestCase):
         # then
         self.BQ.create_dataset.assert_not_called()
 
-    def test_should_create_table_if_is_partitioned_and_not_exist(self):
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=False)
+    def test_should_create_table_if_is_partitioned_and_not_exist(self, _):
         # given
         enforcer = RestoreWorkspaceCreator(self.BQ)
         source, target = self.__create_partitioned_table_references()
-        self.BQ.get_table_cached.return_value = None
+        self.BQ.get_table_by_reference_cached.return_value = BigQueryTableMetadata(None)
 
         # when
         enforcer.create_workspace(source, target)
@@ -114,14 +116,15 @@ class TestRestoreWorkspaceCreator(TestCase):
         enforcer.create_workspace(source, target)
 
         # then
-        self.BQ.get_table_cached.assert_not_called()
+        self.BQ.get_table_by_reference_cached.assert_not_called()
         self.BQ.create_empty_partitioned_table.assert_not_called()
 
-    def test_should_not_create_table_if_table_already_exist(self):
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
+    def test_should_not_create_table_if_table_already_exist(self, _):
         # given
         enforcer = RestoreWorkspaceCreator(self.BQ)
         source, target = self.__create_partitioned_table_references()
-        self.BQ.get_table_cached.return_value = "<TABLE METADATA RETURNED>"
+        self.BQ.get_table_by_reference_cached.return_value = BigQueryTableMetadata(None)
 
         # when
         enforcer.create_workspace(source, target)
@@ -134,14 +137,13 @@ class TestRestoreWorkspaceCreator(TestCase):
         enforcer = RestoreWorkspaceCreator(self.BQ)
         source, target = self.__create_partitioned_table_references()
         self.BQ.get_dataset_cached.return_value = "<DATASET METADATA RETURNED>"
-        self.BQ.get_table_cached.return_value = "<TABLE METADATA RETURNED>"
 
         # when
         enforcer.create_workspace(source, target)
 
         # then
         self.BQ.get_dataset_cached.assert_called_once()
-        self.BQ.get_table_cached.assert_called_once()
+        self.BQ.get_table_by_reference_cached.assert_called_once()
 
     def __create_partitioned_table_references(self):
         source_table_reference = TableReference(SOURCE_PROJECT_ID,

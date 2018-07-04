@@ -4,6 +4,8 @@ from freezegun import freeze_time
 from google.appengine.ext import testbed, ndb
 from mock import patch, Mock
 
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.big_query.big_query import BigQuery
 from src.backup.backup_process import BackupProcess
 from src.backup.table_backup import TableBackup
 from src.backup.table_partitions_backup_scheduler import \
@@ -12,7 +14,6 @@ from src.table_reference import TableReference
 
 
 @freeze_time("2017-04-04")
-@patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
 class TestTableBackup(unittest.TestCase):
 
     def setUp(self):
@@ -27,12 +28,13 @@ class TestTableBackup(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    @patch('src.big_query.big_query.BigQuery.get_table_or_partition.return_value.is_daily_partitioned.return_value', True)  # nopep8 pylint: disable=C0301
-    @patch('src.big_query.big_query.BigQuery.get_table_or_partition.return_value.is_empty.return_value', False)  # nopep8 pylint: disable=C0301
-    @patch('src.big_query.big_query.BigQuery.get_table_or_partition')
+
     @patch.object(TablePartitionsBackupScheduler, 'start')
-    def test_that_partition_backups_are_scheduled_for_partitioned_table(
-            self, _, table_partitions_backup_scheduler):
+    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
+    def test_that_partition_backups_are_scheduled_for_non_empty_partitioned_table(
+            self, _, _1, _2, table_partitions_backup_scheduler):
         # given
         table_reference = TableReference(project_id="test-project",
                                          dataset_id="test-dataset",
@@ -45,11 +47,29 @@ class TestTableBackup(unittest.TestCase):
         # then
         table_partitions_backup_scheduler.assert_called_once()
 
-    @patch('src.big_query.big_query.BigQuery.get_table_or_partition.return_value.is_daily_partitioned.return_value', False)  # nopep8 pylint: disable=C0301
-    @patch('src.big_query.big_query.BigQuery.get_table_or_partition')
+    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=False)
     @patch.object(BackupProcess, 'start')
-    def test_that_backup_is_created_for_not_partitioned_table(
-            self, backup_start, _):
+    def test_that_table_backup_is_scheduled_for_not_partitioned_table(
+            self, backup_start, _, _1):
+        # given
+        table_reference = TableReference(project_id="test-project",
+                                         dataset_id="test-dataset",
+                                         table_id="test-table",
+                                         partition_id=None)
+
+        # when
+        TableBackup.start(table_reference)
+
+        # then
+        backup_start.assert_called_once()
+
+    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
+    @patch.object(BackupProcess, 'start')
+    def test_that_table_backup_is_scheduled_for_empty_partitioned_table(
+            self, backup_start, _, _1, _2):
         # given
         table_reference = TableReference(project_id="test-project",
                                          dataset_id="test-dataset",
