@@ -2,6 +2,7 @@ import logging
 import random
 from datetime import datetime, timedelta
 
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from commons.decorators.retry import retry
 from src.big_query.big_query import BigQuery, RandomizationError
 from src.table_reference import TableReference
@@ -23,7 +24,7 @@ class TableRandomizer(object):
         logging.info("Randomly selected table for the restore test: %s",
                      table_reference)
 
-        table_metadata = self.big_query.get_table_by_reference(table_reference)
+        table_metadata = BigQueryTableMetadata.get_table_by_reference(table_reference)
 
         if not table_metadata.table_exists():
             raise DoesNotMeetSampleCriteriaException("Table not found")
@@ -57,7 +58,7 @@ class TableRandomizer(object):
 
         new_table_reference = TableReference(table_reference.project_id, table_reference.dataset_id, table_reference.table_id, random_partition)
 
-        return self.big_query.get_table_by_reference(new_table_reference)
+        return BigQueryTableMetadata.get_table_by_reference(new_table_reference)
 
     def __get_random_item_of_the_list(self, partitions):
         number_of_partitions = len(partitions)

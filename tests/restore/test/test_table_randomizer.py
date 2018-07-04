@@ -39,7 +39,7 @@ class TestTableRandomizer(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
     @patch.object(BigQuery, 'list_table_partitions')
-    @patch.object(BigQuery, 'get_table_by_reference')
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference')
     @patch.object(random, 'randint', return_value=1)
     def test_return_random_partition_when_table_is_partitioned(
             self, _, get_table_by_reference, list_table_partitions, _1,
@@ -64,7 +64,7 @@ class TestTableRandomizer(unittest.TestCase):
         # # then
         get_table_by_reference.assert_called_with(TableReference('p1', 'd1', 't1', "20170909"))
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQuery, 'fetch_random_table')
     def test_should_raise_exception_and_retry_10_times_when_chosen_table_has_been_modified_today(  # nopep8 pylint: disable=C0301
@@ -82,7 +82,7 @@ class TestTableRandomizer(unittest.TestCase):
                           under_test.get_random_table_metadata)
         self.assertEquals(10, fetch_random_table.call_count)
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQueryTableMetadata, 'is_external_or_view_type')
     @patch.object(BigQuery, 'fetch_random_table')
@@ -102,7 +102,7 @@ class TestTableRandomizer(unittest.TestCase):
         self.assertRaises(DoesNotMeetSampleCriteriaException,
                           under_test.get_random_table_metadata)
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQuery, 'fetch_random_table')
     def test_should_retry_randomization_on_RandomizationError_from_random_table_query(  # nopep8 pylint: disable=C0301
@@ -123,7 +123,7 @@ class TestTableRandomizer(unittest.TestCase):
         # then
         self.assertEquals(2, fetch_random_table.call_count)
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQuery, 'fetch_random_table')
     @patch.object(logging, 'error')

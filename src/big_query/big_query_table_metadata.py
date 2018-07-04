@@ -2,8 +2,11 @@ import datetime
 import logging
 from types import NoneType
 
+
+from commons.decorators.cached import cached
 from src.error_reporting import ErrorReporting
 from src.table_reference import TableReference
+from src.big_query.big_query import BigQuery
 
 
 class BigQueryTableMetadata(object):
@@ -15,6 +18,31 @@ class BigQueryTableMetadata(object):
         if self.table_metadata is None:
             return False
         return True
+
+    @staticmethod
+    def __get_table_or_partition(project_id, dataset_id, table_id,
+                                 partition_id):
+        table_metadata = BigQuery().get_table(project_id, dataset_id,
+                                              BigQueryTableMetadata.get_table_id_with_partition_id(
+                                                  table_id, partition_id))
+        return BigQueryTableMetadata(table_metadata)
+
+    @staticmethod
+    def get_table_id_with_partition_id(table_id, partition_id):
+        return table_id + ('' if partition_id is None else '$' + partition_id)
+
+    @staticmethod
+    def get_table_by_reference(reference):
+        return BigQueryTableMetadata.__get_table_or_partition(project_id=reference.project_id,
+                                                              dataset_id=reference.dataset_id,
+                                                              table_id=reference.table_id,
+                                                              partition_id=reference.partition_id)
+
+    @staticmethod
+    @cached(time=300)
+    def get_table_by_reference_cached(reference):
+        return BigQueryTableMetadata.get_table_by_reference(reference)
+
 
     def is_external_or_view_type(self):
         if 'type' in self.table_metadata:

@@ -30,7 +30,7 @@ class TestTableBackup(unittest.TestCase):
 
 
     @patch.object(TablePartitionsBackupScheduler, 'start')
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     def test_that_partition_backups_are_scheduled_for_non_empty_partitioned_table(
@@ -47,7 +47,7 @@ class TestTableBackup(unittest.TestCase):
         # then
         table_partitions_backup_scheduler.assert_called_once()
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=False)
     @patch.object(BackupProcess, 'start')
     def test_that_table_backup_is_scheduled_for_not_partitioned_table(
@@ -64,7 +64,7 @@ class TestTableBackup(unittest.TestCase):
         # then
         backup_start.assert_called_once()
 
-    @patch.object(BigQuery, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     @patch.object(BackupProcess, 'start')

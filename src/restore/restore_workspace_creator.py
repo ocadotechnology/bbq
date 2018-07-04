@@ -1,3 +1,6 @@
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+
+
 class RestoreWorkspaceCreator(object):
 
     def __init__(self, big_query):
@@ -37,7 +40,7 @@ class RestoreWorkspaceCreator(object):
         )
 
     def __create_empty_partitioned_table_if_not_exists(self, target_table_reference):
-        if target_table_reference.is_partition() and not self.BQ.get_table_by_reference_cached(target_table_reference).table_exists():
+        if target_table_reference.is_partition() and not BigQueryTableMetadata.get_table_by_reference_cached(target_table_reference).table_exists():
             self.BQ.create_empty_partitioned_table(target_table_reference)
 
     @staticmethod
