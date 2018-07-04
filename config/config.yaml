@@ -12,3 +12,7 @@ project_settings:
   backup_project_id: '<your-project-id-for-BBQ-project>' #project id where backups will be stored (it ussualy is the same project on which BBQ runs)
   restoration_project_id: '<your-project-id-for-restoration-project>'  #project into which data will be restored during restoration process
   debug_mode: False
+
+tests:
+  restoration_daily_test_results_gcs_bucket: 'a-gcs-bucket'
+  random_table_view: 'project:dataset.table'
