@@ -6,15 +6,23 @@
 BBQ (read: barbecue) is a python app that runs on Google App Engine (GAE) and creates daily backups of BigQuery tables.
 
 # Table of contents
-
+* [Setup](#setup)
 * [Motivation](#motivation)
 * [Features](#features)
 * [High level architecture](#high-level-architecture)
   * [Backup process](#backup-process)
   * [Restore process](#restore-process)
   * [Retention process](#retention-process)
-* [Setup](#setup)
+
 * [Usage](#usage)
+
+# Setup
+To install BBQ in GCP, follow installation steps from [Setup.md](./SETUP.md) doc.
+
+Below button opens [Setup.md](./SETUP.md) in Google Cloud Shell, where you could instantly follow described steps. 
+
+ [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Focadotechnology%2Fbbq&page=shell&tutorial=SETUP.md)
+
 
 # Motivation
 
@@ -121,16 +129,11 @@ Every day retention process scans all backups to find and delete backups matchin
 ### Example of 7 months old backup deletion and source deletion grace period 
 ![Retention process](docs/images/bbq_retention_process_7_months.gif)
 
-# Setup
-To install BBQ in GCP, click button below or follow [Setup.md](./SETUP.md) doc.
-
-<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
-<img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
-
 # Usage
 
 ## How to run backups?
 Backup process is scheduled periodically for all specified projects (check [config.yaml](./config/config.yaml) to specify which projects to backup and [config/cron.yaml](./config/cron.yaml) to configure schedule time).
+Note that cron uses UTC timezone.
 
 However, you may also invoke backup process manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
 
@@ -138,7 +141,7 @@ It's worth to underline that:
 * Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/config.yaml),
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
-## How to list already created backups?
+## How to find backup for given table?
 In order to find where is stored backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
 1. Find __Key literal__ for table _X_:
