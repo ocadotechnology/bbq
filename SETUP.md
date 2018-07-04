@@ -1,11 +1,11 @@
 ### Installation steps
 
-##### The easiest way is to use Google Cloud Shell - click button below. It opens your Google Cloud Shell and clones the repository. 
+##### The recommended way is to use Google Cloud Shell - click button below. It opens your Google Cloud Shell and clones the repository. 
   [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Focadotechnology%2Fbbq&page=shell&tutorial=SETUP.md)
     
-   * It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
+   It is possible to do it from local environment, but it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
-1. Instruction assumes that you are the owner of two GCP projects. 
+1. Create and enable biliing to two GCP projects 
     * First is the place where BBQ will be deployed and backups will be stored.
     * Second is the place where backups will be temporarily stored after restoration procedure. 
     * see [creating a project in GCP](https://support.google.com/cloud/answer/6251787?hl=en#) doc
@@ -48,7 +48,7 @@ You can also trigger it manually, for more details look at [Usage section](READM
 
   * **custom_project_list** - list of projects to backup. If empty, BBQ will backup everything it has read (**BigQuery Data Viewer**) access to. If list is provided you still need to grant **BigQuery Data Viewer** role for BBQ service account for each mentioned projects.
   * **projects_to_skip** - list of projects to skip (it's recommended to skip BBQ project itself). It is useful when you grant **BigQuery Data Viewer** for BBQ service account for the whole organization or folder and want to exclude some of the projects.
-  * **backup_project_id** - project id where backups will be stored (it ussualy is the same project on which BBQ runs)
+  * **backup_project_id** - project id where backups will be stored (it usually is the same project on which BBQ runs)
   * **restoration_project_id** - project into which data will be restored during restoration process
 
 
