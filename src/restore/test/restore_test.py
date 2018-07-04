@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 
 from src.big_query.big_query import BigQuery
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.configuration import configuration
 from src.google_cloud_storage_client import GoogleCloudStorageClient as gcs
 from src.restore.test.table_randomizer import TableRandomizer
@@ -49,10 +48,7 @@ class RestoreTest(object):
 
         target_table_reference = \
             TableReference.parse_tab_ref(restoration_items[0]['targetTable'])
-
-        target_table = BigQueryTableMetadata(
-            BigQuery().get_table_by_reference(target_table_reference)
-        )
+        target_table = BigQuery().get_table_by_reference(target_table_reference)
 
         tables_match, assertion_msg = \
             self.__assert_restored_table_matches_source(src_table, target_table)
