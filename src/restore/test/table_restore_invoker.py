@@ -1,9 +1,9 @@
 import json
 import logging
+import time
 
 import httplib2
 
-from commons.decorators.retry import retry
 from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService
 
@@ -32,15 +32,17 @@ class TableRestoreInvoker(object):
         resp_data = json.loads(content)
         return resp_data['restorationJobId']
 
-    @retry(JobInProgressException, tries=6, delay=10, backoff=2)
-    def wait_till_done(self, restoration_job_id):
-        result = RestorationJobStatusService()\
+    @staticmethod
+    def wait_till_done(restoration_job_id, timeout, period=20):
+        finish_time = time.time() + timeout
+        while time.time() < finish_time:
+            result = RestorationJobStatusService() \
+                .get_restoration_job(restoration_job_id)
+            if result["status"]["state"] in "Done":
+                return result
+            time.sleep(period)
+        return RestorationJobStatusService()\
             .get_restoration_job(restoration_job_id)
-
-        if result["status"]["state"] in "In progress":
-            raise JobInProgressException()
-
-        return result
 
     @staticmethod
     def __build_restore_url(host_url, src_table_reference,
