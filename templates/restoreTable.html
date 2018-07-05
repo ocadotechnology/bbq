@@ -35,16 +35,74 @@
 </script>
 
 <form name="restoreTableForm" onsubmit="return OnSubmitForm();">
-  Source project id<span style="color: red;">*</span>:<br><input type="text" name="projectId" value="" required><br>
-  Source dataset id<span style="color: red;">*</span>:<br><input type="text" name="datasetId" value="" required><br>
-  Source table id<span style="color: red;">*</span>:<br><input type="text" name="tableId" value="" required><br>
-  Source table partition id:<br><input type="number" min="9999999" max="100000000"
-                                       name="partitionId" value=""><br>
-  Target dataset id:<br><input type="text" name="targetDatasetId" value=""><br>
-  Restoration date:<br><input type="date" name="restorationDate" value=""><br>
-  <span style="color: red;">*</span> - required fields
-  <br>
-  <input type="submit" value="Submit">
+  <div class="form-group row">
+    <label for="sourceProjectId" class="col-sm-2 col-form-label">Source project id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceProjectId" name="projectId"
+             placeholder="project id" required/>
+      <small id="sourceProjectIdHelp" class="form-text text-muted">Project id where dataset is
+        placed originally
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourceDatasetId" class="col-sm-2 col-form-label">Source dataset id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceDatasetId" name="datasetId"
+             placeholder="dataset id">
+      <small id="sourceDatasetIdHelp" class="form-text text-muted">Dataset id where tables were
+        placed originally
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourceTableId" class="col-sm-2 col-form-label">Source table id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceTableId" name="tableId"
+             placeholder="table id">
+      <small id="sourceTableIdHelp" class="form-text text-muted">Table id of original table</small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourcePartitionId" class="col-sm-2 col-form-label">Source partition id</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="sourcePartitionId" name="partitionId"
+             placeholder="partition id">
+      <small id="sourcePartitionIdHelp" class="form-text text-muted">Optional. Partition id of
+        original table. If specified, only this single partition will be restored
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="restorationDate" class="col-sm-2 col-form-label">Restoration date</label>
+    <div class="col-sm-4">
+      <input type="date" class="form-control" id="restorationDate" name="restorationDate">
+      <small id="restorationDateHelp" class="form-text text-muted">Optional. BBQ will restore the
+        most recent version of backup on given date. Default value is today</small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
+    <div class="input-group col-sm-8">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="projectAddOn">{{ restoration_project_id }}.</span>
+      </div>
+      <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
+             name="targetDatasetId" placeholder="source_project_id___source_dataset_id">
+      <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
+        that will be used (and created if does not exist) as container for restored table. Remember
+        that this will be a temporary dataset with expiration time set to 7 days. Note that passed
+        dataset could already exists - it should be in the same location as backup. If target
+        dataset id is not passed, then source dataset id value will be used as a target dataset id
+        in restoration project
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Restore table</button>
+    </div>
+  </div>
 </form>
 
 <br><strong>Response:</strong> <br>
