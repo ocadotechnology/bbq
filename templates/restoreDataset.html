@@ -32,12 +32,58 @@
 
 
 <form name="restoreDatasetForm" onsubmit="return OnSubmitForm();">
-  Source project id<span style="color: red;">*</span>:<br> <input type="text" name="projectId" value="" required><br>
-  Source dataset id<span style="color: red;">*</span>:<br> <input type="text" name="datasetId" value="" required><br>
-  Target dataset id:<br> <input type="text" name="targetDatasetId" value=""><br>
-  Max partition days:<br> <input type="number" min="1" name="max_partition_days" value=""><br>
-  <br>
-  <input type="submit" value="Submit">
+  <div class="form-group row">
+    <label for="sourceProjectId" class="col-sm-2 col-form-label">Source project id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceProjectId" name="projectId"
+             placeholder="project id" required/>
+      <small id="sourceProjectIdHelp" class="form-text text-muted">Project id where dataset is
+        placed originally
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourceDatasetId" class="col-sm-2 col-form-label">Source dataset id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceDatasetId" name="datasetId"
+             placeholder="dataset id">
+      <small id="sourceDatasetIdHelp" class="form-text text-muted">Dataset id where tables were
+        placed originally
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
+    <div class="input-group col-sm-8">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="projectAddOn">{{ restoration_project_id }}.</span>
+      </div>
+      <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
+             name="targetDatasetId" placeholder="source_project_id_source_dataset_id">
+      <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
+        that will be used (and created if does not exist) as container for restored table. Remember
+        that this will be a temporary dataset with expiration time set to 7 days. Note that passed
+        dataset could already exists - it should be in the same location as backup. If target
+        dataset id is not passed, then source dataset id value will be used as a target dataset id
+        in restoration project
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="maxPartitionsDays" class="col-sm-2 col-form-label">Max partition days</label>
+    <div class="col-sm-4">
+      <input type="number" class="form-control" id="maxPartitionsDays" name="max_partition_days">
+      <small id="maxPartitionsDaysHelp" class="form-text text-muted">Optional. Number of days from
+        partitioned tables will be restored (eg. 30 means that partitions from last 30 days will be
+        restored)
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Restore dataset</button>
+    </div>
+  </div>
 </form>
 
 <br><strong>Response:</strong> <br>
