@@ -26,7 +26,8 @@ class RestoreTest(object):
             restoration_point_date=datetime.utcnow().date()
         )
 
-        response = table_restore_invoker.wait_till_done(restoration_job_id)
+        response = table_restore_invoker\
+            .wait_till_done(restoration_job_id, timeout=600)
         table_has_been_restored = response["status"]["result"] == "Success"
 
         if table_has_been_restored:
