@@ -41,7 +41,7 @@ class TableRestoreInvoker(object):
                 return result
             logging.info("Request still in progress ...")
 
-        logging.error("Time (%d seconds) exceeded !!!")
+        logging.error("Timeout (%d seconds) exceeded !!!", timeout)
         return RestorationJobStatusService()\
             .get_restoration_job(restoration_job_id)
 
