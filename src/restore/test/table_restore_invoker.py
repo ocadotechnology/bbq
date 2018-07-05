@@ -8,10 +8,6 @@ from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService
 
 
-class JobInProgressException(Exception):
-    pass
-
-
 class TableRestoreInvoker(object):
 
     def __init__(self, host_url):
@@ -36,11 +32,16 @@ class TableRestoreInvoker(object):
     def wait_till_done(restoration_job_id, timeout, period=20):
         finish_time = time.time() + timeout
         while time.time() < finish_time:
+            logging.info("Waiting %d seconds for request to end...", period)
+            time.sleep(period)
             result = RestorationJobStatusService() \
                 .get_restoration_job(restoration_job_id)
             if result["status"]["state"] in "Done":
+                logging.info("Request finished.")
                 return result
-            time.sleep(period)
+            logging.info("Request still in progress ...")
+
+        logging.error("Time (%d seconds) exceeded !!!")
         return RestorationJobStatusService()\
             .get_restoration_job(restoration_job_id)
 
