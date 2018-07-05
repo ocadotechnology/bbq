@@ -6,6 +6,7 @@ import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
+from src.big_query.big_query_table import BigQueryTable
 from commons.decorators.cached import cached
 from commons.decorators.log_time import log_time, measure_time_and_log
 from commons.decorators.retry import retry
@@ -229,30 +230,21 @@ class BigQuery(object):  # pylint: disable=R0904
         ).execute(num_retries=3)
 
     @retry(Error, tries=3, delay=2, backoff=2)
-    def create_empty_partitioned_table(self, table_reference):
-        logging.info(
-            "Creating empty daily partitioned table: %s",
-            table_reference
-        )
-        body = {
-            'tableReference': {
-                'projectId': table_reference.project_id,
-                'datasetId': table_reference.dataset_id,
-                'tableId': table_reference.table_id,
-            },
-            'timePartitioning': {
-                'type': 'DAY'
-            }
-        }
+    def create_table(self, projectId, datasetId, body):
+        table = BigQueryTable(projectId, datasetId, body.get("tableReference").get("tableId"))
+
+        logging.info("Creating table %s", table)
+        logging.info("BODY: %s", json.dumps(body))
+
         try:
             self.service.tables().insert(
-                projectId=table_reference.project_id,
-                datasetId=table_reference.dataset_id,
+                projectId=projectId,
+                datasetId=datasetId,
                 body=body
             ).execute()
         except HttpError as error:
             if error.resp.status == 409:
-                logging.info('Table already exists %s', table_reference)
+                logging.info('Table already exists %s', table)
             else:
                 raise
 
