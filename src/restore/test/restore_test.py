@@ -16,13 +16,13 @@ RESTORE_DATASET_ID_EU = 'smoke_test_EU'
 class RestoreTest(object):
 
     def test(self, host_url):
-        src_table = self.__pick_random_table()
-        table_reference = src_table.table_reference()
+        source_table = self.__pick_random_table()
+        table_reference = source_table.table_reference()
         table_restore_invoker = TableRestoreInvoker(host_url)
 
         restoration_job_id = table_restore_invoker.invoke(
             src_table_reference=table_reference,
-            target_dataset=self.__get_restore_dataset(src_table),
+            target_dataset=self.__get_restore_dataset(source_table),
             restoration_point_date=datetime.utcnow().date()
         )
 
@@ -31,7 +31,8 @@ class RestoreTest(object):
         table_has_been_restored = response["status"]["result"] == "Success"
 
         if table_has_been_restored:
-            self.__check_restored_table_matches_source(response, src_table)
+            return self.__check_restored_table_matches_source(response,
+                                                              source_table)
         else:
             resp_msg = "Restore test failed. " \
                        "Failed to restore a table {}".format(table_reference)
