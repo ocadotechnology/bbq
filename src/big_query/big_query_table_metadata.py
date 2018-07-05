@@ -43,6 +43,15 @@ class BigQueryTableMetadata(object):
     def get_table_by_reference_cached(reference):
         return BigQueryTableMetadata.get_table_by_reference(reference)
 
+    def create_the_same_empty_table(self, target_reference):
+        body = {}
+        body["tableReference"]={}
+        body["tableReference"]["projectId"]= target_reference.get_project_id()
+        body["tableReference"]["datasetId"]= target_reference.get_dataset_id()
+        body["tableReference"]["tableId"]= target_reference.get_table_id()
+        body["timePartitioning"]=self.table_metadata.get("timePartitioning")
+        body["schema"]=self.table_metadata.get("schema")
+        BigQuery().create_table(target_reference.get_project_id(), target_reference.get_dataset_id(), body)
 
     def is_external_or_view_type(self):
         if 'type' in self.table_metadata:
