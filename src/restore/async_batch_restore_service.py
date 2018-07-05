@@ -8,7 +8,6 @@ from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.big_query.big_query import BigQuery
 from src.restore.datastore.restoration_job import RestorationJob
-from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 
 
@@ -32,10 +31,12 @@ class AsyncBatchRestoreService(object):
 
             source_table_reference = restore_item.source_table_reference
             target_table_reference = restore_item.target_table_reference
+
+            self.restore_workspace_creator.create_workspace(
+                source_table_reference,
+                target_table_reference)
+
             try:
-                self.restore_workspace_creator.create_workspace(
-                    source_table_reference,
-                    target_table_reference)
 
                 CopyJobServiceAsync(
                     copy_job_type_id='restore',
