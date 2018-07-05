@@ -158,28 +158,11 @@ To check the content for given backup __Y__ in Big Query:
 1. Select table and check _Schema_, _Details_ or _Preview_ tab.
 
 ## How to restore data from backups?
-There are several options to restore data, available from _\<your-project-id>_.__appspot.com__ (dropdown tab _Actions_)
-* __Restore whole dataset__ (_\<your-project-id>.appspot.com_/__ui/restoreDataset__). Parameters:
-    * Source project id: id of project where dataset is placed originally,
-    * Source dataset id: original dataset id,
-    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same location as backup__.
-    If _target dataset id_ is not passed, then _source dataset id_ value will be used as a target dataset id in restoration project
-    * Max partition days (optional): number of days from partitioned tables will be restored (eg. 30 means that partitions from last 30 days will be restored),
-* __Restore tables from list of backups__ (_\<your-project-id>.appspot.com_/__ui/restoreList__). Parameters:
-    * Target dataset id (optional): id of temporary dataset that will be used (and created if does not exist) as container for restored table. Remember that this will be a temporary dataset with expiration time set to 7 days. __Note that passed dataset could already exists - it should be in the same location as backup__.
-    If _target dataset id_ is not passed, then source dataset id value of each backup will be used as a target dataset id in restoration project.
-    In case of restoring backups from different datasets multiple target datasets will be created.    
-    * Backup list: set of backups in __JSON__ format, each of them is designated by the url safe key of backup entity available from [Datastore](https://console.cloud.google.com/datastore). Example:  
-```json
-[  
-  {	   
-    "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LPPicXIlCxIFVGFibGUYgICAkOaLgAgMCxIGQmFja3VwGICAgICAgJJJJA"
-  },
-  {	   
-    "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LWJicXIlCxIFVGFibGUYgICAkJOlgAgMCxIGQmFja3VwGICAgICAgIAKDA"
-  }
-]
-```
+There are several options to restore data, available from _\<your-project-id>_.__appspot.com__
+* __Restore whole dataset__ 
+* __Restore single table__ 
+* __Restore tables from custom list of backups__
+
 #### Checking status of restoration process
  Restore process is asynchronous. To check status of process, follow links returned in response:
   
