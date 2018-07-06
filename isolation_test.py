@@ -5,9 +5,10 @@ import click
 
 class IsolationTest(object):
 
-    def __init__(self, test_runner, google_cloud_sdk, v):
+    def __init__(self, test_runner, google_cloud_sdk, test_path, v):
         self.test_runner_absolute_path = os.path.abspath(test_runner)
         self.google_cloud_sdk = google_cloud_sdk
+        self.test_path = test_path
         if v:
             self.std_output_and_error_redirect = None
         else:
@@ -27,23 +28,27 @@ class IsolationTest(object):
                   type=click.Path(exists=True),
                   help='Full path to google-cloud-sdk'
                  )
+    @click.option('--test_path',
+                  required=True,
+                  type=click.Path(exists=True),
+                  help='Path to tests'
+                 )
     @click.option('--v',
                   flag_value=True,
                   help='Verbose mode. '
                        'Displays more detailed output of test executions'
                  )
-    def run(test_runner, google_cloud_sdk, v):
-        IsolationTest(test_runner, google_cloud_sdk, v)\
+    def run(test_runner, google_cloud_sdk, test_path, v):
+        IsolationTest(test_runner, google_cloud_sdk, test_path, v)\
             .execute_all_tests_recursively()
 
     def execute_all_tests_recursively(self):
 
-        for tests_dir in IsolationTest.get_tests_directories():
-            print "CHECKING TESTS DIRECTORY: {}".format(tests_dir)
-            for dirpath, _, _ in os.walk(tests_dir):
-                for test_file in os.listdir(dirpath):
-                    if test_file.startswith('test') and test_file.endswith('.py'):
-                        self.execute_single_file_tests(tests_dir, test_file)
+        print "CHECKING TESTS DIRECTORY: {}".format(self.test_path)
+        for dirpath, _, _ in os.walk(self.test_path):
+            for test_file in os.listdir(dirpath):
+                if test_file.startswith('test') and test_file.endswith('.py'):
+                    self.execute_single_file_tests(self.test_path, test_file)
 
         if self.errors_count == 0:
             print "DONE. Everyting fine."
