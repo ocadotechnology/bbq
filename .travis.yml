@@ -14,11 +14,11 @@ before_install:
     - pip install click
 script:
 #    - find . -name "*.py" -path "./*" -not \( -path "./lib/*" -o -path "./google-cloud-sdk/*" \) | xargs pylint --reports=yes --rcfile=.pylintrc
-    - coverage run --source=src test_runner.py --test-path tests/ --test-pattern 'test*.py' -v ./google-cloud-sdk
     - PYTHONPATH=$PYTHONPATH:./lib:./google-cloud-sdk/bin
     - echo $PYTHONPATH
     - ls ./google-cloud-sdk/bin
     - ls ./google-cloud-sdk
+    - coverage run --source=src test_runner.py --test-path tests/ --test-pattern 'test*.py' -v ./google-cloud-sdk
     - python isolation_test.py --test_runner "test_runner.py" --google_cloud_sdk ./google-cloud-sdk --v
 
 after_success:
