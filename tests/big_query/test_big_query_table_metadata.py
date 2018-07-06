@@ -13,6 +13,40 @@ from src.error_reporting import ErrorReporting
 # table_not_exist_anymore() method tests
 from src.table_reference import TableReference
 
+class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
+
+    @patch.object(BigQuery, 'create_table')
+    def test_create_same_empty_table_execute_a_proper_big_query_request_with_same_table_properties(self, create_table):
+        table_properties = {
+            "tableReference":{
+                "projectId":"p1",
+                "datasetId":"d1",
+                "tableId":"t1",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        }
+
+        target_table_reference = TableReference("p2", "d2", "t2")
+        BigQueryTableMetadata(table_properties).create_the_same_empty_table(target_table_reference)
+        create_table.assert_called_with("p2","d2",
+            {
+            "tableReference":{
+                "projectId":"p2",
+                "datasetId":"d2",
+                "tableId":"t2",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        })
+
+
 class TestBigQueryTableMetadata_GetTableByReferenceCached(unittest.TestCase):
 
     def setUp(self):
