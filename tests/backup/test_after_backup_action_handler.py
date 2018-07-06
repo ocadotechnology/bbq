@@ -36,8 +36,6 @@ class TestAfterBackupActionHandler(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-
-    # TODO:  TestAfterBackupActionHandler should be splitted into TestAfterBackupActionHandler and TestAfterBackupActionService
     @patch.object(BigQuery, '_create_http')
     def test_should_create_datastore_backup_entity(self, _create_http):
         # given

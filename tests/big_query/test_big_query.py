@@ -114,11 +114,11 @@ class TestBigQuery(unittest.TestCase):
         # when then
         BigQuery().create_dataset("project123", "dataset_id", "US")
 
-    # def test_create_dataset_do_nothing_if_dataset_already_exists(self):
-    #     # given
-    #     self._create_http.return_value = self.__create_dataset_create_already_exist_responses()
-    #     # when then
-    #     BigQuery().create_dataset("project123", "dataset_id", "US")
+    def test_create_dataset_do_nothing_if_dataset_already_exists(self):
+        # given
+        self._create_http.return_value = self.__create_dataset_create_already_exist_responses()
+        # when then
+        BigQuery().create_dataset("project123", "dataset_id", "US")
 
     @staticmethod
     def count(generator):
