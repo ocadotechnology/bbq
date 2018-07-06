@@ -15,7 +15,7 @@ before_install:
 script:
 #    - find . -name "*.py" -path "./*" -not \( -path "./lib/*" -o -path "./google-cloud-sdk/*" \) | xargs pylint --reports=yes --rcfile=.pylintrc
     - coverage run --source=src test_runner.py --test-path tests/ --test-pattern 'test*.py' -v ./google-cloud-sdk
-    - PYTHONPATH=$PYTHONPATH:./lib
+    - PYTHONPATH=$PYTHONPATH:./lib:./google-cloud-sdk/bin
     - python isolation_test.py --test_runner "test_runner.py" --google_cloud_sdk ./google-cloud-sdk --v
 
 after_success:
