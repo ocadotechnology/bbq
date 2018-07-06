@@ -40,10 +40,11 @@ class RestoreWorkspaceCreator(object):
         )
 
     def __create_empty_partitioned_table_if_not_exists(self, source_table_reference, target_table_reference):
-        target_table_metadata = BigQueryTableMetadata.get_table_by_reference_cached(target_table_reference)
-        if target_table_reference.is_partition() and not target_table_metadata.table_exists():
-            source_table_metadata = BigQueryTableMetadata.get_table_by_reference_cached(source_table_reference)
-            source_table_metadata.create_the_same_empty_table(target_table_reference)
+        if target_table_reference.is_partition():
+            target_table_metadata = BigQueryTableMetadata.get_table_by_reference_cached(target_table_reference)
+            if not target_table_metadata.table_exists():
+                source_table_metadata = BigQueryTableMetadata.get_table_by_reference_cached(source_table_reference)
+                source_table_metadata.create_the_same_empty_table(target_table_reference)
 
     @staticmethod
     def create_default_target_dataset_id(project_id, dataset_id):
