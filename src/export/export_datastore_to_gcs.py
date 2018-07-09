@@ -2,6 +2,8 @@ import datetime
 import httplib
 import json
 import logging
+import time
+
 import webapp2
 
 from google.appengine.api import app_identity
@@ -11,24 +13,18 @@ from src.configuration import configuration
 
 
 class ExportDatastoreToGCS(webapp2.RequestHandler):
-
-    def get(self):
+    @classmethod
+    def invoke(cls, request, response):
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         app_id = app_identity.get_application_id()
-        timestamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
 
-        output_url_prefix = self.request.get('output_url_prefix')
-        assert output_url_prefix and output_url_prefix.startswith('gs://')
-        if '/' not in output_url_prefix[5:]:
-            # Only a bucket name has been provided - no prefix or trailing slash
-            output_url_prefix += '/' + timestamp
-        else:
-            output_url_prefix += timestamp
+        output_url_prefix = cls.get_output_url_prefix(request)
 
         entity_filter = {
-            'kinds': self.request.get_all('kind'),
-            'namespace_ids': self.request.get_all('namespace_id')
+            'kinds': request.get_all('kind'),
+            'namespace_ids': request.get_all('namespace_id')
         }
         request = {
             'project_id': app_id,
@@ -39,24 +35,70 @@ class ExportDatastoreToGCS(webapp2.RequestHandler):
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + access_token
         }
-        url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
-        try:
+
+        result = urlfetch.fetch(
+            url=url,
+            payload=json.dumps(request),
+            method=urlfetch.POST,
+            deadline=60,
+            headers=headers)
+        if result.status_code == httplib.OK:
+            logging.info(result.content)
+        elif result.status_code >= 500:
+            logging.error(result.content)
+        else:
+            logging.warning(result.content)
+
+        response.status_int = result.status_code
+        return ExportDatastoreToGCSOperation(result.content, headers)
+
+    @classmethod
+    def get_output_url_prefix(cls, request):
+        timestamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        output_url_prefix = request.get('gcs_bucket')
+        assert output_url_prefix and output_url_prefix.startswith('gs://')
+        if '/' not in output_url_prefix[5:]:
+            # Only a bucket name has been provided - no prefix or trailing slash
+            output_url_prefix += '/' + timestamp
+        else:
+            output_url_prefix += timestamp
+        return output_url_prefix
+
+
+class ExportDatastoreToGCSOperation(object):
+    def __init__(self, operation, headers):
+        self.operation = operation
+        self.headers = headers
+
+    def wait_till_done(self, timeout, period=60):
+        app_id = app_identity.get_application_id()
+        url = 'https://datastore.googleapis.com/v1/projects/{}/operations/{}'\
+            .format(app_id, self.operation["name"])
+
+        finish_time = time.time() + timeout
+        while time.time() < finish_time:
+            logging.info("Waiting %d seconds for request to end...", period)
+            time.sleep(period)
+
             result = urlfetch.fetch(
                 url=url,
-                payload=json.dumps(request),
-                method=urlfetch.POST,
+                method=urlfetch.GET,
                 deadline=60,
-                headers=headers)
-            if result.status_code == httplib.OK:
-                logging.info(result.content)
-            elif result.status_code >= 500:
-                logging.error(result.content)
-            else:
-                logging.warning(result.content)
-            self.response.status_int = result.status_code
-        except urlfetch.Error:
-            logging.exception('Failed to initiate export.')
-            self.response.status_int = httplib.INTERNAL_SERVER_ERROR
+                headers=self.headers)
+
+            loads = json.loads(result)
+
+            if "error" in loads:
+                error = loads.get("error")
+                logging.error("Request finished with errors: %s", error)
+                return False
+            if loads.get("done") in True:
+                logging.info("Request finished.")
+                return True
+            logging.info("Request still in progress ...")
+
+        logging.error("Timeout (%d seconds) exceeded !!!", timeout)
+        return False
 
 
 app = webapp2.WSGIApplication([
