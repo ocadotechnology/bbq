@@ -91,14 +91,27 @@ class ExportDatastoreToGCSOperation(object):
             if "error" in loads:
                 error = loads.get("error")
                 logging.error("Request finished with errors: %s", error)
-                return False
+                return ExportDatastoreToGCSOperationResult(False)
             if loads.get("done") in True:
                 logging.info("Request finished.")
-                return True
+                output_url = loads["response"]["outputUrl"]
+                return ExportDatastoreToGCSOperationResult(True, output_url)
             logging.info("Request still in progress ...")
 
         logging.error("Timeout (%d seconds) exceeded !!!", timeout)
-        return False
+        return ExportDatastoreToGCSOperationResult(False)
+
+
+class ExportDatastoreToGCSOperationResult(object):
+    def __init__(self, is_done, output_url_prefix=None):
+        self.is_done = is_done
+        self.output_url_prefix = output_url_prefix
+
+    def is_done(self):
+        return self.is_done
+
+    def get_bucket_url(self):
+        return self.output_url_prefix
 
 
 app = webapp2.WSGIApplication([
