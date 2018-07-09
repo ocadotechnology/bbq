@@ -10,7 +10,7 @@ class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
             .invoke(self.request, self.response)\
             .wait_till_done(timeout=600)
 
-        if not result.is_done():
+        if not result.is_finished_with_success():
             raise Exception("ExportDatastoreToBigQueryHandler NOT DONE !!!")
 
 
