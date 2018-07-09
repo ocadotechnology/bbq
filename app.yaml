@@ -91,6 +91,14 @@ handlers:
   script: src.backup.organization_backup_handler.app
   secure: always
   login: admin
+
+
+- url: /export_gcs_to_bq
+  script: src.datastore_export.tmp_handler.app
+  secure: always
+  login: admin
+
+
 - url: /backups/schedule
   script: src.backup.organization_backup_handler.app
   secure: always
