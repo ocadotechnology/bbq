@@ -11,12 +11,12 @@ from google.appengine.api import urlfetch
 from src.configuration import configuration
 
 
-class ExportDatastoreToGCS(webapp2.RequestHandler):
+class ExportDatastoreToGCSService(webapp2.RequestHandler):
     @classmethod
     def invoke(cls, request, response):
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
-        app_id = app_identity.get_application_id()
+        app_id = configuration.backup_project_id
         url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
 
         output_url_prefix = cls.get_output_url_prefix(request)
@@ -90,9 +90,9 @@ class ExportDatastoreToGCSOperation(object):
                 return ExportDatastoreToGCSOperationResult(False)
             if content.get("done"):
                 logging.info("Request finished.")
-                output_url = content\
-                    .get("response")\
-                    .get("outputUrl")
+                output_url = content \
+                    .get("metadata") \
+                    .get("outputUrlPrefix")
                 return ExportDatastoreToGCSOperationResult(True, output_url)
             logging.info("Request still in progress ...")
 
@@ -108,10 +108,10 @@ class ExportDatastoreToGCSOperationResult(object):
     def is_finished_with_success(self):
         return self.finished_with_success
 
-    def get_bucket_url(self):
+    def get_output_url_prefix(self):
         return self.output_url_prefix
 
 
 app = webapp2.WSGIApplication([
-    webapp2.Route('/cron/export-datastore-to-gcs', ExportDatastoreToGCS)
+    webapp2.Route('/cron/export-datastore-to-gcs', ExportDatastoreToGCSService)
 ], debug=configuration.debug_mode)
