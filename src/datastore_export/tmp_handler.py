@@ -12,7 +12,7 @@ class TmpHandler(webapp2.RequestHandler):
 
   def get(self):  # nopep8 pylint: disable=R0201
     export_service = GCSToBQExportService()
-    export_service.make_export()
+    export_service.export("2018-07-06T16:52:52_38464")
 
 
 app = webapp2.WSGIApplication([webapp2.Route(
