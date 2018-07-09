@@ -1,86 +1,65 @@
 import logging
 from time import sleep
 
-from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.big_query.big_query import BigQuery
+from src.configuration import configuration
+
+
+class ExportGCSToBigQueryException(Exception):
+  pass
 
 
 class GCSToBQExportService(object):
 
-  def __init__(self):
-    pass
+  def export(self, gcs_export_datetime):
+    bakckup_load_job = self.create_load_job("Backup", gcs_export_datetime)
+    table_load_job = self.create_load_job("Table", gcs_export_datetime)
 
-  def make_export(self):
-    load_backup_entities_job = {
-      "projectId": 'local-project-bbq',
+    load_jobs = [bakckup_load_job, table_load_job]
+    load_job_ids = []
+    for load_job in load_jobs:
+      job_id = BigQuery().insert_job(configuration.backup_project_id, load_job)
+      load_job_ids.append(job_id)
+
+    sleep(5)
+
+    for load_job_id in load_job_ids:
+      is_done = False
+      while not is_done:
+        result = BigQuery().get_job(
+            project_id=configuration.backup_project_id,
+            job_id=load_job_id
+        )
+        logging.info(result)
+
+        is_done = result['status']['state'] == 'DONE'
+        print is_done
+
+        if not is_done:
+          sleep(2)
+        if 'errors' in result['status']:
+          raise ExportGCSToBigQueryException()
+
+  def create_load_job(self, entity, gcs_export_datetime):
+    date = gcs_export_datetime.split('T')[0].replace('-', '')
+
+    return {
+      "projectId": configuration.backup_project_id,
       "location": "EU",
       "configuration": {
         "load": {
           "sourceFormat": "DATASTORE_BACKUP",
+          "writeDisposition": "WRITE_TRUNCATE",
           "sourceUris": [
-            "gs://temp_mr_mr/2018-07-06T16:52:52_38464/all_namespaces/kind_Backup/all_namespaces_kind_Backup.export_metadata"
+            "gs://temp_mr_mr/" + gcs_export_datetime +
+            "/all_namespaces/kind_" + entity + "/all_namespaces_kind_"
+            + entity + ".export_metadata"
           ],
           "destinationTable": {
-            "projectId": 'local-project-bbq',
+            "projectId": configuration.backup_project_id,
             "datasetId": "test_mr1",
-            "tableId": "Backup"
+            "tableId": entity + "_" + date
           }
         }
       }
     }
-
-    load_backups_job_id = BigQuery().insert_job(
-        'local-project-bbq', load_backup_entities_job)
-    logging.info("Job ID: " + load_backups_job_id)
-    print load_backups_job_id
-
-    load_table_entities_job = {
-      "projectId": 'local-project-bbq',
-      "location": "EU",
-      "configuration": {
-        "load": {
-          "sourceFormat": "DATASTORE_BACKUP",
-          "sourceUris": [
-            "gs://temp_mr_mr/2018-07-06T16:52:52_38464/all_namespaces/kind_Table/all_namespaces_kind_Table.export_metadata"
-          ],
-          "destinationTable": {
-            "projectId": 'local-project-bbq',
-            "datasetId": "test_mr1",
-            "tableId": "Tables"
-          }
-        }
-      }
-    }
-
-    load_tables_job_id = BigQuery().insert_job(
-        'local-project-bbq', load_table_entities_job)
-    logging.info("Job ID: " + load_tables_job_id)
-    print load_tables_job_id
-
-    is_done=False
-    while not is_done:
-      sleep(5)
-      result = BigQuery().get_job(
-          project_id='local-project-bbq',
-          job_id=load_backups_job_id
-      )
-
-      copy_job_result = CopyJobResult(result)
-      if not copy_job_result.is_done():
-        print "1 not done"
-        continue
-
-      result = BigQuery().get_job(
-          project_id='local-project-bbq',
-          job_id=load_tables_job_id
-      )
-
-      copy_job_result = CopyJobResult(result)
-      if not copy_job_result.is_done():
-
-        continue
-      print "3 is done"
-      is_done=True
-
-
-
