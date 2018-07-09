@@ -8,7 +8,3 @@ cron:
 - description: execute retention policy
   url: /cron/retention
   schedule: every day 14:07
-- description: "Daily Cloud Datastore Export"
-  url: /cron/export-datastore-to-gcs?kind=Table&kind=Backup&output_url_prefix=gs://dev_daily_datastore_export
-  target: cloud-datastore-admin
-  schedule: every 24 hours
