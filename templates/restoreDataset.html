@@ -65,7 +65,8 @@
         that this will be a temporary dataset with expiration time set to 7 days. Note that passed
         dataset could already exists - it should be in the same location as backup. If target
         dataset id is not passed, then source dataset id value will be used as a target dataset id
-        in restoration project
+        in restoration project. In case of restoring backups from different datasets multiple target
+        datasets will be created.
       </small>
     </div>
   </div>
@@ -74,8 +75,8 @@
     <div class="col-sm-4">
       <input type="number" class="form-control" id="maxPartitionsDays" name="max_partition_days">
       <small id="maxPartitionsDaysHelp" class="form-text text-muted">Optional. Number of days from
-        partitioned tables will be restored (eg. 30 means that partitions from last 30 days will be
-        restored)
+        partitioned tables will be restored (eg. 30 means that partitions from last 30 days from now
+        will be restored)
       </small>
     </div>
   </div>
