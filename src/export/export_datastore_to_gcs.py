@@ -5,7 +5,6 @@ import logging
 import time
 
 import webapp2
-
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
 
@@ -67,15 +66,13 @@ class ExportDatastoreToGCS(webapp2.RequestHandler):
 
 class ExportDatastoreToGCSOperation(object):
     def __init__(self, operation, headers):
-        self.operation = operation
+        self.operation_id = json.loads(operation).get("name")
         self.headers = headers
 
     def wait_till_done(self, timeout, period=60):
-        app_id = app_identity.get_application_id()
-        url = 'https://datastore.googleapis.com/v1/projects/{}/operations/{}'\
-            .format(app_id, self.operation["name"])
-
+        url = "https://datastore.googleapis.com/v1/" + self.operation_id
         finish_time = time.time() + timeout
+
         while time.time() < finish_time:
             logging.info("Waiting %d seconds for request to end...", period)
             time.sleep(period)
@@ -85,16 +82,17 @@ class ExportDatastoreToGCSOperation(object):
                 method=urlfetch.GET,
                 deadline=60,
                 headers=self.headers)
+            content = json.loads(result.content)
 
-            loads = json.loads(result)
-
-            if "error" in loads:
-                error = loads.get("error")
+            if "error" in content:
+                error = content.get("error")
                 logging.error("Request finished with errors: %s", error)
                 return ExportDatastoreToGCSOperationResult(False)
-            if loads.get("done") in True:
+            if content.get("done"):
                 logging.info("Request finished.")
-                output_url = loads["response"]["outputUrl"]
+                output_url = content\
+                    .get("response")\
+                    .get("outputUrl")
                 return ExportDatastoreToGCSOperationResult(True, output_url)
             logging.info("Request still in progress ...")
 
@@ -103,12 +101,12 @@ class ExportDatastoreToGCSOperation(object):
 
 
 class ExportDatastoreToGCSOperationResult(object):
-    def __init__(self, is_done, output_url_prefix=None):
-        self.is_done = is_done
+    def __init__(self, finished_with_success, output_url_prefix=None):
+        self.finished_with_success = finished_with_success
         self.output_url_prefix = output_url_prefix
 
-    def is_done(self):
-        return self.is_done
+    def is_finished_with_success(self):
+        return self.finished_with_success
 
     def get_bucket_url(self):
         return self.output_url_prefix
