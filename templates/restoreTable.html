@@ -34,6 +34,12 @@
   }
 </script>
 
+<p class="lead">
+  This form restores single non-partitioned table or single partition. In case of restoring multiple
+  partitions from partitioned table, you need to submit this form for every partition which you want
+  to restore.
+</p>
+
 <form name="restoreTableForm" onsubmit="return OnSubmitForm();">
   <div class="form-group row">
     <label for="sourceProjectId" class="col-sm-2 col-form-label">Source project id</label>
@@ -68,8 +74,9 @@
     <div class="col-sm-8">
       <input type="number" class="form-control" id="sourcePartitionId" name="partitionId"
              placeholder="partition id">
-      <small id="sourcePartitionIdHelp" class="form-text text-muted">Optional. Partition id of
-        original table. If specified, only this single partition will be restored
+      <small id="sourcePartitionIdHelp" class="form-text text-muted">Valid and required for
+        partitioned tables only. Partition id of original table. If specified, only this single
+        partition will be restored
       </small>
     </div>
   </div>
