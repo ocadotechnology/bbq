@@ -6,11 +6,11 @@ from src.export.export_datastore_to_gcs import ExportDatastoreToGCS
 
 class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
     def get(self):
-        is_done = ExportDatastoreToGCS\
+        result = ExportDatastoreToGCS\
             .invoke(self.request, self.response)\
             .wait_till_done(timeout=600)
 
-        if not is_done:
+        if not result.is_done():
             raise Exception("ExportDatastoreToBigQueryHandler NOT DONE !!!")
 
 
