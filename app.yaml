@@ -102,8 +102,8 @@ handlers:
 - url: /backups/schedule
   script: src.backup.organization_backup_handler.app
   secure: always
-- url: /cron/export-datastore-to-gcs
-  script: src.export.export_ds_to_gcs.app
+- url: /cron/export-datastore-to-big-query
+  script: src.export.export_datastore_to_big_query_handler.app.app
   secure: always
   login: admin
 - url: /_ah/start
