@@ -22,7 +22,7 @@ project_settings:
   backup_project_id: '<your-project-id-for-BBQ-project>'
 
   # restoration_project_id - project into which data will be restored during restoration process
-  restoration_project_id: '<your-project-id-for-restoration-project>'
+  restoration_project_id: '<your-project-id-for-restoration-storage-project>'
   debug_mode: False
 
 tests:
