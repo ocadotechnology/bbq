@@ -29,7 +29,8 @@ class ExportGCSToBigQueryService(object):
 
     @classmethod
     def create_load_job(cls, entity, source_gcs_bucket):
-        dataset_id, date = source_gcs_bucket.split("//")[1].split("/")
+        dataset_id, datetime = source_gcs_bucket.split("//")[1].split("/")
+        date = datetime.split("_")[0]
         return {
             "projectId": configuration.backup_project_id,
             "location": "EU",
