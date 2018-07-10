@@ -3,6 +3,7 @@ import time
 
 from src.big_query.big_query import BigQuery
 from src.configuration import configuration
+from src.error_reporting import ErrorReporting
 
 
 class ExportGCSToBigQueryException(Exception):
@@ -11,21 +12,23 @@ class ExportGCSToBigQueryException(Exception):
 
 class ExportGCSToBigQueryService(object):
 
-    @classmethod
-    def export(cls, source_gcs_bucket):
-        backup_load_job = cls.create_load_job("Backup", source_gcs_bucket)
-        table_load_job = cls.create_load_job("Table", source_gcs_bucket)
+    def __init__(self):
+        self.big_query = BigQuery()
+
+    def export(self, source_gcs_bucket):
+        backup_load_job = self.create_load_job("Backup", source_gcs_bucket)
+        table_load_job = self.create_load_job("Table", source_gcs_bucket)
 
         load_jobs = [backup_load_job, table_load_job]
         load_job_ids = []
 
         for load_job in load_jobs:
-            job_id = BigQuery()\
+            job_id = self.big_query \
                 .insert_job(configuration.backup_project_id, load_job)
             load_job_ids.append(job_id)
 
         for load_job_id in load_job_ids:
-            cls.__wait_till_done(load_job_id, 600)
+            self.__wait_till_done(load_job_id, 600)
 
     @classmethod
     def create_load_job(cls, entity, source_gcs_bucket):
@@ -76,5 +79,4 @@ class ExportGCSToBigQueryService(object):
                 return
             logging.info("Export from GCS to BQ still in progress ...")
 
-        error_message = "Timeout (%d seconds) exceeded !!!" % timeout
-        raise ExportGCSToBigQueryException(error_message)
+        ErrorReporting().report("Timeout (%d seconds) exceeded !!!" % timeout)
