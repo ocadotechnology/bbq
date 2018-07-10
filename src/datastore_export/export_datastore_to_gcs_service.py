@@ -11,6 +11,10 @@ from google.appengine.api import urlfetch
 from src.configuration import configuration
 
 
+class ExportDatastoreToGCSException(Exception):
+    pass
+
+
 class ExportDatastoreToGCSService(webapp2.RequestHandler):
     @classmethod
     def invoke(cls, request, response):
@@ -55,8 +59,7 @@ class ExportDatastoreToGCSService(webapp2.RequestHandler):
     @classmethod
     def get_output_url_prefix(cls, request):
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        output_url_prefix = request.get('gcs_bucket')
-        assert output_url_prefix and output_url_prefix.startswith('gs://')
+        output_url_prefix = "gs://%s" % request.get('output_path')
         if '/' not in output_url_prefix[5:]:
             # Only a bucket name has been provided - no prefix or trailing slash
             output_url_prefix += '/' + timestamp
@@ -75,7 +78,8 @@ class ExportDatastoreToGCSOperation(object):
         finish_time = time.time() + timeout
 
         while time.time() < finish_time:
-            logging.info("Waiting %d seconds for request to end...", period)
+            logging.info("Export from DS to GCS - "
+                         "waiting %d seconds for request to end...", period)
             time.sleep(period)
 
             result = urlfetch.fetch(
@@ -87,30 +91,17 @@ class ExportDatastoreToGCSOperation(object):
 
             if "error" in content:
                 error = content.get("error")
-                logging.error("Request finished with errors: %s", error)
-                return ExportDatastoreToGCSOperationResult(False)
+                error_message = "Request finished with errors: %s" % error
+                raise ExportDatastoreToGCSException(error_message)
             if content.get("done"):
-                logging.info("Request finished.")
-                output_url = content \
+                logging.info("Export from DS to GCS finished successfully.")
+                return content \
                     .get("metadata") \
                     .get("outputUrlPrefix")
-                return ExportDatastoreToGCSOperationResult(True, output_url)
-            logging.info("Request still in progress ...")
+            logging.info("Export from DS to GCS still in progress ...")
 
-        logging.error("Timeout (%d seconds) exceeded !!!", timeout)
-        return ExportDatastoreToGCSOperationResult(False)
-
-
-class ExportDatastoreToGCSOperationResult(object):
-    def __init__(self, finished_with_success, output_url_prefix=None):
-        self.finished_with_success = finished_with_success
-        self.output_url_prefix = output_url_prefix
-
-    def is_finished_with_success(self):
-        return self.finished_with_success
-
-    def get_output_url_prefix(self):
-        return self.output_url_prefix
+        error_message = "Timeout (%d seconds) exceeded !!!" % timeout
+        raise ExportDatastoreToGCSException(error_message)
 
 
 app = webapp2.WSGIApplication([
