@@ -54,7 +54,7 @@ class ExportDatastoreToGCSService(webapp2.RequestHandler):
 
     @classmethod
     def get_output_url_prefix(cls, request):
-        timestamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
         output_url_prefix = request.get('gcs_bucket')
         assert output_url_prefix and output_url_prefix.startswith('gs://')
         if '/' not in output_url_prefix[5:]:
