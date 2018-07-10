@@ -25,7 +25,7 @@ class ExportGCSToBigQueryService(object):
             load_job_ids.append(job_id)
 
         for load_job_id in load_job_ids:
-            cls.__wait_till_done(load_job_id)
+            cls.__wait_till_done(load_job_id, 600)
 
     @classmethod
     def create_load_job(cls, entity, source_gcs_bucket):
