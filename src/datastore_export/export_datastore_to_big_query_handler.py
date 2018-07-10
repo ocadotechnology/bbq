@@ -11,16 +11,17 @@ from src.datastore_export.export_gcs_to_big_query_service import \
 
 class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
     def get(self):
-        result = ExportDatastoreToGCSService\
+        logging.info("Scheduling export of Datastore entities to GCS ...")
+        output_url = ExportDatastoreToGCSService\
             .invoke(self.request, self.response)\
             .wait_till_done(timeout=600)
 
-        if not result.is_finished_with_success():
-            raise Exception("ExportDatastoreToBigQueryHandler NOT DONE !!!")
+        logging.info("Scheduling export of GCS to Big Query")
+        ExportGCSToBigQueryService.export(output_url)
 
-        ExportGCSToBigQueryService.export(result.get_output_url_prefix())
-
-        logging.info("SUCESS !!!")
+        logging.info(
+            "Export of Datastore entities to Big Query finished successfully."
+        )
 
 
 app = webapp2.WSGIApplication([
