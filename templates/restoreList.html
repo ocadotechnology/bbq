@@ -27,20 +27,51 @@
   }
 </script>
 
-
 <form name="restoreListForm" onsubmit="return OnSubmitForm();">
-  Target dataset id (optional):<br> <input type="text" name="targetDatasetId" value=""><br>
-  Backup list<span style="color: red;">*</span>:<br><textarea name="requestBody" placeholder='
-[
+  <div class="form-group row">
+    <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
+    <div class="input-group col-sm-8">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="projectAddOn">{{ restoration_project_id }}.</span>
+      </div>
+      <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
+             name="targetDatasetId" placeholder="source_project_id___source_dataset_id">
+      <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
+        that will be used (and created if does not exist) as container for restored table. Remember
+        that this will be a temporary dataset with expiration time set to 7 days. Note that passed
+        dataset could already exists - it should be in the same location as backup. If target
+        dataset id is not passed, then source dataset id value will be used as a target dataset id
+        in restoration project
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="requestBody" class="col-sm-2 col-form-label">Backups list</label>
+    <div class="input-group col-sm-8">
+      <textarea class="form-control" id="requestBody" name="requestBody" rows="20" cols="100" required>[
   {
     "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LPPicXIlCxIFVGFibGUYgICAkOaLgAgMCxIGQmFja3VwGICAgICAgJJJJA"
   },
   {
     "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LWJicXIlCxIFVGFibGUYgICAkJOlgAgMCxIGQmFja3VwGICAgICAgIAKDA"
   }
-]' rows="50" cols="100" required></textarea>
-  <br>
-  <input type="submit" value="Submit">
+]
+</textarea>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label"></label>
+    <div class="input-group col-sm-8">
+      <small id="requestBodyHelp" class="form-text text-muted">backupUrlSafeKey is a "URL-safe key" value taken
+        from <a href="https://console.cloud.google.com/datastore/entities/query?kind=Backup">Cloud Datastore Backup entities</a>
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Restore list of backups</button>
+    </div>
+  </div>
 </form>
 
 <br><strong>Response:</strong> <br>
