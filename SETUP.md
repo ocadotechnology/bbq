@@ -48,9 +48,10 @@
 To perform backup, BBQ need rights to read BigQuery data from project which should be backed up. To allow read accees, **BigQuery Data Viewer** IAM role needs to be granted for App Engine default service account (*\<your-project-id-for-BBQ-project\>@appspot.gserviceaccount.com*). There are some possible options to achieve that:
 
 * **Replace \<project-id-to-be-backed-up\> to proper project id** and run below command:
-      ```bash
-      gcloud projects add-iam-policy-binding <project-id-to-be-backed-up> --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer'
-      ```
+
+    ```bash
+    gcloud projects add-iam-policy-binding <project-id-to-be-backed-up> --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer'
+    ```
 
 * Grant this permission through Google Cloud Console in [IAM tab](https://console.cloud.google.com/iam-admin/iam) for project which should be backed up. 
 * Grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
