@@ -47,7 +47,7 @@ class ExportGCSToBigQueryService(object):
 
     @classmethod
     def create_load_job(cls, entity, output_url_prefix):
-        date = output_url_prefix[5:].split("/")[1]
+        date = output_url_prefix[5:].split("/")[1].replace("-", "_")
         return {
             "projectId": configuration.backup_project_id,
             "location": "EU",

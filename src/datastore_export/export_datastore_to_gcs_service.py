@@ -34,13 +34,14 @@ class ExportDatastoreToGCSService(webapp2.RequestHandler):
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + access_token
         }
-
         result = urlfetch.fetch(
             url=url,
             payload=json.dumps(request),
             method=urlfetch.POST,
             deadline=60,
-            headers=headers)
+            headers=headers
+        )
+
         if result.status_code == httplib.OK:
             logging.info(result.content)
         elif result.status_code >= 500:
@@ -70,7 +71,7 @@ class ExportDatastoreToGCSOperation(object):
         self.headers = headers
 
     def wait_till_done(self, timeout, period=60):
-        url = "https://datastore.googleapis.com/v1/" + self.operation_id
+        url = "https://datastore.googleapis.com/v1/%s" % self.operation_id
         finish_time = time.time() + timeout
 
         while time.time() < finish_time:
