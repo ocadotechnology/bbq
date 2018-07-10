@@ -29,16 +29,22 @@
 
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" id="dropdown01"
+        <a class="nav-link dropdown-toggle" id="dropdown_actions"
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <a class="dropdown-item" href="/ui/restoreDataset">Restore Dataset</a>
-          <a class="dropdown-item" href="/ui/restoreList">Restore custom backup list</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown_actions">
+          <a class="dropdown-item" href="/ui/restoreDataset">Restore dataset</a>
           <a class="dropdown-item" href="/ui/restoreTable">Restore table</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="dropdown_advanced"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Advanced</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown_advanced">
+          <a class="dropdown-item" href="/ui/restoreList">Restore custom backup list</a>
         </div>
       </li>
     </ul>
