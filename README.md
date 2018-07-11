@@ -133,7 +133,7 @@ Every day retention process scans all backups to find and delete backups matchin
 
 ## How to run backups?
 Backup process is scheduled periodically for all specified projects (check [config.yaml](./config/config.yaml) to specify which projects to backup and [config/cron.yaml](./config/cron.yaml) to configure schedule time).
-Note that cron uses UTC timezone.
+Note that cron uses UTC.
 
 However, you may also invoke backup process manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
 
