@@ -75,7 +75,7 @@ class AfterBackupActionHandler(JsonHandler):
         )
 
     @staticmethod
-    @retry(DatastoreTableGetRetriableException, tries=5, delay=1, backoff=2)
+    @retry(DatastoreTableGetRetriableException, tries=6, delay=4, backoff=2)
     def __create_backup(source_table_reference, source_table_metadata,
                         copy_job_results):
 

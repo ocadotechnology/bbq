@@ -68,7 +68,6 @@ class CopyJobService(object):
                 logging.exception('404 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
                 return None
             else:
-                logging.exception("HttpError thrown during Copy Job creation")
                 raise
         except Exception as error:
             logging.error("%s Exception thrown during Copy Job creation: %s",
