@@ -3,9 +3,9 @@ import time
 
 import googleapiclient.discovery
 import httplib2
+from google.appengine.api.app_identity import app_identity
 from oauth2client.client import GoogleCredentials
 
-from src.configuration import configuration
 from src.error_reporting import ErrorReporting
 
 
@@ -16,7 +16,7 @@ class ExportDatastoreToGCSException(Exception):
 class ExportDatastoreBackupsToGCSService(object):
 
     def __init__(self):
-        self.app_id = configuration.backup_project_id
+        self.app_id = app_identity.get_application_id()
         self.http = self.__create_http()
         self.service = googleapiclient.discovery.build(
             'datastore',
@@ -40,11 +40,23 @@ class ExportDatastoreBackupsToGCSService(object):
             .projects() \
             .export(projectId=self.app_id, body=body) \
             .execute()
-        self.__wait_till_done(response["name"], 600)
 
-    def __wait_till_done(self, operation_id, timeout, period=60):
+        finished_with_success = self.__get_result(response, 600)
+        return finished_with_success
+
+    def __get_result(self, response, timeout, period=60):
+        operation_id = response["name"]
         finish_time = time.time() + timeout
-        while time.time() < finish_time:
+        self.__wait_till_done(operation_id, period)
+
+        if time.time() < finish_time:
+            ErrorReporting().report(
+                "Timeout (%d seconds) exceeded !!!" % timeout)
+            return False
+        return True
+
+    def __wait_till_done(self, operation_id, period):
+        while True:
             logging.info("Export from DS to GCS - "
                          "waiting %d seconds for request to end...", period)
             time.sleep(period)
@@ -64,5 +76,3 @@ class ExportDatastoreBackupsToGCSService(object):
                 logging.info("Export from DS to GCS finished successfully.")
                 return
             logging.info("Export from DS to GCS still in progress ...")
-
-        ErrorReporting().report("Timeout (%d seconds) exceeded !!!" % timeout)
