@@ -19,23 +19,28 @@ class BaseHandler(webapp2.RequestHandler):
 
 class MainPage(BaseHandler):
   def get(self):
-    domain = Environment.get_domain(configuration.backup_project_id)
-    self.render_response('index.html', domain=domain)
+    self.render_response('index.html')
 
 
 class RestoreDatasetUIHandler(BaseHandler):
   def get(self):
-    self.render_response('restoreDataset.html')
+    self.render_response('restoreDataset.html',
+                         restoration_project_id=
+                         configuration.restoration_project_id)
 
 
 class RestoreListUIHandler(BaseHandler):
   def get(self):
-    self.render_response('restoreList.html')
+    self.render_response('restoreList.html',
+                         restoration_project_id=
+                         configuration.restoration_project_id)
 
 
 class RestoreTableUIHandler(BaseHandler):
   def get(self):
-    self.render_response('restoreTable.html')
+    self.render_response('restoreTable.html',
+                         restoration_project_id=
+                         configuration.restoration_project_id)
 
 
 app = webapp2.WSGIApplication([
