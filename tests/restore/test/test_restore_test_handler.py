@@ -7,7 +7,6 @@ from google.appengine.ext import testbed
 import webtest
 from mock import patch
 
-from src.big_query.big_query import BigQuery
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.google_cloud_storage_client import GoogleCloudStorageClient
 from src.restore.test import restore_test_handler
