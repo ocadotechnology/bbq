@@ -42,6 +42,7 @@ class TestTableReference(unittest.TestCase):
         TableReference.parse_tab_ref("proj321:dataset123.tableabc_123")
         TableReference.parse_tab_ref("proj321:datas_et123.tableabc123")
         TableReference.parse_tab_ref("proj-321:dataset123.tableabc123")
+        TableReference.parse_tab_ref("dev-project-bbq:smoke_test_EU.epd_none_direct___cpd_indirect___rm_manual___sharded_20170804")
 
     def test_parse_tab_ref_raise_exception_if_doesnt_match_naming_convention(self):
         with self.assertRaises(Exception):

@@ -1,7 +1,11 @@
 import json
 import logging
+import time
 
 import httplib2
+
+from src.restore.status.restoration_job_status_service import \
+    RestorationJobStatusService
 
 
 class TableRestoreInvoker(object):
@@ -22,8 +26,24 @@ class TableRestoreInvoker(object):
         resp, content = self.http.request(url)  # pylint: disable=W0612
         logging.info("Response: %s", resp)
         resp_data = json.loads(content)
-        logging.info("Restored table details: %s", resp_data)
-        return resp_data
+        return resp_data['restorationJobId']
+
+    @staticmethod
+    def wait_till_done(restoration_job_id, timeout, period=20):
+        finish_time = time.time() + timeout
+        while time.time() < finish_time:
+            logging.info("Waiting %d seconds for request to end...", period)
+            time.sleep(period)
+            result = RestorationJobStatusService() \
+                .get_restoration_job(restoration_job_id)
+            if result["status"]["state"] in "Done":
+                logging.info("Request finished.")
+                return result
+            logging.info("Request still in progress ...")
+
+        logging.error("Timeout (%d seconds) exceeded !!!", timeout)
+        return RestorationJobStatusService()\
+            .get_restoration_job(restoration_job_id)
 
     @staticmethod
     def __build_restore_url(host_url, src_table_reference,
