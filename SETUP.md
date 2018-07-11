@@ -19,10 +19,10 @@
       ```
 1. Below commands will edit [config.yaml](./config/config.yaml) file. Previosly exported project id values will replace placeholders:
       ```bash
-      sed -i -e "s/<your-project-id-for-BBQ-project>/${BBQ_PROJECT_ID}/g" config/config.yaml
+      sed -i -e "s/BBQ-project-id/${BBQ_PROJECT_ID}/g" config/config.yaml
       ```
       ```bash
-      sed -i -e "s/<your-project-id-for-restoration-storage-project>/${RESTORATION_STORAGE_PROJECT_ID}/g" config/config.yaml
+      sed -i -e "s/restoration-storage-project-id/${RESTORATION_STORAGE_PROJECT_ID}/g" config/config.yaml
       ```
     To confirm that everything is right, check if exported values are placed in [config.yaml](./config/config.yaml) file. 
 
