@@ -8,3 +8,6 @@ cron:
 - description: execute retention policy
   url: /cron/retention
   schedule: every day 14:07
+- description: daily cloud datastore export
+  url: /cron/export-datastore-to-big-query?kind=Table&kind=Backup
+  yschedule: every day 20:07
