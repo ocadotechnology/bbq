@@ -4,7 +4,7 @@ import time
 from src.big_query.big_query import BigQuery
 from src.configuration import configuration
 from src.error_reporting import ErrorReporting
-
+from src.appinfo import AppInfo
 
 DATASET_ID = "datastore_export"
 
@@ -20,6 +20,11 @@ class LoadDatastoreBackupsToBigQueryService(object):
         self.big_query = BigQuery()
 
     def load(self, source_uri, kinds):
+        self.big_query.create_dataset(
+            configuration.backup_project_id,
+            DATASET_ID, AppInfo().get_location()
+        )
+
         load_job_ids = []
         for kind in kinds:
             job_id = self.big_query.insert_job(
@@ -56,8 +61,8 @@ class LoadDatastoreBackupsToBigQueryService(object):
         finish_time = time.time() + timeout
         while time.time() < finish_time:
             logging.info(
-                "Loading Datastore backups from GCS to BQ - "
-                "waiting %d seconds for request to end...", period
+                "Loading Datastore backups from GCS to BQ (jobId: %s) - "
+                "waiting %d seconds for request to end...", load_job_id, period
             )
             time.sleep(period)
 
