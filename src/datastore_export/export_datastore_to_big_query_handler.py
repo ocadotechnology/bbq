@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import webapp2
@@ -13,16 +14,21 @@ from src.datastore_export.export_gcs_to_big_query_service import \
 class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
     def get(self):
         output_url = self.get_output_url_prefix(self.request)
+        kinds = self.request.get_all('kind')
 
         logging.info("Scheduling export of Datastore entities to GCS ...")
-        ExportDatastoreToGCSService().export(output_url)
+        ExportDatastoreToGCSService().export(output_url, kinds)
 
         logging.info("Scheduling export of GCS to Big Query")
-        ExportGCSToBigQueryService().export(output_url)
+        ExportGCSToBigQueryService().export(output_url, kinds)
 
         logging.info(
             "Export of Datastore entities to Big Query finished successfully."
         )
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.set_status(200)
+        self.response.out.write(json.dumps({'status': 'success'}))
 
     @staticmethod
     def get_output_url_prefix(request):
