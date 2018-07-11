@@ -10,4 +10,6 @@ cron:
   schedule: every day 14:07
 - description: daily cloud datastore export
   url: /cron/export-datastore-to-big-query?kind=Table&kind=Backup
-  yschedule: every day 20:07
+  schedule: every 6 hours
+  retry_parameters:
+    job_retry_limit: 5
