@@ -20,29 +20,25 @@ class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
         kinds = self.request.get_all('kind')
         gcs_output_uri = self.__create_gcs_output_url(now_datetime)
 
-        export_ds_to_gcs_service = ExportDatastoreBackupsToGCSService()
-        load_ds_from_gcs_to_bq_service = \
-            LoadDatastoreBackupsToBigQueryService(now_date)
-
-        finished_with_success = True
-
         logging.info("Scheduling export of Datastore entities to GCS ...")
-        result = export_ds_to_gcs_service.export(gcs_output_uri, kinds)
-        if not result:
-            finished_with_success = False
+        export_ds_backups_to_gcs_result = \
+            ExportDatastoreBackupsToGCSService().export(gcs_output_uri, kinds)
 
         logging.info("Loading Datastore backups from GCS to Big Query")
-        result = load_ds_from_gcs_to_bq_service.load(gcs_output_uri, kinds)
-        if not result:
-            finished_with_success = False
+        load_backups_to_bq_result = \
+            LoadDatastoreBackupsToBigQueryService(now_date).load(
+                gcs_output_uri, kinds)
 
-        logging.info("Export of DS entities to BQ finished successfully.")
+        finished_with_success = \
+            export_ds_backups_to_gcs_result and load_backups_to_bq_result
+
+        http_status = 200 if finished_with_success else 500
         response_status = "success" if finished_with_success else "failed"
-        http_status_code = 200 if finished_with_success else 500
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.set_status(http_status_code)
+        self.__log_result(finished_with_success)
+        self.response.set_status(http_status)
         self.response.out.write(json.dumps({'status': response_status}))
+        self.response.headers['Content-Type'] = 'application/json'
 
     @staticmethod
     def __create_gcs_output_url(gcs_folder_name):
@@ -50,6 +46,14 @@ class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
         output_url_prefix = "gs://staging.{}.appspot.com/{}" \
             .format(app_id, gcs_folder_name)
         return output_url_prefix
+
+    @staticmethod
+    def __log_result(finished_with_success):
+        if finished_with_success:
+            logging.info("Export of DS entities to BQ finished successfully.")
+        else:
+            logging.warning(
+                "Export of DS entities to BQ finished with some warnings.")
 
 
 app = webapp2.WSGIApplication([
