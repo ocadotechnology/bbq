@@ -7,7 +7,6 @@ from google.appengine.ext import testbed
 import webtest
 from mock import patch
 
-from src.big_query.big_query import BigQuery
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.google_cloud_storage_client import GoogleCloudStorageClient
 from src.restore.test import restore_test_handler
@@ -67,7 +66,7 @@ class TestRestoreTestHandler(unittest.TestCase):
     @patch.object(GoogleCloudStorageClient, 'put_gcs_file_content')
     @patch.object(TableRandomizer, 'get_random_table_metadata',
                   return_value=BigQueryTableMetadata(example_table))
-    @patch.object(BigQuery, 'get_table_by_reference',
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
     def test_handler_returns_ok_status_if_restore_is_success(
             self, _, _1, _2, _create_http, wait_till_done):
@@ -89,7 +88,7 @@ class TestRestoreTestHandler(unittest.TestCase):
     @patch.object(GoogleCloudStorageClient, 'put_gcs_file_content')
     @patch.object(TableRandomizer, 'get_random_table_metadata',
                   return_value=BigQueryTableMetadata(example_table))
-    @patch.object(BigQuery, 'get_table_by_reference',
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
     def test_handler_returns_500_status_if_restore_failed(
             self, _, _1, _2, _create_http, wait_till_done):
@@ -112,7 +111,7 @@ class TestRestoreTestHandler(unittest.TestCase):
                   return_value=restoration_status_successful)
     @patch.object(TableRandomizer, 'get_random_table_metadata',
                   return_value=BigQueryTableMetadata(example_table))
-    @patch.object(BigQuery, 'get_table_by_reference',
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
     def test_handler_outputs_success_status_file_to_GCS_if_restore_is_success(
             self, _, _1, _2, _create_http, put_gcs_file_content):
@@ -144,7 +143,7 @@ class TestRestoreTestHandler(unittest.TestCase):
                   return_value=restoration_status_failed)
     @patch.object(TableRandomizer, 'get_random_table_metadata',
                   return_value=BigQueryTableMetadata(example_table))
-    @patch.object(BigQuery, 'get_table_by_reference',
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
     def test_handler_outputs_failed_status_file_to_GCS_if_restore_is_failed(
             self, _, _1, _2, _create_http, put_gcs_file_content):
@@ -171,7 +170,7 @@ class TestRestoreTestHandler(unittest.TestCase):
         )
 
     @patch.object(GoogleCloudStorageClient, 'put_gcs_file_content')
-    @patch.object(BigQuery, 'get_table_by_reference')
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference')
     @patch.object(TableRestoreInvoker, '_create_http')
     @patch.object(TableRestoreInvoker, 'wait_till_done',
                   return_value=restoration_status_successful)
