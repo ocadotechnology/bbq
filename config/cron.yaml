@@ -1,4 +1,4 @@
-# Dates are set in UTC timezone
+# Dates are set in UTC
 cron:
 - description: daily backup job
   url: /cron/backup
