@@ -8,6 +8,9 @@ from oauth2client.client import GoogleCredentials
 
 from src.error_reporting import ErrorReporting
 
+TIMEOUT = 600
+PERIOD = 60
+
 
 class ExportDatastoreToGCSException(Exception):
     pass
@@ -41,25 +44,24 @@ class ExportDatastoreBackupsToGCSService(object):
             .export(projectId=self.app_id, body=body) \
             .execute()
 
-        finished_with_success = self.__get_result(response, 600)
-        return finished_with_success
+        return self.__is_finished_with_success(response)
 
-    def __get_result(self, response, timeout, period=60):
+    def __is_finished_with_success(self, response):
         operation_id = response["name"]
-        finish_time = time.time() + timeout
-        self.__wait_till_done(operation_id, period)
+        finish_time = time.time() + TIMEOUT
+        self.__wait_till_done(operation_id)
 
         if time.time() < finish_time:
             ErrorReporting().report(
-                "Timeout (%d seconds) exceeded !!!" % timeout)
+                "Timeout (%d seconds) exceeded !!!" % TIMEOUT)
             return False
         return True
 
-    def __wait_till_done(self, operation_id, period):
+    def __wait_till_done(self, operation_id):
         while True:
             logging.info("Export from DS to GCS - "
-                         "waiting %d seconds for request to end...", period)
-            time.sleep(period)
+                         "waiting %d seconds for request to end...", PERIOD)
+            time.sleep(PERIOD)
 
             response = self.service \
                 .projects() \

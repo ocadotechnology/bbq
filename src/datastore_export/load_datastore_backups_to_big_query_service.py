@@ -8,6 +8,7 @@ from src.error_reporting import ErrorReporting
 
 DATASET_ID = "datastore_export"
 TIMEOUT = 600
+PERIOD = 60
 
 
 class LoadDatastoreBackupsToBigQueryException(Exception):
@@ -35,8 +36,7 @@ class LoadDatastoreBackupsToBigQueryService(object):
             )
             load_job_ids.append(job_id)
 
-        finished_with_success = self.__get_results(load_job_ids)
-        return finished_with_success
+        return self.__all_finished_with_success(load_job_ids)
 
     def __create_job_body(self, source_uri, kind):
         return {
@@ -59,32 +59,30 @@ class LoadDatastoreBackupsToBigQueryService(object):
             }
         }
 
-    def __get_results(self, load_job_ids):
-        finished_with_success = True
+    def __all_finished_with_success(self, load_job_ids):
+        result = True
         for load_job_id in load_job_ids:
-            result = self.__get_result(load_job_id, TIMEOUT)
-            time_exceeded = not result
-            if time_exceeded:
-                finished_with_success = False
-        return finished_with_success
+            if not self.__is_finished_with_success(load_job_id):
+                result = False
+        return result
 
-    def __get_result(self, load_job_id, timeout, period=60):
-        finish_time = time.time() + timeout
-        self.__wait_till_done(load_job_id, period)
+    def __is_finished_with_success(self, load_job_id):
+        finish_time = time.time() + TIMEOUT
+        self.__wait_till_done(load_job_id)
 
         if time.time() < finish_time:
             ErrorReporting().report(
-                "Timeout (%d seconds) exceeded !!!" % timeout)
+                "Timeout (%d seconds) exceeded !!!" % TIMEOUT)
             return False
         return True
 
-    def __wait_till_done(self, load_job_id, period):
+    def __wait_till_done(self, load_job_id):
         while True:
             logging.info(
                 "Loading Datastore backups from GCS to BQ (jobId: %s) - "
-                "waiting %d seconds for request to end...", load_job_id, period
+                "waiting %d seconds for request to end...", load_job_id, PERIOD
             )
-            time.sleep(period)
+            time.sleep(PERIOD)
 
             result = self.big_query.get_job(
                 project_id=configuration.backup_project_id,
