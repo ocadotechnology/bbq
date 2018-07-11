@@ -14,9 +14,9 @@ before_install:
 jobs:
   include:
     - stage: unit-tests
-    - script: coverage run --source=src test_runner.py --test-path tests/ --test-pattern 'test*.py' -v ./google-cloud-sdk
+      script: coverage run --source=src test_runner.py --test-path tests/ --test-pattern 'test*.py' -v ./google-cloud-sdk
     - stage: isolation-tests
-    - script: python isolation_test.py --test_runner "test_runner.py" --test_path "tests" --google_cloud_sdk ./google-cloud-sdk
+      script: python isolation_test.py --test_runner "test_runner.py" --test_path "tests" --google_cloud_sdk ./google-cloud-sdk
 
 after_success:
   coveralls
