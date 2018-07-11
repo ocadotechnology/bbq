@@ -13,10 +13,11 @@ class ExportDatastoreToGCSException(Exception):
     pass
 
 
-class ExportDatastoreToGCSService(object):
+class ExportDatastoreBackupsToGCSService(object):
 
     def __init__(self):
-        self.http = self._create_http()
+        self.app_id = configuration.backup_project_id
+        self.http = self.__create_http()
         self.service = googleapiclient.discovery.build(
             'datastore',
             'v1',
@@ -25,26 +26,23 @@ class ExportDatastoreToGCSService(object):
         )
 
     @staticmethod
-    def _create_http():
+    def __create_http():
         return httplib2.Http(timeout=60)
 
-    def export(self, output_url_prefix, kinds):
+    def export(self, gcs_output_url, kinds):
         body = {
-            'output_url_prefix': output_url_prefix,
+            'output_url_prefix': gcs_output_url,
             'entity_filter': {
                 'kinds': kinds
             }
         }
-        app_id = configuration.backup_project_id
-
         response = self.service \
             .projects() \
-            .export(projectId=app_id, body=body) \
+            .export(projectId=self.app_id, body=body) \
             .execute()
         self.__wait_till_done(response["name"], 600)
 
     def __wait_till_done(self, operation_id, timeout, period=60):
-        # projects/dev-project-bbq/operations/ASAzNTAwMzc4MjEJGnRsdWFmZWQHEmVwb3J1ZS1zYm9qLW5pbWRhEQopEg
         finish_time = time.time() + timeout
         while time.time() < finish_time:
             logging.info("Export from DS to GCS - "
