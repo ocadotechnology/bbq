@@ -37,23 +37,32 @@ class ExportDatastoreToGCSService(object):
         }
         app_id = configuration.backup_project_id
 
-        response = self.service.projects().export(projectId=app_id, body=body)
+        response = self.service \
+            .projects() \
+            .export(projectId=app_id, body=body) \
+            .execute()
         self.__wait_till_done(response["name"], 600)
 
     def __wait_till_done(self, operation_id, timeout, period=60):
+        # projects/dev-project-bbq/operations/ASAzNTAwMzc4MjEJGnRsdWFmZWQHEmVwb3J1ZS1zYm9qLW5pbWRhEQopEg
         finish_time = time.time() + timeout
         while time.time() < finish_time:
             logging.info("Export from DS to GCS - "
                          "waiting %d seconds for request to end...", period)
             time.sleep(period)
 
-            result = self.service.projects().operations().get(operation_id)
+            response = self.service \
+                .projects() \
+                .operations() \
+                .get(name=operation_id) \
+                .execute()
+            logging.info(response)
 
-            if "error" in result:
-                error = result["error"]
+            if "error" in response:
+                error = response["error"]
                 error_message = "Request finished with errors: %s" % error
                 raise ExportDatastoreToGCSException(error_message)
-            if result["done"]:
+            if response["done"]:
                 logging.info("Export from DS to GCS finished successfully.")
                 return
             logging.info("Export from DS to GCS still in progress ...")
