@@ -1,14 +1,74 @@
 import datetime
 import unittest
 
+from google.appengine.ext import testbed
 # nopep8 pylint: disable=C0301
 from mock import patch
+
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.big_query.big_query import BigQuery
 from src.error_reporting import ErrorReporting
 
 
 # table_not_exist_anymore() method tests
 from src.table_reference import TableReference
+
+class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
+
+    @patch.object(BigQuery, 'create_table')
+    def test_create_same_empty_table_execute_a_proper_big_query_request_with_same_table_properties(self, create_table):
+        table_properties = {
+            "tableReference":{
+                "projectId":"p1",
+                "datasetId":"d1",
+                "tableId":"t1",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        }
+
+        target_table_reference = TableReference("p2", "d2", "t2")
+        BigQueryTableMetadata(table_properties).create_the_same_empty_table(target_table_reference)
+        create_table.assert_called_with("p2","d2",
+            {
+            "tableReference":{
+                "projectId":"p2",
+                "datasetId":"d2",
+                "tableId":"t2",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        })
+
+
+class TestBigQueryTableMetadata_GetTableByReferenceCached(unittest.TestCase):
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        # patch.stopall()
+        self.testbed.deactivate()
+
+    @patch.object(BigQuery, 'get_table', return_value={})
+    def test_get_table_cached_should_only_call_bq_once(self, get_table):
+        # given
+
+        # when
+        result1 = BigQueryTableMetadata.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
+        result2 = BigQueryTableMetadata.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
+
+        # then
+        self.assertEqual(result1, result2)
+        get_table.assert_called_once()
 
 
 class TestBigQueryTableMetadata_TableExists(unittest.TestCase):
