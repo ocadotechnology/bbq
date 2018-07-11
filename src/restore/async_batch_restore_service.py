@@ -32,12 +32,11 @@ class AsyncBatchRestoreService(object):
             source_table_reference = restore_item.source_table_reference
             target_table_reference = restore_item.target_table_reference
 
-            self.restore_workspace_creator.create_workspace(
-                source_table_reference,
-                target_table_reference)
 
             try:
-
+                self.restore_workspace_creator.create_workspace(
+                    source_table_reference,
+                    target_table_reference)
                 CopyJobServiceAsync(
                     copy_job_type_id='restore',
                     task_name_suffix=restoration_job_id
@@ -49,8 +48,8 @@ class AsyncBatchRestoreService(object):
                     target_table_reference.create_big_query_table()
                 )
             except Exception as ex:
-                logging.error(
-                    "Error during creating copy job. Marking restore item as FAILED")
+                logging.error("Error during creating copy job. Marking restore "
+                              "item as FAILED, Error message: %s", ex.message)
                 restore_item.update_with_failed(restore_item.key, ex.message)
 
     @staticmethod
