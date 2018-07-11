@@ -24,7 +24,6 @@
       ```bash
       sed -i -e "s/restoration-storage-project-id/${RESTORATION_STORAGE_PROJECT_ID}/g" config/config.yaml
       ```
-    To confirm that everything is right, check if exported values are placed in [config.yaml](./config/config.yaml) file. 
 
 1. Below command installs all required python dependencies:
       ```bash
