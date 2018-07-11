@@ -3,6 +3,7 @@ import logging
 
 import webapp2
 
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from commons.decorators.retry import retry
 from commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
@@ -53,13 +54,12 @@ class AfterBackupActionHandler(JsonHandler):
 
         source_table_reference = self.__create_table_reference(
             data["sourceBqTable"])
-        source_table_metadata = self.BQ.get_table_by_reference(
+        source_table_metadata = BigQueryTableMetadata.get_table_by_reference(
             source_table_reference)
 
         if source_table_metadata.table_exists():
             self.__create_backup(source_table_reference, source_table_metadata,
                                  copy_job_results)
-
             if source_table_metadata.has_partition_expiration():
                 self.__disable_partition_expiration(copy_job_results)
         else:

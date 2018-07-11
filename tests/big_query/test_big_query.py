@@ -5,7 +5,6 @@ from google.appengine.ext import testbed
 from mock import patch
 
 from src.big_query.big_query import BigQuery, RandomizationError
-from src.table_reference import TableReference
 from tests.test_utils import content
 
 
@@ -46,10 +45,10 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_get_table_400_responses()
 
         # when
-        table = BigQuery().get_table_by_reference(TableReference("project_id", "dataset_id", "table_id"))
+        table = BigQuery().get_table("project_id", "dataset_id", "table_id")
 
         # then
-        self.assertFalse(table.table_exists())
+        self.assertIsNone(table)
 
     def test_iterating_tables(self):
         # given
@@ -88,18 +87,6 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual('O_PRODUCT_SUPPLIER_20151127',
                          random_table.get_table_id())
 
-    def test_get_table_cached_should_only_call_bq_once_but_response_is_cached(
-            self):
-        # given
-        self._create_http.return_value = \
-            self.__create_table_responses_with_only_one_response_for_get_table()
-        # when
-        bq = BigQuery()
-        result1 = bq.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
-        result2 = bq.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
-
-        # then
-        self.assertEqual(result1, result2)
 
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
             self):

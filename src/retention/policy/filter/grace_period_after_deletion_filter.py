@@ -3,14 +3,11 @@ import logging
 
 from dateutil.relativedelta import relativedelta
 
-from src.big_query.big_query import BigQuery
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
 class GracePeriodAfterDeletionFilter(object):
     GRACE_PERIOD_AFTER_DELETION_IN_MONTHS = 7
-
-    def __init__(self):
-        self.big_query = BigQuery()
 
     def filter(self, backups, table_reference):
         if self.__should_keep_backups(backups, table_reference):
@@ -51,5 +48,4 @@ class GracePeriodAfterDeletionFilter(object):
         return False
 
     def __source_table_exists(self, table_reference):
-        return self.big_query. \
-            get_table_by_reference(table_reference).table_exists()
+        return BigQueryTableMetadata.get_table_by_reference(table_reference).table_exists()

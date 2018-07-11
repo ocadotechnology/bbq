@@ -1,6 +1,8 @@
 import jsonpickle
 import os
 from datetime import datetime
+
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 
 from src.backup.datastore.Table import Table
@@ -156,19 +158,15 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(response.status_int, 200)
         self.assertIsNone(backup)
 
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())
+    @patch.object(BigQueryTableMetadata, 'table_size_in_bytes', return_value=123)
+    @patch.object(BigQueryTableMetadata, 'has_partition_expiration', return_value=True)
     @patch.object(BigQuery, 'disable_partition_expiration')
-    @patch.object(BigQuery, '_create_http')
     def test_should_disable_partition_expiration_if_source_table_has_it(
-            self, _create_http, disable_partition_expiration):
+            self, disable_partition_expiration, _, _1, _2, _3, _4):
         # given
-        _create_http.return_value = HttpMockSequence([
-            ({'status': '200'},
-             content('tests/json_samples/bigquery_v2_test_schema.json')),
-            ({'status': '200'},
-             content('tests/json_samples/table_get/'
-                     'bigquery_partitioned_table_with_expiration_get.json'))
-        ])
-
         table_entity = Table(
             project_id="test-project",
             dataset_id="test-dataset",
