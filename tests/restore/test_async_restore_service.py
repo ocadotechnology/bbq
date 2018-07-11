@@ -2,7 +2,7 @@ import uuid
 from unittest import TestCase
 
 from google.appengine.ext import testbed, ndb
-from mock import patch, call
+from mock import patch, call, mock
 
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
@@ -10,6 +10,7 @@ from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
+from apiclient.errors import HttpError
 
 from src.table_reference import TableReference
 
@@ -60,6 +61,25 @@ class TestAsyncRestoreService(TestCase):
                         })),
                 call().with_post_action().copy_table(source_bq, target_bq)
             ])
+
+    @patch.object(RestoreWorkspaceCreator, 'create_workspace', side_effect=
+        HttpError(mock.Mock(status=403), 'Forbidden'))
+    def test_failing_creating_dataset_should_update_restore_item_status(self,
+        _):
+        # given
+        restoration_job_key = RestorationJob.create(HARDCODED_UUID)
+        restore_items_tuple = self.__create_restore_items(count=1)
+        restore_item = restore_items_tuple[0][0]
+
+        # when
+        AsyncBatchRestoreService().restore(HARDCODED_UUID, [[restore_item]])
+
+        # then
+        restore_items = list(RestoreItem.query().filter(
+            RestoreItem.restoration_job_key == restoration_job_key))
+
+        self.assertEqual(restore_items[0].status,
+                         RestoreItem.STATUS_FAILED)
 
     def test_multiple_items_restore(self):
         # given
@@ -116,7 +136,7 @@ class TestAsyncRestoreService(TestCase):
 
         self.enforcer.assert_has_calls(expected_calls)
 
-    def test_that_proper_entities_was_stored_in_datastore(self):
+    def test_that_proper_entities_were_stored_in_datastore(self):
         # given
         RestorationJob.create(HARDCODED_UUID)
         restore_item_tuples = self.__create_restore_items(count=3)
