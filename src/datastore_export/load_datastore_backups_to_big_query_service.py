@@ -70,7 +70,7 @@ class LoadDatastoreBackupsToBigQueryService(object):
         finish_time = time.time() + TIMEOUT
         self.__wait_till_done(load_job_id)
 
-        if time.time() < finish_time:
+        if time.time() > finish_time:
             ErrorReporting().report(
                 "Timeout (%d seconds) exceeded !!!" % TIMEOUT)
             return False
