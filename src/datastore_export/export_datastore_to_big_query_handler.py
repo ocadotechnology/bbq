@@ -6,39 +6,38 @@ import webapp2
 from google.appengine.api.app_identity import app_identity
 
 from src.configuration import configuration
-from src.datastore_export.export_datastore_backups_to_gcs_service import \
-    ExportDatastoreBackupsToGCSService
-from src.datastore_export.load_datastore_backups_to_big_query_service import \
-    LoadDatastoreBackupsToBigQueryService
+from src.datastore_export.export_datastore_to_big_query_service import \
+    ExportDatastoreToBigQueryService
 
 
 class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
     def get(self):
-        now_datetime = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        now_date = now_datetime.split("_")[0]
+        now = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        date = now.split("_")[0]
 
+        gcs_output_uri = self.__create_gcs_output_url(now)
         kinds = self.request.get_all('kind')
-        gcs_output_uri = self.__create_gcs_output_url(now_datetime)
 
-        logging.info("Scheduling export of Datastore entities to GCS ...")
-        export_ds_backups_to_gcs_result = \
-            ExportDatastoreBackupsToGCSService().export(gcs_output_uri, kinds)
+        logging.info("Scheduling export of Datastore backups to Big Query...")
+        service = ExportDatastoreToBigQueryService(date)
 
-        logging.info("Loading Datastore backups from GCS to Big Query")
-        load_backups_to_bq_result = \
-            LoadDatastoreBackupsToBigQueryService(now_date).load(
-                gcs_output_uri, kinds)
+        finished_with_success = service.export(gcs_output_uri, kinds)
 
-        finished_with_success = \
-            export_ds_backups_to_gcs_result and load_backups_to_bq_result
+        self.__parse_result(finished_with_success)
 
+    def __parse_result(self, finished_with_success):
         http_status = 200 if finished_with_success else 500
         response_status = "success" if finished_with_success else "failed"
 
-        self.__log_result(finished_with_success)
         self.response.set_status(http_status)
         self.response.out.write(json.dumps({'status': response_status}))
         self.response.headers['Content-Type'] = 'application/json'
+
+        if finished_with_success:
+            logging.info("Export of DS entities to BQ finished successfully.")
+        else:
+            logging.warning(
+                "Export of DS entities to BQ finished with some warnings.")
 
     @staticmethod
     def __create_gcs_output_url(gcs_folder_name):
@@ -46,14 +45,6 @@ class ExportDatastoreToBigQueryHandler(webapp2.RequestHandler):
         output_url_prefix = "gs://staging.{}.appspot.com/{}" \
             .format(app_id, gcs_folder_name)
         return output_url_prefix
-
-    @staticmethod
-    def __log_result(finished_with_success):
-        if finished_with_success:
-            logging.info("Export of DS entities to BQ finished successfully.")
-        else:
-            logging.warning(
-                "Export of DS entities to BQ finished with some warnings.")
 
 
 app = webapp2.WSGIApplication([
