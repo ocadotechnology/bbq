@@ -49,7 +49,6 @@ class ExportDatastoreBackupsToGCSService(object):
     def __is_finished_with_success(self, response):
         operation_id = response["name"]
         finish_time = time.time() + TIMEOUT
-        self.__wait_till_done(operation_id)
 
         if time.time() < finish_time:
             ErrorReporting().report(
