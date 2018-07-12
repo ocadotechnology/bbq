@@ -10,6 +10,8 @@ before_install:
     - pip install -t lib -r requirements.txt
     - pip install -r requirements_tests.txt
     - pip install coveralls==1.3.0
+    - pip install pylint==1.9.2
+    - pip install click==6.7
     - PYTHONPATH=$PYTHONPATH:./lib:./google-cloud-sdk/bin
 
 jobs:
