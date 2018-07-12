@@ -73,7 +73,7 @@ class ExportDatastoreBackupsToGCSService(object):
                 error = response["error"]
                 error_message = "Request finished with errors: %s" % error
                 raise ExportDatastoreToGCSException(error_message)
-            if response["done"]:
+            if response.get("done"):
                 logging.info("Export from DS to GCS finished successfully.")
                 return
             logging.info("Export from DS to GCS still in progress ...")
