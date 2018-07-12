@@ -8,3 +8,8 @@ cron:
 - description: execute retention policy
   url: /cron/retention
   schedule: every day 14:07
+- description: cloud datastore export
+  url: /cron/export-datastore-to-big-query?kind=Table&kind=Backup
+  schedule: every 6 hours
+  retry_parameters:
+    job_retry_limit: 5
