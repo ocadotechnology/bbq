@@ -1,0 +1,79 @@
+import logging
+import time
+
+import googleapiclient.discovery
+import httplib2
+from google.appengine.api.app_identity import app_identity
+from oauth2client.client import GoogleCredentials
+
+from src.error_reporting import ErrorReporting
+
+TIMEOUT = 600
+PERIOD = 60
+
+
+class ExportDatastoreToGCSException(Exception):
+    pass
+
+
+class ExportDatastoreBackupsToGCSService(object):
+
+    def __init__(self):
+        self.app_id = app_identity.get_application_id()
+        self.http = self.__create_http()
+        self.service = googleapiclient.discovery.build(
+            'datastore',
+            'v1',
+            credentials=GoogleCredentials.get_application_default(),
+            http=self.http,
+        )
+
+    @staticmethod
+    def __create_http():
+        return httplib2.Http(timeout=60)
+
+    def export(self, gcs_output_url, kinds):
+        body = {
+            'output_url_prefix': gcs_output_url,
+            'entity_filter': {
+                'kinds': kinds
+            }
+        }
+        response = self.service \
+            .projects() \
+            .export(projectId=self.app_id, body=body) \
+            .execute()
+
+        return self.__is_finished_with_success(response)
+
+    def __is_finished_with_success(self, response):
+        finish_time = time.time() + TIMEOUT
+        self.__wait_till_done(response["name"])
+
+        if time.time() > finish_time:
+            ErrorReporting().report(
+                "Timeout (%d seconds) exceeded !!!" % TIMEOUT)
+            return False
+        return True
+
+    def __wait_till_done(self, operation_id):
+        while True:
+            logging.info("Export from DS to GCS - "
+                         "waiting %d seconds for request to end...", PERIOD)
+            time.sleep(PERIOD)
+
+            response = self.service \
+                .projects() \
+                .operations() \
+                .get(name=operation_id) \
+                .execute()
+            logging.info(response)
+
+            if "error" in response:
+                error = response["error"]
+                error_message = "Request finished with errors: %s" % error
+                raise ExportDatastoreToGCSException(error_message)
+            if response["done"]:
+                logging.info("Export from DS to GCS finished successfully.")
+                return
+            logging.info("Export from DS to GCS still in progress ...")
