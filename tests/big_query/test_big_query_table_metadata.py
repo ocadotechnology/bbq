@@ -15,8 +15,21 @@ from src.table_reference import TableReference
 
 class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
 
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        # patch.stopall()
+        self.testbed.deactivate()
+
     @patch.object(BigQuery, 'create_table')
     def test_create_same_empty_table_execute_a_proper_big_query_request_with_same_table_properties(self, create_table):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
         table_properties = {
             "tableReference":{
                 "projectId":"p1",
