@@ -1,0 +1,13 @@
+{
+  "error": {
+    "errors": [
+      {
+        "domain": "global",
+        "reason": "notFound",
+        "message": "Not found: Dataset projectid:dataset_id"
+      }
+    ],
+    "code": 404,
+    "message": "Not found: Dataset projectid:dataset_id"
+  }
+}

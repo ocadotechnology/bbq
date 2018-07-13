@@ -6,10 +6,10 @@ import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
-from src.big_query.big_query_table import BigQueryTable
 from commons.decorators.cached import cached
 from commons.decorators.log_time import log_time, measure_time_and_log
 from commons.decorators.retry import retry
+from src.big_query.big_query_table import BigQueryTable
 from src.configuration import configuration
 from src.table_reference import TableReference
 
@@ -72,7 +72,16 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=project_id, datasetId=dataset_id
         )
         while request is not None:
-            tables = request.execute()
+            try:
+                tables = request.execute()
+            except HttpError as ex:
+                if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
+                    logging.info("Dataset '%s:%s' is not found", project_id,
+                                 dataset_id)
+                    return
+                else:
+                    raise ex
+
             if 'tables' in tables:
                 for table in tables['tables']:
                     if 'tableReference' not in table:
