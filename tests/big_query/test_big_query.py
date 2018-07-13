@@ -62,7 +62,7 @@ class TestBigQuery(unittest.TestCase):
 
     def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
         # given
-        self._create_http.return_value = self.__create_tables_list_404_responses()
+        self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
 
         # when
         tables_ids = BigQuery().list_table_ids("projectid", "dataset_id")
@@ -178,7 +178,7 @@ class TestBigQuery(unittest.TestCase):
         ])
 
     @staticmethod
-    def __create_tables_list_404_responses():
+    def __create_dataset_not_found_during_tables_list_responses():
         return HttpMockSequence([
             ({'status': '200'},
              content('tests/json_samples/bigquery_v2_test_schema.json')),
