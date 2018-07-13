@@ -55,10 +55,20 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_tables_list_responses()
 
         # when
-        dataset_ids = BigQuery().list_table_ids("project1233", "dataset_id")
+        tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
 
         # then
-        self.assertEqual(self.count(dataset_ids), 5)
+        self.assertEqual(self.count(tables_ids), 5)
+
+    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
+        # given
+        self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
+
+        # when
+        tables_ids = BigQuery().list_table_ids("projectid", "dataset_id")
+
+        # then
+        self.assertEqual(self.count(tables_ids), 0)
 
     def test_listing_table_partitions(self):
         # given
@@ -165,6 +175,16 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_table_list_page_1.json')),
             ({'status': '200'},
              content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
+
+    @staticmethod
+    def __create_dataset_not_found_during_tables_list_responses():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '200'},
+             content(
+                 'tests/json_samples/bigquery_table_list_404_dataset_not_exist.json'))
         ])
 
     @staticmethod
