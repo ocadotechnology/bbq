@@ -75,10 +75,10 @@ class BigQuery(object):  # pylint: disable=R0904
             try:
                 tables = request.execute()
             except HttpError as ex:
-                if ex.resp.status == 404:
+                if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
                     logging.info("Dataset not '%s:%s' Not Found", project_id,
-                               dataset_id)
-                    raise StopIteration
+                                 dataset_id)
+                    return
                 else:
                     raise ex
 
