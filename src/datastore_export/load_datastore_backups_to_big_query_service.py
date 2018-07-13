@@ -7,7 +7,9 @@ from src.configuration import configuration
 from src.error_reporting import ErrorReporting
 
 DATASET_ID = "datastore_export"
-TIMEOUT = 600
+# 30 minutes
+TIMEOUT = 3 * 600
+# 1 minute
 PERIOD = 60
 
 
@@ -73,7 +75,9 @@ class LoadDatastoreBackupsToBigQueryService(object):
         if time.time() > finish_time:
             ErrorReporting().report(
                 "Timeout (%d seconds) exceeded !!!" % TIMEOUT)
+            logging.warning("Export from GCS to BQ finished with timeout.")
             return False
+        logging.info("Export from GCS to BQ finished successfully.")
         return True
 
     def __wait_till_done(self, load_job_id):
@@ -88,7 +92,6 @@ class LoadDatastoreBackupsToBigQueryService(object):
                         load_job_id)
                 )
             if result['status']['state'] == 'DONE':
-                logging.info("Export from GCS to BQ finished successfully.")
                 return
 
             logging.info(
