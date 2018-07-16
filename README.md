@@ -162,12 +162,27 @@ To check the content for given backup __Y__ in Big Query:
 It is possible to export Datastore kinds and query them in Big Query, this method is recommended for more frequent usage. 
 * To turn the export on, check [Cloud Datastore export](./SETUP.md#cloud-datastore-export) section.
 * Export is scheduled periodically however, to have latest data you may invoke them manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
-* To find where is stored backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) and execute query below:
+* To find where is stored backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project __Z__ - replace __X__, __Y__, __Z__ in query below and execute:
     ```sql
-    SELECT * FROM 
+    #StandardSQL
+    WITH last_tables AS (
+      SELECT *
+      FROM `Y.datastore_export.Table_*`
+      WHERE _TABLE_SUFFIX IN (
+        SELECT MAX(_TABLE_SUFFIX) FROM `Y.datastore_export.Table_*`
+      )
+    ), last_backups AS (
+      SELECT *, CAST(SPLIT(__key__.path, ',')[OFFSET(1)] AS INT64) AS PARENT_ID
+      FROM `Y.datastore_export.Backup_*`
+      WHERE _TABLE_SUFFIX IN (
+        SELECT MAX(_TABLE_SUFFIX) FROM `Y.datastore_export.Backup_*`
+      )
+    )
+    SELECT * FROM last_backups WHERE PARENT_ID IN (
+      SELECT __key__.id FROM last_tables
+      WHERE project_id = X.project_id AND dataset_id = X.dataset_id AND table_id = X.table_id
+    ) 
     ```
-
-
 ## How to restore data from backups?
 There are several options to restore data, available from _\<your-project-id>_.__appspot.com__
 * __Restore whole dataset__ 
