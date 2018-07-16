@@ -142,6 +142,7 @@ It's worth to underline that:
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
 ## How to find backup for given table?
+### Way number 1
 In order to find where is stored backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
 1. Find __Key literal__ for table _X_:
@@ -153,9 +154,19 @@ In order to find where is stored backup __Y__ for table __X__:
     * Filter entities by _Key_ that __has ancestor__ _X.Key literal_.
 
 To check the content for given backup __Y__ in Big Query:  
-1. Open [Big Query](https://console.cloud.google.com/bigquery),
+1. Open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project,
 1. Filter tables by _Y.dataset_id_ or _Y.table_id_ in search bar,
 1. Select table and check _Schema_, _Details_ or _Preview_ tab.
+
+### Way number 2
+It is possible to export Datastore kinds and query them in Big Query, this method is recommended for more frequent usage. 
+* To turn the export on, check [Cloud Datastore export](./SETUP.md#cloud-datastore-export) section.
+* Export is scheduled periodically however, to have latest data you may invoke them manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
+* To find where is stored backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) and execute query below:
+    ```sql
+    SELECT * FROM 
+    ```
+
 
 ## How to restore data from backups?
 There are several options to restore data, available from _\<your-project-id>_.__appspot.com__
