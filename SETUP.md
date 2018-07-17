@@ -58,9 +58,9 @@ To perform backup, BBQ need rights to read BigQuery data from project which shou
 * Grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
 
 ### Cloud Datastore export
-  BBQ may export periodically data from Datastore to Big Query. Holding them additionally in Big Query insures against accidental deletion and allows to browse data about tables and its backups in the easier way. To turn it on:
+  BBQ may periodically export data from Datastore to Big Query. It's much easier to query the data in Big Query rather than Datastore. To enable export:
 
-* Execute command bellow which assign the **Cloud Datastore Import Export Admin** IAM role to BBQ default service account:
+* Execute command below which assigns the **Cloud Datastore Import Export Admin** IAM role to BBQ default service account:
     ```bash
     gcloud projects add-iam-policy-binding ${BBQ_PROJECT_ID} --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/datastore.importExportAdmin'
     ```
