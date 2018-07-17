@@ -9,7 +9,7 @@ cron:
   url: /cron/retention
   schedule: every day 14:07
 - description: cloud datastore export
-  # set the kind fields to specify which ones should be exported to Big Query
+  # set the kind fields to specify datastore kinds to be exported to Big Query
   url: /cron/export-datastore-to-big-query?kind=Table&kind=Backup
   schedule: every 6 hours
   retry_parameters:

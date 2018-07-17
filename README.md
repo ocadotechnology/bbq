@@ -142,8 +142,8 @@ It's worth to underline that:
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
 ## How to find backup for given table?
-### Way number 1
-In order to find where is stored backup __Y__ for table __X__:
+### Option 1
+In order to find backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
 1. Find __Key literal__ for table _X_:
     * Select __Table__ kind,
@@ -158,11 +158,11 @@ To check the content for given backup __Y__ in Big Query:
 1. Filter tables by _Y.dataset_id_ or _Y.table_id_ in search bar,
 1. Select table and check _Schema_, _Details_ or _Preview_ tab.
 
-### Way number 2
+### Option 2
 It is possible to export Datastore kinds and query them in Big Query, this method is recommended for more frequent usage. 
-* To turn the export on, check [Cloud Datastore export](./SETUP.md#cloud-datastore-export) section.
-* Export is scheduled periodically however, to have latest data you may invoke them manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
-* To find where is stored backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project __Z__ - replace __X__, __Y__, __Z__ in query below and execute:
+* To enable export, check [Cloud Datastore export](./SETUP.md#cloud-datastore-export) section.
+* Export is scheduled periodically; however, to have latest data you should invoke them manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
+* To find backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project __Z__ - replace __X__, __Y__, __Z__ in query below and execute:
     ```sql
     #StandardSQL
     WITH last_tables AS (
