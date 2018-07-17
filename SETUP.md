@@ -15,7 +15,7 @@
       export BBQ_PROJECT_ID="<your-project-id-for-BBQ-project>"
       ```
       ```bash 
-      export RESTORATION_STORAGE_PROJECT_ID="<your-project-id-for-restoration-storage-project>
+      export RESTORATION_STORAGE_PROJECT_ID="<your-project-id-for-restoration-storage-project>"
       ```
 1. Run commands below:
       ```bash
