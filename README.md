@@ -142,7 +142,8 @@ It's worth to underline that:
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
 ## How to find backup for given table?
-In order to find where is stored backup __Y__ for table __X__:
+### Option 1
+In order to find backup __Y__ for table __X__:
 1. In Cloud Console visit [Datastore](https://console.cloud.google.com/datastore),
 1. Find __Key literal__ for table _X_:
     * Select __Table__ kind,
@@ -153,10 +154,35 @@ In order to find where is stored backup __Y__ for table __X__:
     * Filter entities by _Key_ that __has ancestor__ _X.Key literal_.
 
 To check the content for given backup __Y__ in Big Query:  
-1. Open [Big Query](https://console.cloud.google.com/bigquery),
+1. Open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project,
 1. Filter tables by _Y.dataset_id_ or _Y.table_id_ in search bar,
 1. Select table and check _Schema_, _Details_ or _Preview_ tab.
 
+### Option 2
+It is possible to export Datastore kinds and query them in Big Query, this method is recommended for more frequent usage. 
+* To enable export, check [Cloud Datastore export](./SETUP.md#cloud-datastore-export) section.
+* Export is scheduled periodically; however, to have latest data you should invoke them manually from [cron jobs](https://console.cloud.google.com/appengine/taskqueues/cron).
+* To find backup __Y__ for table __X__ open [Big Query](https://console.cloud.google.com/bigquery) in BBQ storage project __Z__ - replace __X__, __Y__, __Z__ in query below and execute:
+    ```sql
+    #StandardSQL
+    WITH last_tables AS (
+      SELECT *
+      FROM `Y.datastore_export.Table_*`
+      WHERE _TABLE_SUFFIX IN (
+        SELECT MAX(_TABLE_SUFFIX) FROM `Y.datastore_export.Table_*`
+      )
+    ), last_backups AS (
+      SELECT *, CAST(SPLIT(__key__.path, ',')[OFFSET(1)] AS INT64) AS PARENT_ID
+      FROM `Y.datastore_export.Backup_*`
+      WHERE _TABLE_SUFFIX IN (
+        SELECT MAX(_TABLE_SUFFIX) FROM `Y.datastore_export.Backup_*`
+      )
+    )
+    SELECT * FROM last_backups WHERE PARENT_ID IN (
+      SELECT __key__.id FROM last_tables
+      WHERE project_id = X.project_id AND dataset_id = X.dataset_id AND table_id = X.table_id
+    ) 
+    ```
 ## How to restore data from backups?
 There are several options to restore data, available from _\<your-project-id>_.__appspot.com__
 * __Restore whole dataset__ 
