@@ -19,7 +19,7 @@ All required views to implement that metric are given below, from most low level
 
 **is required.** 
 
-##### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_table
+#### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_table
 View shows *Table* entities from newest Datastore backup.
 ```sql
 #legacySQL
@@ -30,7 +30,7 @@ FROM TABLE_QUERY(
 )
 ```
 
-##### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_backup
+#### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_backup
 View shows *Backup* entities from newest Datastore backup.
 ```sql
 #legacySQL
@@ -48,7 +48,7 @@ FROM(
 )
 ```
 
-##### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.all_backups
+#### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.all_backups
 View shows joined *Table* and *Backup* pairs from newest Datastore backup.
 ```sql
 #legacySQL
@@ -71,7 +71,7 @@ JOIN [datastore_export_views_legacy.last_table] AS t
 ON b.parent_id = t.id
 ```
 
-##### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_available_backup_for_every_table_entity
+#### \<your-project-id-for-BBQ-project\>:datastore_export_views_legacy.last_available_backup_for_every_table_entity
 View shows joined *Table* and *Backup* pairs from newest Datastore backup, but only newest backup for each table. 
 
 ```sql
@@ -84,7 +84,7 @@ SELECT * FROM (
 WHERE rownum=1
 ```
 
-##### \<your-project-id-for-BBQ-project\>:SLO_views_legacy.census_data_3_days_ago
+#### \<your-project-id-for-BBQ-project\>:SLO_views_legacy.census_data_3_days_ago
 View shows all tables and partitions data from GCP Census, in state seen 3 days ago.
 
 ```sql 
@@ -118,7 +118,7 @@ SELECT * FROM (
 )
 ```
 
-##### \<your-project-id-for-BBQ-project\>:SLO_views_legacy.SLI_3_days
+#### \<your-project-id-for-BBQ-project\>:SLO_views_legacy.SLI_3_days
 
 View shows all tables which still haven't had backups, although 3 days ago there was a new, not backed up modification of the table.
 
