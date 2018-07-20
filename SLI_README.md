@@ -25,8 +25,8 @@ View shows *Table* entities from newest Datastore backup.
 #legacySQL
 SELECT project_id, dataset_id, table_id, partition_id, last_checked, __key__.id AS id 
 FROM TABLE_QUERY(
-  [\<your-project-id-for-BBQ-project\>:datastore_export], 
-  'table_id=(SELECT MAX(table_id) FROM [\<your-project-id-for-BBQ-project\>:datastore_export.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")'
+  [<your-project-id-for-BBQ-project>:datastore_export], 
+  'table_id=(SELECT MAX(table_id) FROM [<your-project-id-for-BBQ-project>:datastore_export.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")'
 )
 ```
 
@@ -42,8 +42,8 @@ FROM(
     NTH(2, SPLIT(__key__.path, ',')) AS parent_id, 
     TO_BASE64(BYTES(__key__.path)) AS key
   FROM TABLE_QUERY(
-    [\<your-project-id-for-BBQ-project\>:datastore_export], 
-    'table_id=(SELECT MAX(table_id) FROM [\<your-project-id-for-BBQ-project\>:datastore_export.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")'
+    [<your-project-id-for-BBQ-project>:datastore_export], 
+    'table_id=(SELECT MAX(table_id) FROM [<your-project-id-for-BBQ-project>:datastore_export.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")'
   )
 )
 ```
@@ -97,7 +97,7 @@ SELECT * FROM (
       projectId, datasetId, tableId, creationTime, lastModifiedTime, 'null' AS partitionId,
       ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
     FROM 
-      [\<your-project-id-for-BBQ-project\>.bigquery.table_metadata_v1_0]
+      [<your-project-id-for-GCP-Census-project>.bigquery.table_metadata_v1_0]
     WHERE
       _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -6, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -3, "DAY"))
       AND timePartitioning.type IS NULL AND type='TABLE'
@@ -110,7 +110,7 @@ SELECT * FROM (
       projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime,
         ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId, partitionId ORDER BY snapshotTime DESC) AS rownum
       FROM
-        [\<your-project-id-for-BBQ-project\>.bigquery.partition_metadata_v1_0]
+        [<your-project-id-for-GCP-Census-project>.bigquery.partition_metadata_v1_0]
       WHERE
         _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -6, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -3, "DAY"))
   )
@@ -134,12 +134,12 @@ SELECT
   IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
   IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
 FROM
-  [\<your-project-id-for-BBQ-project\>.SLO_views_legacy.census_data_3_days_ago] AS census
+  [<your-project-id-for-BBQ-project>.SLO_views_legacy.census_data_3_days_ago] AS census
 LEFT JOIN (
   SELECT
     backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
   FROM
-    [\<your-project-id-for-BBQ-project\>.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
+    [<your-project-id-for-BBQ-project>.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
 ) AS last_backups
 ON 
   census.projectId=last_backups.source_project_id AND 
