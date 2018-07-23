@@ -6,7 +6,7 @@
 This metric is measuring number of tables which are not backed up since X days from last observed change. 
 
 To measure it, it is required to have [GCP Census](https://github.com/ocadotechnology/gcp-census) application scanning all data which should be backed up 
-and also turning on daily datastore exports. 
+and also turning on [cloud datastore exports](https://github.com/ocadotechnology/bbq/blob/master/SETUP.md#cloud-datastore-export). 
 
 Metric is implemented as a BigQuery query, which uses mentioned earlier data. 
 
@@ -120,7 +120,7 @@ SELECT * FROM (
 
 #### \<your-project-id-for-BBQ-project\>:SLO_views_legacy.SLI_3_days
 
-View shows all tables which still haven't had backups, although 3 days ago there was a new, not backed up modification of the table.
+View shows all tables which still have not had backups, although 3 days ago there was a new, not backed up modification of the table.
 
 ```sql
 #legacySQL
