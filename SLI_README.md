@@ -1,7 +1,7 @@
 # SLI (Service Level Indicators)
 
 
-### Number of tables which have't have backups after X days since last change.  
+### Number of tables which have no backups after X days since last change.  
 
 This metric is measuring number of tables which are not backed up since X days from last observed change. 
 
