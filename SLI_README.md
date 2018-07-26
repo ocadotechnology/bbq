@@ -8,7 +8,7 @@ This metric is measuring number of tables which are not backed up since X days f
 To measure it, it is required to have [GCP Census](https://github.com/ocadotechnology/gcp-census) application that collects metadata about tables. 
 Also, we need data collected by BBQ in datastore to be exported into BigQuery. That's why we need [cloud datastore exports](https://github.com/ocadotechnology/bbq/blob/master/SETUP.md#cloud-datastore-export) turn on. 
 
-Metric is implemented as a BigQuery query, which uses data about modifications of tables (collected by ). 
+Metric is implemented as a BigQuery query, which uses data about modifications of tables (collected by Census) and data about existing backups. 
 
 All required views to implement that metric are given below, from most low level ones to SLI query at the end.
  
