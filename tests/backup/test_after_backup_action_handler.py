@@ -2,6 +2,8 @@ import jsonpickle
 import os
 from datetime import datetime
 
+from jsonpickle import json
+from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 
@@ -65,6 +67,7 @@ class TestAfterBackupActionHandler(unittest.TestCase):
             "data": data,
             "jobJson": JobResultExample.DONE}
         )
+        copy_job_result = CopyJobResult(json.loads(payload).get('jobJson'))
 
         # when
         response = self.under_test.post(
@@ -77,6 +80,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(backup.dataset_id, "target_dataset_id")
         self.assertEqual(backup.table_id, "target_table_id")
         self.assertTrue(isinstance(backup.created, datetime))
+        self.assertEqual(backup.created, copy_job_result.end_time)
+
+        self.assertTrue(isinstance(backup.last_modified, datetime))
+        self.assertEqual(backup.last_modified, copy_job_result.start_time)
 
     @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
