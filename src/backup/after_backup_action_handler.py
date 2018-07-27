@@ -85,8 +85,7 @@ class AfterBackupActionHandler(JsonHandler):
 
         backup = Backup(
             parent=table_entity.key,
-            last_modified=
-            source_table_metadata.get_last_modified_datetime(),
+            last_modified=copy_job_results.start_time,
             created=copy_job_results.end_time,
             dataset_id=copy_job_results.target_dataset_id,
             table_id=copy_job_results.target_table_id,
