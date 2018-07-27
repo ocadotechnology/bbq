@@ -8,7 +8,7 @@ from commons.decorators.retry import retry
 
 class Backup(ndb.Model):
 
-    # date of last modification which could be included in Backup
+    # date of last modification that will be included in the Backup
     # (copyJob start time - as it is atomic operation
     # and every change before that point is included in copy)
     last_modified = ndb.DateTimeProperty(indexed=True)
