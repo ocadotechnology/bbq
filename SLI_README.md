@@ -149,7 +149,7 @@ ON
 WHERE
   projectId != "\<your-project-id-for-BBQ-project\>"
   AND backup_created < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -3 , "DAY"))
-  AND backup_created < lastModifiedTime
+  AND backup_last_modified < lastModifiedTime
 ```
 
 To implement above metric another 'X' days, there is only need to implement census_data_X_days_ago and SLI_X_days views. It could be done by simple change parameters in WHERE clause. 
