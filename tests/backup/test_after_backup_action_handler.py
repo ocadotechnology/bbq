@@ -50,9 +50,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         ])
 
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -96,9 +97,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
              content('tests/json_samples/bigquery_v2_test_schema.json')),
         ])
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -137,9 +139,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         ])
 
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -175,9 +178,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
             self, disable_partition_expiration, _, _1, _2, _3, _4):
         # given
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
