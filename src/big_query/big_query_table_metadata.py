@@ -97,6 +97,12 @@ class BigQueryTableMetadata(object):
     def is_localized_in_EU(self):
         return self.get_location() == 'EU'
 
+    def is_schema_defined(self):
+        schema = self.table_metadata.get("schema")
+        if schema:
+            return True
+        return False
+
     def is_daily_partitioned(self):
         if self.table_metadata and 'timePartitioning' in self.table_metadata:
             if self.is_partition():

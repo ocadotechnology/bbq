@@ -183,12 +183,10 @@ class BigQuery(object):  # pylint: disable=R0904
             ).execute(num_retries=3)
 
             if log_table and table:
-                table_copy = table.copy()
-                if 'schema' in table_copy:
-                    del table_copy['schema']
-                logging.info("Table: " + json.dumps(table_copy))
+                self.__log_table(table)
 
             return table
+
         except HttpError as ex:
             if ex.resp.status == 404:
                 logging.warning(
@@ -203,6 +201,12 @@ class BigQuery(object):  # pylint: disable=R0904
                 return None
             else:
                 raise ex
+
+    def __log_table(self, table):
+        table_copy = table.copy()
+        if 'schema' in table_copy:
+            del table_copy['schema']
+        logging.info("Table: " + json.dumps(table_copy))
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):
