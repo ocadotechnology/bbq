@@ -12,6 +12,9 @@ class ShouldBackupPredicate(object):
         if not self.big_query_table_metadata.table_exists():
             logging.info('Table not found (404)')
             return False
+        if not self.big_query_table_metadata.is_schema_defined():
+            logging.info('This table is without schema')
+            return False
         if self.big_query_table_metadata.is_empty():
             logging.info('This table is empty')
         if self.big_query_table_metadata.is_external_or_view_type():
