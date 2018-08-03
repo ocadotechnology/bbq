@@ -62,7 +62,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 * Modification of table metadata (including table description) qualifies table to be backed up at the next cycle. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data,
 * There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bigquery/quotas#copy_jobs), which you may hit on the first day. This limit can be increased by Google Support,
 * Data in table streaming buffer will be backed up on the next run, once the buffer is flushed. BBQ uses [copy-job](https://cloud.google.com/bigquery/docs/managing-tables#copy-table) for creating backups and *"Records in the streaming buffer are not considered when a copy or extract job runs"* (check [Life of a BigQuery streaming insert](https://cloud.google.com/blog/big-data/2017/06/life-of-a-bigquery-streaming-insert) for more details),
-* BBQ may backup more than once tables which name is longer than 400 characters. 
+* When table name is longer than 400 characters, then in rare cases BBQ may backup tables more than once. Such backup duplicates are automatically removed by retention process. 
 
 # High level architecture
 

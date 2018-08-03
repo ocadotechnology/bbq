@@ -33,9 +33,7 @@ class TestCopyJobNameCreator(unittest.TestCase):
     @freeze_time("2017-12-06")
     def test_return_none_if_calculated_name_is_too_long(self):
         # given
-        task_name_suffix = ""
-        for i in range(500):
-            task_name_suffix += "x"
+        task_name_suffix = "x" * 501
 
         copy_job_request = CopyJobRequest(
             task_name_suffix=task_name_suffix,

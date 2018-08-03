@@ -15,8 +15,8 @@ class CopyJobTaskName(object):
     # what protect us from failures where source table name is very long,
     # but still valid.
     #
-    # The con is - if task_name is None,
-    # that means it's not unique and same task may be invoked more then once.
+    # The disadvantage is - if task_name is None, that means
+    # it's not unique and the same backup may be created more than once.
     def create(self):
         logging.info("INFO:  %s", self.__copy_job_request)
         task_name = '_'.join([
