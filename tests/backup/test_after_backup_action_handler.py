@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 
 from jsonpickle import json
+from mock.mock import Mock
+
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
@@ -127,8 +129,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertIsNone(backup)
         error_reporting.assert_called_once()
 
+    @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
-    def test_should_not_create_backups_entity_if_source_table_was_deleted(self, _create_http):
+    def test_should_not_create_backups_entity_if_backup_table_doesnt_exist(self, _create_http,error_reporting):
         # given
         _create_http.return_value = HttpMockSequence([
           ({'status': '200'},
@@ -167,14 +170,17 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         # then
         self.assertEqual(response.status_int, 200)
         self.assertIsNone(backup)
+        error_reporting.assert_called_once()
 
+
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())
     @patch.object(BigQueryTableMetadata, 'table_size_in_bytes', return_value=123)
     @patch.object(BigQueryTableMetadata, 'has_partition_expiration', return_value=True)
     @patch.object(BigQuery, 'disable_partition_expiration')
-    def test_should_disable_partition_expiration_if_source_table_has_it(
+    def test_should_disable_partition_expiration_if_backup_table_has_it(
             self, disable_partition_expiration, _, _1, _2, _3, _4):
         # given
         table_entity = Table(
