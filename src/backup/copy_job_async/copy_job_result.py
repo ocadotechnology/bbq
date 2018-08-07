@@ -38,13 +38,7 @@ class CopyJobResult(object):
 
     @property
     def source_table_reference(self):
-        table_id, partition_id = BigQueryTable \
-            .split_table_and_partition_id(self.source_table_id)
-
-        return TableReference(project_id=self.source_project_id,
-                              dataset_id=self.source_dataset_id,
-                              table_id=table_id,
-                              partition_id=partition_id)
+        return TableReference.from_bq_table(self.source_bq_table)
 
     @property
     def start_time(self):
@@ -75,13 +69,8 @@ class CopyJobResult(object):
 
     @property
     def target_table_reference(self):
-        table_id, partition_id = BigQueryTable\
-            .split_table_and_partition_id(self.target_table_id)
+        return TableReference.from_bq_table(self.target_bq_table)
 
-        return TableReference(project_id=self.target_project_id,
-                              dataset_id=self.target_dataset_id,
-                              table_id=table_id,
-                              partition_id=partition_id)
 
     def has_errors(self):
         return 'errors' in self.__job_json['status']

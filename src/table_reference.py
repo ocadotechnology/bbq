@@ -13,6 +13,13 @@ class TableReference(object):
     def from_table_entity(table):
         return TableReference(table.project_id, table.dataset_id,
                               table.table_id, table.partition_id)
+    @staticmethod
+    def from_bq_table(bq_table):
+        table_id, partition_id = BigQueryTable.split_table_and_partition_id(bq_table.table_id)
+        return TableReference(project_id=bq_table.project_id,
+                              dataset_id=bq_table.dataset_id,
+                              table_id=table_id,
+                              partition_id=partition_id)
 
     @staticmethod
     def parse_tab_ref(string):
