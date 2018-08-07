@@ -85,6 +85,7 @@ class TestBigQueryTableMetadata_GetTableByReferenceCached(unittest.TestCase):
 
 
 class TestBigQueryTableMetadata_TableExists(unittest.TestCase):
+
     def test_should_return_true_if_json_is_None(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata(None)
@@ -104,6 +105,7 @@ class TestBigQueryTableMetadata_TableExists(unittest.TestCase):
 
 # is_external_or_view_type() method tests
 class TestBigQueryTableMetadata_IsExternalOrViewType(unittest.TestCase):
+
     def test_should_return_true_if_EXTERNAL_type(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata({"type":"EXTERNAL"})
@@ -226,6 +228,7 @@ class TestBigQueryTableMetadata_GetLocation(unittest.TestCase):
 
 # is_localized_in_EU() method tests
 class TestBigQueryTableMetadata_IsLocalizedInEU(unittest.TestCase):
+
     def test_should_return_TRUE_if_dataset_is_localized_in_EU(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata({"location": "EU"})
@@ -253,8 +256,38 @@ class TestBigQueryTableMetadata_IsLocalizedInEU(unittest.TestCase):
         self.assertFalse(result)
 
 
+# is_schema_defined() method tests
+class TestBigQueryTableMetadata_IsSchemaDefined(unittest.TestCase):
+
+    def test_should_return_True_if_schema_exists(self):
+        # given
+        big_query_table_metadata = BigQueryTableMetadata({"schema": {
+            "fields": [
+                {
+                    "name": "Field_1",
+                    "type": "STRING",
+                    "mode": "NULLABLE"
+                }
+            ]
+        }})
+        # when
+        result = big_query_table_metadata.is_schema_defined()
+        # then
+        self.assertTrue(result)
+
+    def test_should_return_False_if_schema_doesnt_exist(
+        self):
+        # given
+        # without schema field
+        big_query_table_metadata = BigQueryTableMetadata({})
+        # when
+        result = big_query_table_metadata.is_schema_defined()
+        # then
+        self.assertFalse(result)
+
 # is_daily_partitionded() method tests
 class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
+
     def setUp(self):
         patch(
             'src.environment.Environment.version_id',

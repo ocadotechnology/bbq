@@ -27,6 +27,8 @@ class TestShouldBackupPredicate(unittest.TestCase):
               return_value=False).start()
         patch('src.big_query.big_query_table_metadata.BigQueryTableMetadata.'
               'is_external_or_view_type', return_value=False).start()
+        patch('src.big_query.big_query_table_metadata.BigQueryTableMetadata.'
+              'is_schema_defined', return_value=True).start()
 
     def initTestBedForDatastore(self):
         self.testbed = testbed.Testbed()
@@ -38,6 +40,16 @@ class TestShouldBackupPredicate(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
         patch.stopall()
+
+    @patch.object(BigQueryTableMetadata, 'is_schema_defined', return_value=False)
+    def test_should_return_false_if_schema_is_not_defined(self, _):
+        # given
+        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        # when
+        result = predicate.test(self.table)
+        # then
+        self.assertFalse(result, "ShouldBackupPredicate should return FALSE "
+                                "if table has no schema")
 
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
