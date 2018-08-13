@@ -52,34 +52,36 @@ class AfterBackupActionHandler(JsonHandler):
             ErrorReporting().report(error_message)
             return
 
-        source_table_reference = self.__create_table_reference(
-            data["sourceBqTable"])
-        source_table_metadata = BigQueryTableMetadata.get_table_by_reference(
-            source_table_reference)
+        backup_table_metadata = BigQueryTableMetadata.get_table_by_reference(
+            copy_job_results.target_table_reference)
 
-        if source_table_metadata.table_exists():
-            self.__create_backup(source_table_reference, source_table_metadata,
+        if backup_table_metadata.table_exists():
+            self.__create_backup(backup_table_metadata,
                                  copy_job_results)
-            if source_table_metadata.has_partition_expiration():
-                self.__disable_partition_expiration(copy_job_results)
+            if backup_table_metadata.has_partition_expiration():
+                self.__disable_partition_expiration(
+                    copy_job_results.target_table_reference)
         else:
-            logging.info(
-                "Source table {0} not exist. Backup entity is not created".format(
-                    source_table_reference))
+            pass
+            ErrorReporting().report(
+                "Backup table {0} not exist. Backup entity is not created".format(
+                    copy_job_results.target_table_reference))
 
-    def __disable_partition_expiration(self, copy_job_results):
+    def __disable_partition_expiration(self, backup_table_reference):
         self.BQ.disable_partition_expiration(
-            copy_job_results.target_project_id,
-            copy_job_results.target_dataset_id,
-            copy_job_results.target_table_id
+            backup_table_reference.project_id,
+            backup_table_reference.dataset_id,
+            backup_table_reference.table_id
         )
 
     @staticmethod
     @retry(DatastoreTableGetRetriableException, tries=6, delay=4, backoff=2)
-    def __create_backup(source_table_reference, source_table_metadata,
-                        copy_job_results):
+    def __create_backup(backup_table_metadata, copy_job_results):
 
-        table_entity = Table.get_table_by_reference(source_table_reference)
+        table_entity = Table.get_table_by_reference(
+            copy_job_results.source_table_reference
+        )
+
         if table_entity is None:
             raise DatastoreTableGetRetriableException()
 
@@ -89,11 +91,13 @@ class AfterBackupActionHandler(JsonHandler):
             created=copy_job_results.end_time,
             dataset_id=copy_job_results.target_dataset_id,
             table_id=copy_job_results.target_table_id,
-            numBytes=source_table_metadata.table_size_in_bytes()
+            numBytes=backup_table_metadata.table_size_in_bytes()
         )
         logging.debug(
             "Saving backup to datastore, source:{0}, target:{1}".format(
-                source_table_reference, copy_job_results.target_bq_table))
+                copy_job_results.source_bq_table,
+                copy_job_results.target_bq_table))
+
         backup.insert_if_absent(backup)
 
     @staticmethod

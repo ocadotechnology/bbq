@@ -5,7 +5,6 @@ from google.appengine.ext import testbed, ndb
 from mock import patch, Mock
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.big_query.big_query import BigQuery
 from src.backup.backup_process import BackupProcess
 from src.backup.table_backup import TableBackup
 from src.backup.table_partitions_backup_scheduler import \
@@ -28,7 +27,7 @@ class TestTableBackup(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(TablePartitionsBackupScheduler, 'start')
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
@@ -47,6 +46,7 @@ class TestTableBackup(unittest.TestCase):
         # then
         table_partitions_backup_scheduler.assert_called_once()
 
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=False)
     @patch.object(BackupProcess, 'start')
@@ -64,6 +64,7 @@ class TestTableBackup(unittest.TestCase):
         # then
         backup_start.assert_called_once()
 
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)

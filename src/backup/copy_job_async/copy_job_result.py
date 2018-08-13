@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from src.big_query.big_query_table import BigQueryTable
+from src.table_reference import TableReference
 
 
 class CopyJobResult(object):
@@ -36,6 +37,10 @@ class CopyJobResult(object):
                              self.source_table_id)
 
     @property
+    def source_table_reference(self):
+        return TableReference.from_bq_table(self.source_bq_table)
+
+    @property
     def start_time(self):
         start_time = float(self.__job_json['statistics']['startTime']) / 1000.0
         return datetime.fromtimestamp(start_time)
@@ -61,6 +66,11 @@ class CopyJobResult(object):
     def target_bq_table(self):
         return BigQueryTable(self.target_project_id, self.target_dataset_id,
                              self.target_table_id)
+
+    @property
+    def target_table_reference(self):
+        return TableReference.from_bq_table(self.target_bq_table)
+
 
     def has_errors(self):
         return 'errors' in self.__job_json['status']
