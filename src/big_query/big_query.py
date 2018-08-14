@@ -84,7 +84,7 @@ class BigQuery(object):  # pylint: disable=R0904
                     logging.info("Dataset '%s:%s' is not found", project_id,
                                  dataset_id)
                     return
-                if ex.resp.status == 503 and 'Error encountered during execution. Retrying may solve the problem.' in ex.content:
+                if ex.resp.status >= 500:
                     raise BigQueryRetriableException()
                 raise ex
 
