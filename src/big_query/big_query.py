@@ -22,6 +22,10 @@ class DatasetNotFoundException(Exception):
     pass
 
 
+class BigQueryRetriableException(Exception):
+    pass
+
+
 class BigQuery(object):  # pylint: disable=R0904
     def __init__(self):
         self.http = self._create_http()
@@ -67,6 +71,7 @@ class BigQuery(object):  # pylint: disable=R0904
         for table_id in self.list_table_ids(project_id, dataset_id):
             func(project_id, dataset_id, table_id)
 
+    @retry(BigQueryRetriableException, tries=3, delay=2, backoff=2)
     def list_table_ids(self, project_id, dataset_id):
         request = self.service.tables().list(
             projectId=project_id, datasetId=dataset_id
@@ -79,8 +84,9 @@ class BigQuery(object):  # pylint: disable=R0904
                     logging.info("Dataset '%s:%s' is not found", project_id,
                                  dataset_id)
                     return
-                else:
-                    raise ex
+                if ex.resp.status == 503 and 'Error encountered during execution. Retrying may solve the problem.' in ex.content:
+                    raise BigQueryRetriableException()
+                raise ex
 
             if 'tables' in tables:
                 for table in tables['tables']:
