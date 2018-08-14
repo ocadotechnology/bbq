@@ -1,11 +1,11 @@
 import unittest
 
+from apiclient.errors import HttpError
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.big_query.big_query import BigQuery, RandomizationError, \
-    BigQueryRetriableException
+from src.big_query.big_query import BigQuery, RandomizationError
 from tests.test_utils import content
 
 
@@ -66,7 +66,7 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_tables_list_responses_with_503()
 
         # when
-        with self.assertRaises(BigQueryRetriableException) as context:
+        with self.assertRaises(HttpError) as context:
             tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
         # then
             self.assertEqual(self.count(tables_ids), 5)
