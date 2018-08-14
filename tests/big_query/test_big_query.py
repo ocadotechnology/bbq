@@ -4,7 +4,8 @@ from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.big_query.big_query import BigQuery, RandomizationError
+from src.big_query.big_query import BigQuery, RandomizationError, \
+    BigQueryRetriableException
 from tests.test_utils import content
 
 
@@ -59,6 +60,17 @@ class TestBigQuery(unittest.TestCase):
 
         # then
         self.assertEqual(self.count(tables_ids), 5)
+
+    def test_iterating_tables_should_retry_if_gets_http_503_response_once(self):
+        # given
+        self._create_http.return_value = self.__create_tables_list_responses_with_503()
+
+        # when
+        with self.assertRaises(BigQueryRetriableException) as context:
+            tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
+        # then
+            self.assertEqual(self.count(tables_ids), 5)
+
 
     def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
         # given
@@ -171,6 +183,19 @@ class TestBigQuery(unittest.TestCase):
         return HttpMockSequence([
             ({'status': '200'},
              content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_1.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
+
+    @staticmethod
+    def __create_tables_list_responses_with_503():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '503'},
+             content('tests/json_samples/bigquery_table_list_503_error.json')),
             ({'status': '200'},
              content('tests/json_samples/bigquery_table_list_page_1.json')),
             ({'status': '200'},
