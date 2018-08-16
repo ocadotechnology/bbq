@@ -61,16 +61,21 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(tables_ids), 5)
 
-    def test_iterating_tables_should_retry_if_gets_http_503_response_once(self):
+    class TestClass(object):
+        def func_for_test(self, project_id, dataset_id, table_id):
+            pass
+
+    @patch('time.sleep', return_value=None)
+    @patch.object(TestClass, "func_for_test")
+    def test_iterating_tables_should_retry_if_gets_http_503_response_once(self, func,_):
         # given
         self._create_http.return_value = self.__create_tables_list_responses_with_503()
 
         # when
-        with self.assertRaises(HttpError) as context:
-            tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
-        # then
-            self.assertEqual(self.count(tables_ids), 5)
+        BigQuery().for_each_table("project1233", "dataset_id", func)
 
+        # then
+        self.assertEquals(5, func.call_count)
 
     def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
         # given
