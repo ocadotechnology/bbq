@@ -2,11 +2,10 @@ import unittest
 from datetime import datetime
 
 from google.appengine.ext import testbed, ndb
-from mock import patch, PropertyMock
+from mock import patch
 
 from src.commons.exceptions import NotFoundException
-from src.environment import Environment
-from src.configuration import Configuration
+from src.commons.config.environment import Environment
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.datastore.restore_item import RestoreItem, TableReferenceEntity
 from src.restore.status.restoration_job_status_service import \

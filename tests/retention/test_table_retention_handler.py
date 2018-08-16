@@ -7,7 +7,7 @@ import webtest
 from mock import patch
 from src.retention.table_retention import TableRetention
 from src.retention.table_retention_handler import TableRetentionHandler
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestTableRetentionHandler(unittest.TestCase):

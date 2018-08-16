@@ -1,8 +1,8 @@
 import logging
 from random import randint
 
-from src.configuration import configuration
-from src.tasks import Tasks
+from src.commons.config.configuration import configuration
+from src.commons.tasks import Tasks
 
 
 class TaskCreator(object):

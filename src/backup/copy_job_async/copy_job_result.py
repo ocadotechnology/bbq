@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from src.big_query.big_query_table import BigQueryTable
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class CopyJobResult(object):

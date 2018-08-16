@@ -8,7 +8,7 @@ import webtest
 from mock import patch
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.google_cloud_storage_client import GoogleCloudStorageClient
+from src.commons.google_cloud_storage_client import GoogleCloudStorageClient
 from src.restore.test import restore_test_handler
 from src.restore.test.table_randomizer import TableRandomizer
 from src.restore.test.table_restore_invoker import TableRestoreInvoker

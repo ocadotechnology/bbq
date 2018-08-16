@@ -4,14 +4,14 @@ from mock import patch
 from src.backup.datastore.Backup import Backup
 from src.retention.should_perform_retention_predicate import \
     ShouldPerformRetentionPredicate
-from src.error_reporting import ErrorReporting
+from src.commons.error_reporting import ErrorReporting
 
 
 class TestShouldPerformRetentionPredicate(unittest.TestCase):
 
     def setUp(self):
         patch(
-            'src.environment.Environment.version_id',
+            'src.commons.config.environment.Environment.version_id',
             return_value='dummy_version'
         ).start()
         patch('googleapiclient.discovery.build').start()

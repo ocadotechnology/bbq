@@ -6,11 +6,11 @@ from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock
 
 from src.backup.datastore.Table import Table
-from src.configuration import Configuration
+from src.commons.config.configuration import Configuration
 from src.restore.dataset.dataset_restore_items_generator import \
     DatasetRestoreItemsGenerator
 from src.restore.datastore.restore_item import RestoreItem
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils import table_entities_creator
 
 RESTORATION_JOB_ID = 'restoration_job_id'

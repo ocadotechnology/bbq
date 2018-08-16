@@ -9,7 +9,7 @@ from src.backup.backup_process import BackupProcess
 from src.backup.table_backup import TableBackup
 from src.backup.table_partitions_backup_scheduler import \
     TablePartitionsBackupScheduler
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 @freeze_time("2017-04-04")

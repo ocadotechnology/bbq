@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.decorators.retry import retry
 from src.big_query.big_query import BigQuery, RandomizationError
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class DoesNotMeetSampleCriteriaException(BaseException):

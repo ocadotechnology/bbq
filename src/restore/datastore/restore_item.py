@@ -5,7 +5,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 
 from src.backup.datastore.Table import query_using_cursor
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TableReferenceEntity(ndb.Model):
