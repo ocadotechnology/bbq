@@ -3,9 +3,9 @@ import json
 import webapp2
 from google.appengine.ext import ndb
 
-from commons.exceptions import JsonNotParseableException, \
+from src.commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
-from commons.json_handler import JsonHandler
+from src.commons.json_handler import JsonHandler
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.configuration import configuration
 from src.restore.datastore.restore_item import RestoreItem

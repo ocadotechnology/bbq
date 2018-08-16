@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from commons.exceptions import NotFoundException
+from src.commons.exceptions import NotFoundException
 from src.backup.datastore.Table import Table
 
 

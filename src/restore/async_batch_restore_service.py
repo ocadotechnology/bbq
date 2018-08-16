@@ -2,7 +2,7 @@ import logging
 
 from google.appengine.ext import ndb
 
-from commons.decorators.log_time import log_time
+from src.commons.decorators.log_time import log_time
 from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest

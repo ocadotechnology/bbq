@@ -2,7 +2,7 @@ import os
 
 from datetime import datetime
 
-from commons.exceptions import NotFoundException
+from src.commons.exceptions import NotFoundException
 from src.restore.table import table_restore_handler
 from src.restore.table.table_restore_service import TableRestoreService
 from src.table_reference import TableReference

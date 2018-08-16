@@ -1,4 +1,4 @@
-from commons.secured_handler import SecuredHandler
+from src.commons.secured_handler import SecuredHandler
 from src.configuration import configuration
 
 

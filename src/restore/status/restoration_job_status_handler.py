@@ -1,6 +1,6 @@
 import webapp2
 
-from commons.json_handler import JsonHandler
+from src.commons.json_handler import JsonHandler
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.configuration import configuration
 from src.restore.status.restoration_job_status_service import \

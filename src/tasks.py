@@ -5,10 +5,10 @@ from google.appengine.api.taskqueue import TransientError, Queue, \
     UnknownQueueError, Task
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 from error_reporting import ErrorReporting
 from src import request_correlation_id
-from commons.collections import paginated
+from src.commons.collections import paginated
 
 
 class Tasks(object):

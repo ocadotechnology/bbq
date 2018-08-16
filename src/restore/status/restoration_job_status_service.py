@@ -3,7 +3,7 @@ import logging
 from collections import Counter
 
 from commons import camel_case_converter
-from commons.exceptions import NotFoundException
+from src.commons.exceptions import NotFoundException
 from src.environment import Environment
 from src.configuration import configuration
 from src.restore.datastore.restoration_job import RestorationJob

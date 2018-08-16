@@ -4,10 +4,10 @@ import logging
 import webapp2
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from commons.decorators.retry import retry
-from commons.exceptions import JsonNotParseableException, \
+from src.commons.decorators.retry import retry
+from src.commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
-from commons.json_handler import JsonHandler
+from src.commons.json_handler import JsonHandler
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table

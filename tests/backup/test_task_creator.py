@@ -4,7 +4,7 @@ import unittest
 from google.appengine.ext import testbed
 from mock import patch
 
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from src import request_correlation_id
 from src.backup.task_creator import TaskCreator
 
