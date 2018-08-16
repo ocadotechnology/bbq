@@ -11,7 +11,7 @@ from tests import test_utils
 
 from src.backup.datastore.Table import Table
 from src.big_query.big_query import BigQuery
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.backup.copy_job_async.result_check.job_result_example import \
   JobResultExample
 from tests.test_utils import content

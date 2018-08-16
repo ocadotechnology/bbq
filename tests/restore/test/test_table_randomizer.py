@@ -9,7 +9,7 @@ from src.big_query.big_query import BigQuery, RandomizationError
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.restore.test.table_randomizer import TableRandomizer, \
     DoesNotMeetSampleCriteriaException
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestTableRandomizer(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestTableRandomizer(unittest.TestCase):
     def setUp(self):
         patch('googleapiclient.discovery.build').start()
         patch(
-            'src.configuration.Configuration.backup_project_id',
+            'src.commons.config.configuration.Configuration.backup_project_id',
             return_value='project-id'
         ).start()
         patch('oauth2client.client.GoogleCredentials.get_application_default')\

@@ -1,6 +1,6 @@
 import unittest
 
-from src.configuration import Configuration
+from src.commons.config.configuration import Configuration
 
 
 class TestPrdConfiguration(unittest.TestCase):

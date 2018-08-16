@@ -5,7 +5,7 @@ import googleapiclient.discovery
 import httplib2
 from oauth2client.client import GoogleCredentials
 
-from environment import Environment
+from src.commons.config.environment import Environment
 from src.commons.decorators.retry import retry
 
 from google.appengine.api.app_identity import app_identity

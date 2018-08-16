@@ -1,6 +1,6 @@
 import os
 
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 import unittest

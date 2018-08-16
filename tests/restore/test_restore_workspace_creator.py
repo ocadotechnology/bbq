@@ -5,7 +5,7 @@ from mock import patch, ANY
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 SOURCE_PROJECT_ID = "source_project_id_1"
 SOURCE_DATASET_ID = "source_dataset_id_1"
