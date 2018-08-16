@@ -4,7 +4,7 @@ import logging
 import webapp2
 from googleapiclient.errors import HttpError
 
-from commons.exceptions import ParameterValidationException, \
+from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException, WrongJsonFormatException, NotFoundException
 
 

@@ -6,9 +6,9 @@ import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
-from commons.decorators.cached import cached
-from commons.decorators.log_time import log_time, measure_time_and_log
-from commons.decorators.retry import retry
+from src.commons.decorators.cached import cached
+from src.commons.decorators.log_time import log_time, measure_time_and_log
+from src.commons.decorators.retry import retry
 from src.big_query.big_query_table import BigQueryTable
 from src.configuration import configuration
 from src.table_reference import TableReference

@@ -22,7 +22,7 @@ from mock import patch
 import webtest
 from google.appengine.ext import testbed
 from apiclient.http import HttpMockSequence
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from src.backup import after_backup_action_handler
 from src.big_query.big_query_table import BigQueryTable
 

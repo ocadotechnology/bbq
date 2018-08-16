@@ -5,7 +5,7 @@ import webapp2
 from google.appengine.ext import testbed
 
 import webtest
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from mock import patch
 from src.backup.datastore.Table import Table
 from src.retention.organization_retention_handler import \

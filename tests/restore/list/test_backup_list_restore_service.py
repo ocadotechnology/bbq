@@ -3,7 +3,7 @@ import unittest
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock
 
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.configuration import Configuration

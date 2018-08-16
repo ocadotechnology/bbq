@@ -4,7 +4,7 @@ from unittest import TestCase
 from google.appengine.ext import testbed
 from mock import patch
 
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 from src.restore.dataset.dataset_restore_parameters_validator import \
     DatasetRestoreParametersValidator
 from tests.utils import table_entities_creator

@@ -2,8 +2,8 @@ from datetime import datetime
 
 import webapp2
 
-from commons.exceptions import ParameterValidationException
-from commons.json_handler import JsonHandler
+from src.commons.exceptions import ParameterValidationException
+from src.commons.json_handler import JsonHandler
 from src.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
 from src.configuration import configuration
