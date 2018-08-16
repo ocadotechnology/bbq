@@ -63,6 +63,7 @@ class BigQuery(object):  # pylint: disable=R0904
                     yield dataset['datasetReference']['datasetId']
             request = self.service.datasets().list_next(request, datasets)
 
+    @retry(HttpError, tries=3, delay=2, backoff=2)
     def for_each_table(self, project_id, dataset_id, func):
         for table_id in self.list_table_ids(project_id, dataset_id):
             func(project_id, dataset_id, table_id)
@@ -79,8 +80,7 @@ class BigQuery(object):  # pylint: disable=R0904
                     logging.info("Dataset '%s:%s' is not found", project_id,
                                  dataset_id)
                     return
-                else:
-                    raise ex
+                raise ex
 
             if 'tables' in tables:
                 for table in tables['tables']:
