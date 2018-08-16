@@ -4,7 +4,7 @@ from datetime import datetime
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock
 
-from commons.exceptions import NotFoundException
+from src.commons.exceptions import NotFoundException
 from src.environment import Environment
 from src.configuration import Configuration
 from src.restore.datastore.restoration_job import RestorationJob

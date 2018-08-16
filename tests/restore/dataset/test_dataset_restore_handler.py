@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 from src.restore.dataset.dataset_restore_service import DatasetRestoreService
 from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService

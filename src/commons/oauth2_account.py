@@ -4,7 +4,7 @@ import httplib2
 
 from googleapiclient.errors import HttpError
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 
 
 class OAuth2Account(object):

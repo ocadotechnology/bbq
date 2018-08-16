@@ -3,7 +3,7 @@ import logging
 import datetime
 from google.appengine.ext import ndb
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 
 
 class Backup(ndb.Model):

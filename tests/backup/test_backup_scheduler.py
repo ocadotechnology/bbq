@@ -5,7 +5,7 @@ from apiclient.errors import HttpError
 from google.appengine.ext import testbed
 from mock import patch, Mock, mock, call
 
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from mock.mock import PropertyMock
 from src import request_correlation_id
 from src.backup.backup_scheduler import BackupScheduler

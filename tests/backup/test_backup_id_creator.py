@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from src.backup.backup_id_creator import BackupIdCreator
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 
 
 class TestBackupIdCreator(unittest.TestCase):
