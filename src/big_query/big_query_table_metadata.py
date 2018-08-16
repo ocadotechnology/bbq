@@ -3,7 +3,7 @@ import logging
 from types import NoneType
 
 
-from commons.decorators.cached import cached
+from src.commons.decorators.cached import cached
 from src.error_reporting import ErrorReporting
 from src.table_reference import TableReference
 from src.big_query.big_query import BigQuery

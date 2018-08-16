@@ -5,7 +5,7 @@ from google.appengine.api.taskqueue import Task
 from google.appengine.ext import testbed
 from mock import patch
 
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from src import request_correlation_id
 from src.tasks import Tasks
 

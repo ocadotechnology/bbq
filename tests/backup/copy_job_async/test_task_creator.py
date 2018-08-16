@@ -6,7 +6,7 @@ from google.appengine.api.taskqueue import UnknownQueueError
 from google.appengine.ext import testbed
 from mock import patch
 
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
 from src.backup.copy_job_async.copy_job.copy_job_task_name import \
     CopyJobTaskName
