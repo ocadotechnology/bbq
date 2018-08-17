@@ -1,0 +1,20 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+service: slo-service
+
+instance_class: F1
+
+libraries:
+- name: ssl
+  version: 2.7.11
+
+handlers:
+- url: /favicon.ico
+  static_files: static/images/favicon.ico
+  upload: static/images/favicon.ico
+  application_readable: true
+- url: /.*
+  script: src.slo.main.app
+  secure: always
+  login: admin

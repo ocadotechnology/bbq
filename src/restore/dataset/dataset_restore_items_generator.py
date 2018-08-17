@@ -1,7 +1,7 @@
 import logging
 
-from commons.collections import paginated
-from commons.decorators.log_time import log_time
+from src.commons.collections import paginated
+from src.commons.decorators.log_time import log_time
 from src.backup.datastore.Table import Table
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restoration_table_reference import RestoreTableReference

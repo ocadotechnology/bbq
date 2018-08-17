@@ -4,7 +4,7 @@ import jsonpickle
 import webapp2
 
 from src.backup.copy_job_async.copy_job.copy_job_service import CopyJobService
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 
 
 class CopyJobServiceHandler(webapp2.RequestHandler):

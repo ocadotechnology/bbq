@@ -1,9 +1,9 @@
 import webapp2
 
 from src.backup.table_backup import TableBackup
-from src.configuration import configuration
-from src.table_reference import TableReference
-from src.tasks import Tasks
+from src.commons.config.configuration import configuration
+from src.commons.table_reference import TableReference
+from src.commons.tasks import Tasks
 
 
 class TableBackupHandler(webapp2.RequestHandler):

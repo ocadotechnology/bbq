@@ -6,7 +6,7 @@ from mock import Mock, patch, call
 from src.backup.table_partitions_backup_scheduler import \
     TablePartitionsBackupScheduler
 from src.backup.task_creator import TaskCreator
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestTablePartitionsBackupScheduler(unittest.TestCase):

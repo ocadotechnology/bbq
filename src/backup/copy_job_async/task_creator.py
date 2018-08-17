@@ -1,12 +1,12 @@
 import logging
 
 import jsonpickle
-from google.appengine.api.taskqueue import UnknownQueueError, Task
+from google.appengine.api.taskqueue import Task
 
-from src.tasks import Tasks
+from src.commons.tasks import Tasks
 from src.backup.copy_job_async.copy_job.copy_job_task_name import \
     CopyJobTaskName
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 
 
 class TaskCreator(object):

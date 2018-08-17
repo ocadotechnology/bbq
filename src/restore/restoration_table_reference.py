@@ -1,5 +1,5 @@
-from src.configuration import configuration
-from src.table_reference import TableReference
+from src.commons.config.configuration import configuration
+from src.commons.table_reference import TableReference
 
 
 class RestoreTableReference(object):

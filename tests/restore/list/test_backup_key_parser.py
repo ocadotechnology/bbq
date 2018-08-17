@@ -2,7 +2,7 @@ import unittest
 
 from google.appengine.ext import ndb
 
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 from src.restore.list.backup_key_parser import BackupKeyParser
 
 

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block body %}
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+  <a class="navbar-brand" href="/">BBQ</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
+          aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="dropdown_actions"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown_actions">
+          <a class="dropdown-item" href="/ui/restoreDataset">Restore dataset</a>
+          <a class="dropdown-item" href="/ui/restoreTable">Restore table</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="dropdown_advanced"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Advanced</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown_advanced">
+          <a class="dropdown-item" href="/ui/restoreList">Restore custom backup list</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script type="text/javascript">
+  function encodeQueryData(data) {
+    let ret = [];
+    for (let d in data) {
+      if (data[d]) {
+        ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+      }
+    }
+    return ret.join('&');
+  }
+
+  function makeUrlsClickable() {
+    var content = document.getElementById("response").innerHTML;
+    content = content.replace(/"(http.*)"/g, "<a href=\"$1\">$1</a>");
+    document.getElementById("response").innerHTML = content;
+  }
+</script>
+
+<main role="main" class="container">
+  {% block main %}
+  {% endblock %}
+</main>
+
+{% endblock %}

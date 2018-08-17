@@ -6,12 +6,12 @@ import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
-from commons.decorators.cached import cached
-from commons.decorators.log_time import log_time, measure_time_and_log
-from commons.decorators.retry import retry
-from src.configuration import configuration
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.table_reference import TableReference
+from src.commons.decorators.cached import cached
+from src.commons.decorators.log_time import log_time, measure_time_and_log
+from src.commons.decorators.retry import retry
+from src.big_query.big_query_table import BigQueryTable
+from src.commons.config.configuration import configuration
+from src.commons.table_reference import TableReference
 
 
 class TableNotFoundException(Exception):
@@ -63,6 +63,7 @@ class BigQuery(object):  # pylint: disable=R0904
                     yield dataset['datasetReference']['datasetId']
             request = self.service.datasets().list_next(request, datasets)
 
+    @retry(HttpError, tries=3, delay=2, backoff=2)
     def for_each_table(self, project_id, dataset_id, func):
         for table_id in self.list_table_ids(project_id, dataset_id):
             func(project_id, dataset_id, table_id)
@@ -72,7 +73,15 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=project_id, datasetId=dataset_id
         )
         while request is not None:
-            tables = request.execute()
+            try:
+                tables = request.execute()
+            except HttpError as ex:
+                if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
+                    logging.info("Dataset '%s:%s' is not found", project_id,
+                                 dataset_id)
+                    return
+                raise ex
+
             if 'tables' in tables:
                 for table in tables['tables']:
                     if 'tableReference' not in table:
@@ -163,22 +172,6 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=configuration.backup_project_id,
             body=query_data).execute(num_retries=3)
 
-    def get_table_or_partition(self, project_id, dataset_id, table_id,
-                               partition_id):
-        table_metadata = self.get_table(project_id, dataset_id,
-                                        BigQuery.get_table_id_with_partition_id(
-                                            table_id, partition_id))
-        return BigQueryTableMetadata(table_metadata)
-
-    def get_table_by_reference(self, reference):
-        return self.get_table_or_partition(project_id=reference.project_id,
-                                           dataset_id=reference.dataset_id,
-                                           table_id=reference.table_id,
-                                           partition_id=reference.partition_id)
-
-    @staticmethod
-    def get_table_id_with_partition_id(table_id, partition_id):
-        return table_id + ('' if partition_id is None else '$' + partition_id)
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
@@ -188,12 +181,10 @@ class BigQuery(object):  # pylint: disable=R0904
             ).execute(num_retries=3)
 
             if log_table and table:
-                table_copy = table.copy()
-                if 'schema' in table_copy:
-                    del table_copy['schema']
-                logging.info("Table: " + json.dumps(table_copy))
+                self.__log_table(table)
 
             return table
+
         except HttpError as ex:
             if ex.resp.status == 404:
                 logging.warning(
@@ -209,10 +200,11 @@ class BigQuery(object):  # pylint: disable=R0904
             else:
                 raise ex
 
-    @cached(time=300)
-    def get_table_cached(self, project_id, dataset_id, table_id,
-                         log_table=True):
-        return self.get_table(project_id, dataset_id, table_id, log_table)
+    def __log_table(self, table):
+        table_copy = table.copy()
+        if 'schema' in table_copy:
+            del table_copy['schema']
+        logging.info("Table: " + json.dumps(table_copy))
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):
@@ -249,30 +241,21 @@ class BigQuery(object):  # pylint: disable=R0904
         ).execute(num_retries=3)
 
     @retry(Error, tries=3, delay=2, backoff=2)
-    def create_empty_partitioned_table(self, table_reference):
-        logging.info(
-            "Creating empty daily partitioned table: %s",
-            table_reference
-        )
-        body = {
-            'tableReference': {
-                'projectId': table_reference.project_id,
-                'datasetId': table_reference.dataset_id,
-                'tableId': table_reference.table_id,
-            },
-            'timePartitioning': {
-                'type': 'DAY'
-            }
-        }
+    def create_table(self, projectId, datasetId, body):
+        table = BigQueryTable(projectId, datasetId, body.get("tableReference").get("tableId"))
+
+        logging.info("Creating table %s", table)
+        logging.info("BODY: %s", json.dumps(body))
+
         try:
             self.service.tables().insert(
-                projectId=table_reference.project_id,
-                datasetId=table_reference.dataset_id,
+                projectId=projectId,
+                datasetId=datasetId,
                 body=body
             ).execute()
         except HttpError as error:
             if error.resp.status == 409:
-                logging.info('Table already exists %s', table_reference)
+                logging.info('Table already exists %s', table)
             else:
                 raise
 

@@ -1,12 +1,22 @@
-{% extends "base.html" %}
-{% block body %}
-<h1>Backup Big Query (BBQ)</h1>
+{% extends "bbq-menu.html" %}
+{% block main %}
 
-<h4>Expand <strong>
-  <word style="color:red">Actions</word>
-</strong>
-  dropdown to list possible actions.
-</h4>
+<h1>Backup Big Query (BBQ)</h1>
+<br/>
+
+<h4>What would you like to restore?</h4>
+
+<ul>
+  <li>
+    <a href="/ui/restoreDataset">Dataset</a>
+  </li>
+  <li>
+    <a href="/ui/restoreTable">Table</a>
+  </li>
+</ul>
+
+Full documentation is available on <a href="https://github.com/ocadotechnology/bbq/blob/master/README.md" target="_blank">BBQ Github page</a>
+
 {% endblock %}
 
 

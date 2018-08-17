@@ -3,10 +3,10 @@ import unittest
 
 from google.appengine.ext import testbed, ndb
 
-from commons.exceptions import NotFoundException
+from src.commons.exceptions import NotFoundException
 from src.backup.datastore.Table import Table
 from src.backup.datastore.backup_finder import BackupFinder
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils import backup_utils
 
 PROJECT_ID = 'project-id'

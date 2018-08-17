@@ -1,17 +1,94 @@
 import datetime
 import unittest
 
+from google.appengine.ext import testbed
 # nopep8 pylint: disable=C0301
 from mock import patch
+from mock.mock import Mock
+
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.error_reporting import ErrorReporting
+from src.big_query.big_query import BigQuery
+from src.commons.error_reporting import ErrorReporting
 
 
 # table_not_exist_anymore() method tests
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
+
+class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        # patch.stopall()
+        self.testbed.deactivate()
+
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch.object(BigQuery, 'create_table')
+    def test_create_same_empty_table_execute_a_proper_big_query_request_with_same_table_properties(self, create_table):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
+        table_properties = {
+            "tableReference":{
+                "projectId":"p1",
+                "datasetId":"d1",
+                "tableId":"t1",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        }
+
+        target_table_reference = TableReference("p2", "d2", "t2")
+        BigQueryTableMetadata(table_properties).create_the_same_empty_table(target_table_reference)
+        create_table.assert_called_with("p2","d2",
+            {
+            "tableReference":{
+                "projectId":"p2",
+                "datasetId":"d2",
+                "tableId":"t2",
+            },
+            "timePartitioning": {
+                "type": "DAY",
+                "field": "birth_date"
+            },
+            "schema": "a schema"
+        })
+
+
+class TestBigQueryTableMetadata_GetTableByReferenceCached(unittest.TestCase):
+
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        # patch.stopall()
+        self.testbed.deactivate()
+
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch.object(BigQuery, 'get_table', return_value={})
+    def test_get_table_cached_should_only_call_bq_once(self, get_table):
+        # given
+
+        # when
+        result1 = BigQueryTableMetadata.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
+        result2 = BigQueryTableMetadata.get_table_by_reference_cached(TableReference('project', 'dataset', 'table'))
+
+        # then
+        self.assertEqual(result1, result2)
+        get_table.assert_called_once()
 
 
 class TestBigQueryTableMetadata_TableExists(unittest.TestCase):
+
     def test_should_return_true_if_json_is_None(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata(None)
@@ -31,6 +108,7 @@ class TestBigQueryTableMetadata_TableExists(unittest.TestCase):
 
 # is_external_or_view_type() method tests
 class TestBigQueryTableMetadata_IsExternalOrViewType(unittest.TestCase):
+
     def test_should_return_true_if_EXTERNAL_type(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata({"type":"EXTERNAL"})
@@ -153,6 +231,7 @@ class TestBigQueryTableMetadata_GetLocation(unittest.TestCase):
 
 # is_localized_in_EU() method tests
 class TestBigQueryTableMetadata_IsLocalizedInEU(unittest.TestCase):
+
     def test_should_return_TRUE_if_dataset_is_localized_in_EU(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata({"location": "EU"})
@@ -180,15 +259,45 @@ class TestBigQueryTableMetadata_IsLocalizedInEU(unittest.TestCase):
         self.assertFalse(result)
 
 
+# is_schema_defined() method tests
+class TestBigQueryTableMetadata_IsSchemaDefined(unittest.TestCase):
+
+    def test_should_return_True_if_schema_exists(self):
+        # given
+        big_query_table_metadata = BigQueryTableMetadata({"schema": {
+            "fields": [
+                {
+                    "name": "Field_1",
+                    "type": "STRING",
+                    "mode": "NULLABLE"
+                }
+            ]
+        }})
+        # when
+        result = big_query_table_metadata.is_schema_defined()
+        # then
+        self.assertTrue(result)
+
+    def test_should_return_False_if_schema_doesnt_exist(
+        self):
+        # given
+        # without schema field
+        big_query_table_metadata = BigQueryTableMetadata({})
+        # when
+        result = big_query_table_metadata.is_schema_defined()
+        # then
+        self.assertFalse(result)
+
 # is_daily_partitionded() method tests
 class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
+
     def setUp(self):
         patch(
-            'src.environment.Environment.version_id',
+            'src.commons.config.environment.Environment.version_id',
             return_value='dummy_version'
         ).start()
         patch(
-            'src.configuration.Configuration.backup_project_id',
+            'src.commons.config.configuration.Configuration.backup_project_id',
             return_value='dummy_version'
         ).start()
         patch('googleapiclient.discovery.build').start()

@@ -1,54 +1,79 @@
-### Prerequisites
-Ownership of the GCP project with assigned billing (backups will be stored in that project).
- * see [creating a project in GCP](https://support.google.com/cloud/answer/6251787?hl=en#) doc
-
 ### Installation steps
 
-The easiest way is to use Google Cloud Shell - click button below. It opens GCShell and clones the repository. 
+##### The recommended way is to use Google Cloud Shell - click button below. It opens your Google Cloud Shell and clones the repository. 
+  [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Focadotechnology%2Fbbq&page=shell&tutorial=SETUP.md)
+    
+   It is possible to do it from local environment, but it requires Google Cloud SDK for Python (see [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
-<a href="https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/ocadotechnology/bbq&page=editor&open_in_editor=SETUP.md">
-<img alt="Open in Cloud Shell" src ="http://gstatic.com/cloudssh/images/open-btn.png"></a>
+1. Create and enable billing for two GCP projects 
+    * First project is the place where BBQ will be deployed and backups will be stored. (**BBQ_PROJECT_ID** variable)
+    * Second project is meant to work as a temporary storage into which backups will be restored. (**RESTORATION_STORAGE_PROJECT_ID** variable)
+    * see [creating a project in GCP](https://support.google.com/cloud/answer/6251787?hl=en#) doc
 
-<br>
-  
-  * Note: It is possible to do it from local environment. But it requires installing Google Cloud SDK for Python (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
-
-Then you could follow below steps:
-1. Export your project id:
-      ```bash
-      export PROJECT_ID="<your-project-id>"
+1. **Change values in brackets '<>' to project id's created in previous step. Note - changing values in command is needed only in this step.** Below commands will export that values, as they are used by commands from next steps:
+      ```bash 
+      export BBQ_PROJECT_ID="<your-project-id-for-BBQ-project>"
       ```
-
-1. Change all **\<your-project-id\>** to your previously created project in [config.yaml](./config/config.yaml) config file.
-      ```bash
-      sed -i -e "s/<your-project-id>/${PROJECT_ID}/g" config/config.yaml
+      ```bash 
+      export RESTORATION_STORAGE_PROJECT_ID="<your-project-id-for-restoration-storage-project>"
       ```
+1. Run commands below:
+      ```bash
+      sed -i -e "s/BBQ-project-id/${BBQ_PROJECT_ID}/g" config/config.yaml
+      ```
+      ```bash
+      sed -i -e "s/restoration-storage-project-id/${RESTORATION_STORAGE_PROJECT_ID}/g" config/config.yaml
+      ```
+   Those command will edit [config.yaml](./config/config.yaml) file. Previosly exported project id values will replace placeholders.
 
-1. Install dependency requirements
+1. Command below installs all required python dependencies:
       ```bash
       pip install -t lib -r requirements.txt
       ```
-1.  Deploy App Engine application
-      ```bash
-      gcloud app deploy --project ${PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
-      ```
-  
-    Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations).
-1. Grant IAM role **BigQuery Data Viewer** for App Engine default service account (*\<your-project-id\>@appspot.gserviceaccount.com*) to each project which should be backed up, e.g.:
-      ```bash
-      gcloud projects add-iam-policy-binding <project-id-to-be-backed-up> --member='serviceAccount:'${PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer'
-      ```
-      * You can also grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
 
-1. Congratulations! BBQ is running now. The backup process will start on time defined in [cron.yaml](./config/cron.yaml) file.
-You can also trigger it manually, for more details look at [Usage section](README.md#usage).
+1. Command below deploys App Engine application:
+      ```bash
+      gcloud app deploy --project ${BBQ_PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
+      ```
+      Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations). It is recommended to pick the same location as where most of your BigQuery data resides.
+
+1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
+   The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
+   You can also trigger the backup manually, for more details see [Usage section](README.md#usage).
+  
+   **Now you need to decide what will be backed up. Please go to *Granting access for BBQ* section**
+
+
+### Granting access for BBQ
+
+To perform backup, BBQ needs rights to read BigQuery data from the project which should be backed up. To allow read accees, **BigQuery Data Viewer** IAM role needs to be granted to App Engine default service account (*\<your-project-id-for-BBQ-project\>@appspot.gserviceaccount.com*). There are few alternative ways to do that:
+
+* **Replace \<project-id-to-be-backed-up\> to proper project id** and run below command:
+
+    ```bash
+    gcloud projects add-iam-policy-binding --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/bigquery.dataViewer' <project-id-to-be-backed-up>
+    ```
+
+* Grant this permission through Google Cloud Console in [IAM tab](https://console.cloud.google.com/iam-admin/iam) for project which should be backed up. 
+* Grant this permission for the whole folder or organisation. It will be inherited by all of the projects underneath.
+
+### Cloud Datastore export
+  BBQ may periodically export data from Datastore to Big Query. It's much easier to query the data in Big Query rather than Datastore. To enable export:
+
+* Execute command below which assigns the **Cloud Datastore Import Export Admin** IAM role to BBQ default service account:
+    ```bash
+    gcloud projects add-iam-policy-binding ${BBQ_PROJECT_ID} --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/datastore.importExportAdmin'
+    ```
+* (Optionally) Configure schedule time and kinds to export in [cron.yaml](./config/cron.yaml) file.
+
 
 ### Advanced setup
-  It is possible to manage what projects will be backed up using project IAMs and also using config.yaml file.
-  * **custom_project_list** - list of projects to backup. If empty, BBQ will backup everything it has read (**BigQuery Data Viewer**) access to. If list is provided you still need to grant **BigQuery Data Viewer** role for BBQ service account for each mentioned projects.
-  * **projects_to_skip** - list of projects to skip (it's recommended to skip BBQ project itself). It is useful when you grant **BigQuery Data Viewer** for BBQ service account for the whole organization or folder and want to exclude some of the projects.
-  * **backup_project_id** - project id where backups will be stored (it can also be the same project on which BBQ runs)
-  * **restoration_project_id** - project into which data will be restored by default (you can also define restoration destination directly while executing restoration)
+  It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
+
+  * **custom_project_list** - list of projects to backup. If empty, BBQ will backup everything it has read (**BigQuery Data Viewer**) access to. If list is provided you still need to grant **BigQuery Data Viewer** role to BBQ service account for each mentioned project.
+  * **projects_to_skip** - list of projects to skip (it's highly recommended to skip the project where BBQ runs and backups are stored). Common practice is to grant **BigQuery Data Viewer** to BBQ service account for the whole organization or folder and then exclude some of the projects.
+  * **backup_project_id** - project id where backups will be stored (it usually is the same project on which BBQ runs)
+  * **restoration_project_id** - project into which data will be restored during restoration process
 
 
 ### Local environment setup
@@ -65,7 +90,7 @@ All backups that was invoked on local application will end up in this project.
       python -V
       ```
 
-1. Install Google Cloud SDK (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
+1. Install Google Cloud SDK (see [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
 1. Run `gcloud init` to set up your account which will be used by BBQ
 
@@ -96,7 +121,7 @@ All backups that was invoked on local application will end up in this project.
       pip install -t lib -r requirements.txt
       ```
 
-1. Link config files to main application folder (due to lack of possibility to pass full path to dev_appserver.py)
+1. Link config files to main application folder (dev_appserver.py expects config files in the root folder)
       ```bash
       ln -s config/queue.yaml queue.yaml
       ln -s config/cron.yaml cron.yaml
@@ -113,7 +138,7 @@ All backups that was invoked on local application will end up in this project.
 
 #### Running unit tests
 
-1. Install Google Cloud SDK (see at [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
+1. Install Google Cloud SDK (see [installing Cloud SDK for Python](https://cloud.google.com/appengine/docs/standard/python/download))
 
 1. Clone repository to the location of your choice and change the directory to bbq
       ```bash

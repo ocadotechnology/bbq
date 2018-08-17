@@ -1,21 +1,20 @@
 import logging
 
-from src import request_correlation_id
+from src.commons import request_correlation_id
 from src.backup.backup_id_creator import BackupIdCreator
 from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.backup.dataset_id_creator import DatasetIdCreator
-from src.big_query.big_query import BigQuery
 from src.big_query.big_query_table import BigQueryTable
-from src.configuration import configuration
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.config.configuration import configuration
 
 
 class BackupCreator(object):
 
     def __init__(self, now):
         self.now = now
-        self.BQ = BigQuery()
 
     def create_backup(self, source_table_entity, bq_table_metadata):
         logging.info('Scheduling copy job for backup, request correlation id:'
@@ -27,9 +26,9 @@ class BackupCreator(object):
                                                     source_table_entity.project_id)
         target_table_id = self.__create_table_id(source_table_entity)
 
-        source_table_id_with_partition_id = \
-            self.BQ.get_table_id_with_partition_id(source_table_entity.table_id,
-                                                   source_table_entity.partition_id)
+        source_table_id_with_partition_id = BigQueryTableMetadata\
+            .get_table_id_with_partition_id(source_table_entity.table_id, source_table_entity.partition_id)
+
         source_bq_table = BigQueryTable(source_table_entity.project_id,
                                         source_table_entity.dataset_id,
                                         source_table_id_with_partition_id)

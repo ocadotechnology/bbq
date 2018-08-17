@@ -1,7 +1,7 @@
 from google.appengine.ext import ndb
 from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 from binascii import Error
 
 
