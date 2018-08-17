@@ -99,7 +99,7 @@ handlers:
   secure: always
   login: admin
 - url: /_ah/start
-  script: src.main.app
+  script: src.restore.restore_ui_handler.app
   secure: always
   login: admin
 - url: /favicon.ico
@@ -107,6 +107,6 @@ handlers:
   upload: static/images/favicon.ico
   application_readable: true
 - url: /.*
-  script: src.main.app
+  script: src.restore.restore_ui_handler.app
   secure: always
   login: admin
