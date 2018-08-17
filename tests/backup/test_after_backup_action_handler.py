@@ -6,11 +6,11 @@ from jsonpickle import json
 from mock.mock import Mock
 
 from src.backup.copy_job_async.copy_job_result import CopyJobResult
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 
 from src.backup.datastore.Table import Table
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from src.commons.table_reference import TableReference
 from tests.backup.copy_job_async.result_check.job_result_example import \
   JobResultExample
@@ -24,7 +24,7 @@ from google.appengine.ext import testbed
 from apiclient.http import HttpMockSequence
 from src.commons.test_utils import utils
 from src.backup import after_backup_action_handler
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 
 
 class TestAfterBackupActionHandler(unittest.TestCase):
@@ -173,7 +173,7 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         error_reporting.assert_called_once()
 
 
-    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())

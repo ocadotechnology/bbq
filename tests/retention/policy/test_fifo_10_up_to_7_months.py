@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from mock import patch
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months

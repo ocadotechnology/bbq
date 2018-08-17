@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.table_reference import TableReference
 
 

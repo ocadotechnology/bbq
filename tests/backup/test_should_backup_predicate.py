@@ -8,7 +8,7 @@ from mock import patch
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.backup.should_backup_predicate import ShouldBackupPredicate
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
 class TestShouldBackupPredicate(unittest.TestCase):
@@ -23,11 +23,11 @@ class TestShouldBackupPredicate(unittest.TestCase):
         )
 
         self.big_query_table_metadata = BigQueryTableMetadata({})
-        patch('src.big_query.big_query_table_metadata.BigQueryTableMetadata.is_empty',
+        patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata.is_empty',
               return_value=False).start()
-        patch('src.big_query.big_query_table_metadata.BigQueryTableMetadata.'
+        patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata.'
               'is_external_or_view_type', return_value=False).start()
-        patch('src.big_query.big_query_table_metadata.BigQueryTableMetadata.'
+        patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata.'
               'is_schema_defined', return_value=True).start()
 
     def initTestBedForDatastore(self):

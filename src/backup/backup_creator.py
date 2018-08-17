@@ -6,8 +6,8 @@ from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.backup.dataset_id_creator import DatasetIdCreator
-from src.big_query.big_query_table import BigQueryTable
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.config.configuration import configuration
 
 

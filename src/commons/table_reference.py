@@ -1,5 +1,5 @@
 import re
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 
 
 class TableReference(object):

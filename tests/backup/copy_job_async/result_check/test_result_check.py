@@ -11,7 +11,7 @@ from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.backup.copy_job_async.result_check.result_check_request import \
     ResultCheckRequest
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from tests.backup.copy_job_async.result_check.job_result_example import \
     JobResultExample
 

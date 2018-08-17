@@ -6,8 +6,8 @@ from google.appengine.ext import testbed
 from mock import patch
 from mock.mock import Mock
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query import BigQuery
 from src.commons.error_reporting import ErrorReporting
 
 
@@ -25,7 +25,7 @@ class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
         # patch.stopall()
         self.testbed.deactivate()
 
-    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQuery, 'create_table')
     def test_create_same_empty_table_execute_a_proper_big_query_request_with_same_table_properties(self, create_table):
         self.testbed = testbed.Testbed()
@@ -73,7 +73,7 @@ class TestBigQueryTableMetadata_GetTableByReferenceCached(unittest.TestCase):
         # patch.stopall()
         self.testbed.deactivate()
 
-    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQuery, 'get_table', return_value={})
     def test_get_table_cached_should_only_call_bq_once(self, get_table):
         # given
