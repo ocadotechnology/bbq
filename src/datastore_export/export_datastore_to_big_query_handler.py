@@ -5,7 +5,7 @@ import logging
 import webapp2
 from google.appengine.api.app_identity import app_identity
 
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 from src.datastore_export.export_datastore_to_big_query_service import \
     ExportDatastoreToBigQueryService
 

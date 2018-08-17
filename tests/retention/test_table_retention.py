@@ -5,14 +5,14 @@ from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from mock import patch, call, PropertyMock
 
-from src.configuration import Configuration
+from src.commons.config.configuration import Configuration
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.big_query.big_query import BigQuery, TableNotFoundException
 from src.retention.policy.delete_non_partitioned_tables_above_10_versions import \
     DeleteNonPartitionedTablesOlderThan10Versions
 from src.retention.table_retention import TableRetention
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils import backup_utils
 
 

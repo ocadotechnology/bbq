@@ -6,12 +6,12 @@ from mock import patch, PropertyMock
 from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
-from src.configuration import Configuration
+from src.commons.config.configuration import Configuration
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.list.backup_list_restore_service import \
     BackupItem, BackupListRestoreRequest, BackupListRestoreService
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestBackupListRestoreService(unittest.TestCase):

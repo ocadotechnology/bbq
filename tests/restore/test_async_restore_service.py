@@ -12,7 +12,7 @@ from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 from apiclient.errors import HttpError
 
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 HARDCODED_UUID = '123'
 

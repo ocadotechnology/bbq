@@ -3,12 +3,12 @@ from datetime import datetime
 import webapp2
 
 from src.commons.exceptions import ParameterValidationException
-from src.commons.json_handler import JsonHandler
-from src.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.commons.handlers.json_handler import JsonHandler
+from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 from src.restore.table.table_restore_service import TableRestoreService
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TableRestoreHandler(JsonHandler):

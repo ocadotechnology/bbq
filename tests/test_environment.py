@@ -3,7 +3,7 @@ import unittest
 
 from mock import mock, patch
 
-from src.environment import Environment
+from src.commons.config.environment import Environment
 
 
 class TestEnvironment(unittest.TestCase):

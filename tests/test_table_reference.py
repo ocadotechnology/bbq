@@ -1,6 +1,6 @@
 import unittest
 
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestTableReference(unittest.TestCase):

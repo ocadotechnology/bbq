@@ -2,7 +2,7 @@ import googleapiclient.discovery
 import httplib2
 from oauth2client.client import GoogleCredentials
 
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 
 
 class AppInfo(object):

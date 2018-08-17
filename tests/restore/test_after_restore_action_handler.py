@@ -8,7 +8,7 @@ from google.appengine.ext import testbed
 
 from src.restore import after_restore_action_handler
 from src.restore.datastore.restore_item import RestoreItem
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.backup.copy_job_async.result_check.job_result_example import \
     JobResultExample
 

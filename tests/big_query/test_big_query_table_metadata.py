@@ -8,11 +8,11 @@ from mock.mock import Mock
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.big_query.big_query import BigQuery
-from src.error_reporting import ErrorReporting
+from src.commons.error_reporting import ErrorReporting
 
 
 # table_not_exist_anymore() method tests
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 class TestBigQueryTableMetadata_CreateTheSameEmptyTable(unittest.TestCase):
 
@@ -293,11 +293,11 @@ class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
 
     def setUp(self):
         patch(
-            'src.environment.Environment.version_id',
+            'src.commons.config.environment.Environment.version_id',
             return_value='dummy_version'
         ).start()
         patch(
-            'src.configuration.Configuration.backup_project_id',
+            'src.commons.config.configuration.Configuration.backup_project_id',
             return_value='dummy_version'
         ).start()
         patch('googleapiclient.discovery.build').start()
