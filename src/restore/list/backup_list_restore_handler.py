@@ -9,8 +9,8 @@ from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException
 from src.commons.handlers.json_handler import JsonHandler
 from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
-from src.big_query import validators
-from src.big_query.validators import WrongDatasetNameException
+from src.commons.big_query import validators
+from src.commons.big_query.validators import WrongDatasetNameException
 from src.commons.config.configuration import configuration
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \

@@ -5,7 +5,7 @@ from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.big_query.big_query import BigQuery, RandomizationError
+from src.commons.big_query.big_query import BigQuery, RandomizationError
 from tests.test_utils import content
 
 

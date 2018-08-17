@@ -1,10 +1,10 @@
 import logging
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.backup.backup_process import BackupProcess
 from src.backup.table_partitions_backup_scheduler import \
     TablePartitionsBackupScheduler
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 
 
 class TableBackup(object):

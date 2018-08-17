@@ -4,7 +4,7 @@ from apiclient.errors import HttpError
 from src.commons.decorators.retry import retry
 from src.backup.copy_job_async.task_creator import TaskCreator
 from src.backup.copy_job_async.result_check.result_check_request import ResultCheckRequest
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 
 
 class CopyJobService(object):

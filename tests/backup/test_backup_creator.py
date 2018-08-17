@@ -8,8 +8,8 @@ from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.datastore.Table import Table
 # pylint: disable=W0613,R0201
 from src.backup.backup_creator import BackupCreator
-from src.big_query.big_query_table import BigQueryTable
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
 class TestBackupCreator(unittest.TestCase):

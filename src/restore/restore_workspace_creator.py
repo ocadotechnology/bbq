@@ -1,4 +1,4 @@
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
 class RestoreWorkspaceCreator(object):

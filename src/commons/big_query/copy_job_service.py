@@ -2,7 +2,7 @@ import json
 import logging
 import time
 
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 
 
 class RetriableCopyJobException(Exception):

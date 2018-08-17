@@ -2,7 +2,7 @@ import logging
 
 import webapp2
 
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
 from src.commons.tasks import Tasks
 
