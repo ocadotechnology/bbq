@@ -15,6 +15,16 @@ libraries:
 - name: ssl
   version: 2.7.11
 
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- docs
+- tests
+- src/slo
+
 handlers:
 - url: /_ah/queue/deferred
   script: google.appengine.ext.deferred.deferred.application
