@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from src.commons import request_correlation_id
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
 from src.commons.error_reporting import ErrorReporting
 from src.commons.tasks import Tasks

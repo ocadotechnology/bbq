@@ -8,8 +8,8 @@ from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.backup.copy_job_async.task_creator import TaskCreator
-from src.big_query.big_query import BigQuery
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_table import BigQueryTable
 
 
 class TestCopyJobServiceAsync(unittest.TestCase):

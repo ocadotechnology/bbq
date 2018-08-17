@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.config.configuration import configuration
 from src.commons.google_cloud_storage_client import GoogleCloudStorageClient as gcs
 from src.restore.test.table_randomizer import TableRandomizer

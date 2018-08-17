@@ -3,7 +3,7 @@ from unittest import TestCase
 from google.appengine.ext import testbed, ndb
 from mock import patch, ANY
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 from src.commons.table_reference import TableReference
 

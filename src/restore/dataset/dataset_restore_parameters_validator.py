@@ -2,7 +2,7 @@ import logging
 
 from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Table import Table
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
 
 

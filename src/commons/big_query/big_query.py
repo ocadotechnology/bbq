@@ -9,7 +9,7 @@ from oauth2client.client import GoogleCredentials
 from src.commons.decorators.cached import cached
 from src.commons.decorators.log_time import log_time, measure_time_and_log
 from src.commons.decorators.retry import retry
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 

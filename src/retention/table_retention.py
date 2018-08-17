@@ -4,7 +4,7 @@ from apiclient.errors import HttpError  # nopep8 pylint: disable=C0413
 from google.appengine.ext import ndb
 
 from src.backup.datastore.Backup import Backup
-from src.big_query.big_query import TableNotFoundException, BigQuery
+from src.commons.big_query.big_query import TableNotFoundException, BigQuery
 from src.commons.config.configuration import configuration
 from src.retention.should_perform_retention_predicate import \
     ShouldPerformRetentionPredicate

@@ -5,8 +5,8 @@ import random
 import logging
 from mock import patch, call
 
-from src.big_query.big_query import BigQuery, RandomizationError
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query import BigQuery, RandomizationError
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.restore.test.table_randomizer import TableRandomizer, \
     DoesNotMeetSampleCriteriaException
 from src.commons.table_reference import TableReference
