@@ -50,8 +50,6 @@ class BackupCreator(object):
                         source_bq_table.dataset_id,
                         source_bq_table.table_id),
             data={"sourceBqTable": source_bq_table,
-                  # @refactor targetBqTable is no used in after backup action
-                  # handler, consider removing it after checking if its needed
                   "targetBqTable": destination_bq_table
                   })
         ).copy_table(source_bq_table, destination_bq_table)
