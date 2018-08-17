@@ -175,8 +175,6 @@ class BigQuery(object):  # pylint: disable=R0904
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
-        logging.info("Getting table '%s'",
-                     TableReference(project_id, dataset_id, table_id))
         try:
             table = self.service.tables().get(
                 projectId=project_id, datasetId=dataset_id, tableId=table_id

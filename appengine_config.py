@@ -38,3 +38,9 @@ def add_vendor_packages(vendor_folder):
 
 # Change 'lib' to whichever directory you use for your vendored packages.
 add_vendor_packages('lib')
+
+from googleapiclient import discovery
+from oauth2client import client
+
+discovery.logger.setLevel('WARNING')
+client.logger.setLevel('WARNING')
