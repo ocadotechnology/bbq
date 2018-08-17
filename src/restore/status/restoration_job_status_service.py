@@ -4,8 +4,8 @@ from collections import Counter
 
 from src.commons import camel_case_converter
 from src.commons.exceptions import NotFoundException
-from src.environment import Environment
-from src.configuration import configuration
+from src.commons.config.environment import Environment
+from src.commons.config.configuration import configuration
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.datastore.restore_item import RestoreItem
 

@@ -9,7 +9,7 @@ from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils.backup_utils import create_backup_daily_sequence, create_backup
 
 

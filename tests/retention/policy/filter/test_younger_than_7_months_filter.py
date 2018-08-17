@@ -5,11 +5,10 @@ from freezegun import freeze_time
 
 from mock import patch
 from src.backup.datastore.Backup import Backup
-from src.big_query.big_query import BigQuery
 from src.retention.policy.filter.younger_than_7_months_filter import \
     YoungerThan7MonthsFilter
-from src.table_reference import TableReference
-from tests.utils.backup_utils import create_backup_daily_sequence, create_backup
+from src.commons.table_reference import TableReference
+from tests.utils.backup_utils import create_backup
 
 
 class TestYoungerThan7MonthsFilter(unittest.TestCase):

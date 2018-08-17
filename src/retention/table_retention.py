@@ -5,10 +5,10 @@ from google.appengine.ext import ndb
 
 from src.backup.datastore.Backup import Backup
 from src.big_query.big_query import TableNotFoundException, BigQuery
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 from src.retention.should_perform_retention_predicate import \
     ShouldPerformRetentionPredicate
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TableRetention(object):

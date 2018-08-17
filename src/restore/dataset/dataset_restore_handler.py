@@ -4,11 +4,11 @@ import uuid
 import webapp2
 
 from src.commons.exceptions import ParameterValidationException
-from src.commons.json_handler import JsonHandler
-from src.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.commons.handlers.json_handler import JsonHandler
+from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.big_query import validators
 from src.big_query.validators import WrongDatasetNameException
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 from src.restore.dataset.dataset_restore_service import \
     DatasetRestoreService
 from src.restore.status.restoration_job_status_service import \

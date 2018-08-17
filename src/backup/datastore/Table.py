@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 
 from src.commons.decorators.retry import retry
 from src.backup.datastore.Backup import Backup
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class Table(ndb.Model):

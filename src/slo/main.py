@@ -1,7 +1,7 @@
 import webapp2
-from src.common_handlers import BaseHandler
+from src.commons.handlers.common_handlers import BaseHandler
 
-from src.configuration import configuration
+from src.commons.config.configuration import configuration
 
 
 class MainSloPage(BaseHandler):

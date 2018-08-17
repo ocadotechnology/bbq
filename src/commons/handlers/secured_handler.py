@@ -2,7 +2,7 @@ import logging
 
 import webapp2
 
-from oauth2_account import OAuth2Account
+from src.commons.oauth2_account import OAuth2Account
 
 
 class MissingAuthorizationInHeaderException(Exception):

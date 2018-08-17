@@ -1,10 +1,10 @@
 import logging
 import time
 
-from src.appinfo import AppInfo
+from src.commons.config.appinfo import AppInfo
 from src.big_query.big_query import BigQuery
-from src.configuration import configuration
-from src.error_reporting import ErrorReporting
+from src.commons.config.configuration import configuration
+from src.commons.error_reporting import ErrorReporting
 
 DATASET_ID = "datastore_export"
 # 30 minutes

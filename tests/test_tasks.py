@@ -6,8 +6,8 @@ from google.appengine.ext import testbed
 from mock import patch
 
 from src.commons.test_utils import utils
-from src import request_correlation_id
-from src.tasks import Tasks
+from src.commons import request_correlation_id
+from src.commons.tasks import Tasks
 
 
 class TestTasks(unittest.TestCase):

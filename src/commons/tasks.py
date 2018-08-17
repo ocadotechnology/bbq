@@ -7,7 +7,7 @@ from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 
 from src.commons.decorators.retry import retry
 from error_reporting import ErrorReporting
-from src import request_correlation_id
+from src.commons import request_correlation_id
 from src.commons.collections import paginated
 
 

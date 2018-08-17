@@ -1,11 +1,11 @@
 import logging
 import uuid
 
-from src import request_correlation_id
+from src.commons import request_correlation_id
 from src.big_query.big_query import BigQuery
-from src.configuration import configuration
-from src.error_reporting import ErrorReporting
-from src.tasks import Tasks
+from src.commons.config.configuration import configuration
+from src.commons.error_reporting import ErrorReporting
+from src.commons.tasks import Tasks
 
 
 class BackupScheduler(object):

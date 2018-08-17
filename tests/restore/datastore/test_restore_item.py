@@ -1,15 +1,13 @@
 import unittest
-import uuid
 from datetime import datetime
 from freezegun import freeze_time
 
 from google.appengine.ext import ndb, testbed
-from mock import patch
 
 from src.restore.datastore.restoration_job import RestorationJob
 
 from src.restore.datastore.restore_item import RestoreItem, TableReferenceEntity
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TestRestoreItem(unittest.TestCase):

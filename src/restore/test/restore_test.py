@@ -3,11 +3,11 @@ import logging
 from datetime import datetime
 
 from src.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.configuration import configuration
-from src.google_cloud_storage_client import GoogleCloudStorageClient as gcs
+from src.commons.config.configuration import configuration
+from src.commons.google_cloud_storage_client import GoogleCloudStorageClient as gcs
 from src.restore.test.table_randomizer import TableRandomizer
 from src.restore.test.table_restore_invoker import TableRestoreInvoker
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 RESTORE_DATASET_ID_US = 'smoke_test_US'
 RESTORE_DATASET_ID_EU = 'smoke_test_EU'

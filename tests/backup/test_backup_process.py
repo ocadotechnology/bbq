@@ -11,7 +11,7 @@ from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
 from src.backup.should_backup_predicate import ShouldBackupPredicate
 from src.backup.backup_creator import BackupCreator
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 copy_job_constructor = 'src.backup.backup_creator.BackupCreator.__init__'
 

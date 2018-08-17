@@ -6,7 +6,7 @@ import httplib2
 from google.appengine.api.app_identity import app_identity
 from oauth2client.client import GoogleCredentials
 
-from src.error_reporting import ErrorReporting
+from src.commons.error_reporting import ErrorReporting
 
 # 30 minutes
 TIMEOUT = 3 * 600

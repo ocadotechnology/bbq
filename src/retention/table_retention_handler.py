@@ -4,7 +4,7 @@ import webapp2
 
 from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
 from src.retention.table_retention import TableRetention
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 
 
 class TableRetentionHandler(webapp2.RequestHandler):

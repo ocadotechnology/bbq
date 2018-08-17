@@ -10,7 +10,7 @@ from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.retention.policy.filter.grace_period_after_deletion_filter import \
     GracePeriodAfterDeletionFilter
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils.backup_utils import create_backup
 
 

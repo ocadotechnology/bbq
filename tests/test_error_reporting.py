@@ -3,17 +3,17 @@ import unittest
 
 from mock import patch
 
-from src import error_reporting
+from src.commons import error_reporting
 
 
 # pylint: disable=W0212
 class test_error_reporting(unittest.TestCase):
     def setUp(self):
-        patch('src.environment.Environment.version_id',
+        patch('src.commons.config.environment.Environment.version_id',
               return_value='dummy_version').start()
         patch('logging.warn').start()
         patch('googleapiclient.discovery.build').start()
-        patch('src.error_reporting.ErrorReporting._send_error_report',
+        patch('src.commons.error_reporting.ErrorReporting._send_error_report',
               return_value=True).start()
         patch('oauth2client.client.GoogleCredentials.get_application_default') \
             .start()
