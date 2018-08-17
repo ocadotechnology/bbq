@@ -14,7 +14,12 @@ handlers:
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
   application_readable: true
-- url: /.*
-  script: src.slo.main.app
+- url: /cron/slo/calculate
+  script: src.slo.slo_handlers.app
   secure: always
   login: admin
+- url: /.*
+  script: src.slo.slo_ui_handlers.app
+  secure: always
+  login: admin
+
