@@ -3,7 +3,7 @@ import unittest
 from google.appengine.api import memcache
 from google.appengine.ext import testbed
 
-from commons.decorators.cached import cached
+from src.commons.decorators.cached import cached
 from mock import patch, call
 
 RETURNED_VALUE = 'importantString'

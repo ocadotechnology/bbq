@@ -1,7 +1,7 @@
 import collections
 import logging
 
-from src.error_reporting import ErrorReporting
+from src.commons.error_reporting import ErrorReporting
 
 
 class ShouldPerformRetentionPredicate(object):

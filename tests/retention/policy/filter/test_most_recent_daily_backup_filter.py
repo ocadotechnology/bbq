@@ -3,7 +3,7 @@ from datetime import datetime
 
 from src.retention.policy.filter.most_recent_daily_backup_filter import \
     MostRecentDailyBackupFilter
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils.backup_utils import create_backup
 
 

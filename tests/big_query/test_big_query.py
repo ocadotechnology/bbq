@@ -1,5 +1,6 @@
 import unittest
 
+from apiclient.errors import HttpError
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
@@ -55,10 +56,36 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_tables_list_responses()
 
         # when
-        dataset_ids = BigQuery().list_table_ids("project1233", "dataset_id")
+        tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
 
         # then
-        self.assertEqual(self.count(dataset_ids), 5)
+        self.assertEqual(self.count(tables_ids), 5)
+
+    class TestClass(object):
+        def func_for_test(self, project_id, dataset_id, table_id):
+            pass
+
+    @patch('time.sleep', return_value=None)
+    @patch.object(TestClass, "func_for_test")
+    def test_iterating_tables_should_retry_if_gets_http_503_response_once(self, func,_):
+        # given
+        self._create_http.return_value = self.__create_tables_list_responses_with_503()
+
+        # when
+        BigQuery().for_each_table("project1233", "dataset_id", func)
+
+        # then
+        self.assertEquals(5, func.call_count)
+
+    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
+        # given
+        self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
+
+        # when
+        tables_ids = BigQuery().list_table_ids("projectid", "dataset_id")
+
+        # then
+        self.assertEqual(self.count(tables_ids), 0)
 
     def test_listing_table_partitions(self):
         # given
@@ -87,18 +114,6 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual('O_PRODUCT_SUPPLIER_20151127',
                          random_table.get_table_id())
 
-    def test_get_table_cached_should_only_call_bq_once_but_response_is_cached(
-            self):
-        # given
-        self._create_http.return_value = \
-            self.__create_table_responses_with_only_one_response_for_get_table()
-        # when
-        bq = BigQuery()
-        result1 = bq.get_table_cached('project', 'dataset', 'table')
-        result2 = bq.get_table_cached('project', 'dataset', 'table')
-
-        # then
-        self.assertEqual(result1, result2)
 
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
             self):
@@ -177,6 +192,29 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_table_list_page_1.json')),
             ({'status': '200'},
              content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
+
+    @staticmethod
+    def __create_tables_list_responses_with_503():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '503'},
+             content('tests/json_samples/bigquery_table_list_503_error.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_1.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
+
+    @staticmethod
+    def __create_dataset_not_found_during_tables_list_responses():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '200'},
+             content(
+                 'tests/json_samples/bigquery_table_list_404_dataset_not_exist.json'))
         ])
 
     @staticmethod

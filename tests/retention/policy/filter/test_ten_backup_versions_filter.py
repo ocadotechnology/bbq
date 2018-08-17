@@ -4,7 +4,7 @@ from random import shuffle
 from nose_parameterized import parameterized
 from src.retention.policy.filter.ten_backup_versions_filter import \
     TenBackupVersionsFilter
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils import backup_utils
 
 

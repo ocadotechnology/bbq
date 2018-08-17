@@ -4,7 +4,7 @@ from freezegun import freeze_time
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock, ANY
 
-from src.configuration import Configuration
+from src.commons.config.configuration import Configuration
 from src.restore.dataset.dataset_restore_service import _DatasetRestoreService, \
     DatasetRestoreService
 

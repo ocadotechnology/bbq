@@ -1,6 +1,6 @@
 import unittest
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 from mock import patch
 
 

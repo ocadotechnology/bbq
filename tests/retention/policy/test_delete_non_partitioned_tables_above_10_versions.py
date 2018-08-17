@@ -5,7 +5,7 @@ from nose_parameterized import parameterized
 from src.backup.datastore.Backup import Backup
 from src.retention.policy.delete_non_partitioned_tables_above_10_versions import \
     DeleteNonPartitionedTablesOlderThan10Versions
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.utils import backup_utils
 
 

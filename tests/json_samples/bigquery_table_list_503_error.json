@@ -1,0 +1,13 @@
+{
+  "error": {
+    "errors": [
+      {
+        "domain": "",
+        "reason": "",
+        "message": "Error encountered during execution. Retrying may solve the problem."
+      }
+    ],
+    "code": 503,
+    "message": "Error encountered during execution. Retrying may solve the problem."
+  }
+}

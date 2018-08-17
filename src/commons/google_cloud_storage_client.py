@@ -1,7 +1,7 @@
 import logging
 import cloudstorage as gcs
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 
 my_default_retry_params = gcs.RetryParams(
     initial_delay=0.2,

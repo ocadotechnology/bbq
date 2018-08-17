@@ -1,8 +1,8 @@
 import webapp2
 
 from src.backup.backup_scheduler import BackupScheduler
-from src.bbq_authenticated_handler import BbqAuthenticatedHandler
-from src.configuration import configuration
+from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.commons.config.configuration import configuration
 
 
 class OrganizationBackupHandler(webapp2.RequestHandler):

@@ -2,8 +2,11 @@ import datetime
 import logging
 from types import NoneType
 
-from src.error_reporting import ErrorReporting
-from src.table_reference import TableReference
+
+from src.commons.decorators.cached import cached
+from src.commons.error_reporting import ErrorReporting
+from src.commons.table_reference import TableReference
+from src.big_query.big_query import BigQuery
 
 
 class BigQueryTableMetadata(object):
@@ -15,6 +18,42 @@ class BigQueryTableMetadata(object):
         if self.table_metadata is None:
             return False
         return True
+
+    @staticmethod
+    def __get_table_or_partition(project_id, dataset_id, table_id,
+                                 partition_id):
+        table_metadata = BigQuery().get_table(project_id, dataset_id,
+                                              BigQueryTableMetadata.get_table_id_with_partition_id(
+                                                  table_id, partition_id))
+        return BigQueryTableMetadata(table_metadata)
+
+    @staticmethod
+    def get_table_id_with_partition_id(table_id, partition_id):
+        return table_id + ('' if partition_id is None else '$' + partition_id)
+
+    @staticmethod
+    def get_table_by_reference(reference):
+        return BigQueryTableMetadata.__get_table_or_partition(project_id=reference.project_id,
+                                                              dataset_id=reference.dataset_id,
+                                                              table_id=reference.table_id,
+                                                              partition_id=reference.partition_id)
+
+    @staticmethod
+    @cached(time=300)
+    def get_table_by_reference_cached(reference):
+        return BigQueryTableMetadata.get_table_by_reference(reference)
+
+    def create_the_same_empty_table(self, target_reference):
+        body = {
+            "tableReference":{
+                "projectId":target_reference.get_project_id(),
+                "datasetId":target_reference.get_dataset_id(),
+                "tableId":target_reference.get_table_id(),
+            },
+            "timePartitioning":self.table_metadata.get("timePartitioning"),
+            "schema":self.table_metadata.get("schema")
+        }
+        BigQuery().create_table(target_reference.get_project_id(), target_reference.get_dataset_id(), body)
 
     def is_external_or_view_type(self):
         if 'type' in self.table_metadata:
@@ -58,6 +97,12 @@ class BigQueryTableMetadata(object):
     def is_localized_in_EU(self):
         return self.get_location() == 'EU'
 
+    def is_schema_defined(self):
+        schema = self.table_metadata.get("schema")
+        if schema:
+            return True
+        return False
+
     def is_daily_partitioned(self):
         if self.table_metadata and 'timePartitioning' in self.table_metadata:
             if self.is_partition():
@@ -99,3 +144,7 @@ class BigQueryTableMetadata(object):
             return TableReference(table_reference['projectId'],
                                   table_reference['datasetId'],
                                   table_reference['tableId'])
+
+    def __eq__(self, o):
+        return type(o) is BigQueryTableMetadata \
+               and self.table_metadata == o.table_metadata

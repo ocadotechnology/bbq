@@ -20,10 +20,10 @@ class TestBackupCreator(unittest.TestCase):
         patch(
             'oauth2client.client.GoogleCredentials.get_application_default')\
             .start()
-        patch('src.request_correlation_id.get',
+        patch('src.commons.request_correlation_id.get',
               return_value='correlation-id').start()
         patch(
-            'src.configuration.Configuration.backup_project_id',
+            'src.commons.config.configuration.Configuration.backup_project_id',
             new_callable=PropertyMock,
             return_value='bkup_storage_project'
         ).start()

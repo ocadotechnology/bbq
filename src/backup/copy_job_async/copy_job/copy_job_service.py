@@ -1,7 +1,7 @@
 import logging
 
 from apiclient.errors import HttpError
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 from src.backup.copy_job_async.task_creator import TaskCreator
 from src.backup.copy_job_async.result_check.result_check_request import ResultCheckRequest
 from src.big_query.big_query import BigQuery
@@ -68,7 +68,6 @@ class CopyJobService(object):
                 logging.exception('404 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
                 return None
             else:
-                logging.exception("HttpError thrown during Copy Job creation")
                 raise
         except Exception as error:
             logging.error("%s Exception thrown during Copy Job creation: %s",

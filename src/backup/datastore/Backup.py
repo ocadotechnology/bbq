@@ -3,16 +3,25 @@ import logging
 import datetime
 from google.appengine.ext import ndb
 
-from commons.decorators.retry import retry
+from src.commons.decorators.retry import retry
 
 
 class Backup(ndb.Model):
-    # source table last modified
+
+    # date of last modification that will be included in the Backup
+    # (copyJob start time - as it is atomic operation
+    # and every change before that point is included in copy)
     last_modified = ndb.DateTimeProperty(indexed=True)
+
+    # date of backup table creation (copyJob end)
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+
     table_id = ndb.StringProperty(indexed=True)
+
     dataset_id = ndb.StringProperty(indexed=True)
+
     numBytes = ndb.IntegerProperty(indexed=True)
+
     deleted = ndb.DateTimeProperty(indexed=True)
 
     @classmethod

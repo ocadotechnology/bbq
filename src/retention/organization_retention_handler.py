@@ -2,9 +2,9 @@ import webapp2
 from google.appengine.api.taskqueue import Task
 from google.appengine.datastore.datastore_query import Cursor
 
-from src.tasks import Tasks
+from src.commons.tasks import Tasks
 from src.backup.datastore.Table import Table
-from src.bbq_authenticated_handler import BbqAuthenticatedHandler
+from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 
 
 class OrganizationRetentionHandler(webapp2.RequestHandler):

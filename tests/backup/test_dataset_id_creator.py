@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from src.backup.dataset_id_creator import DatasetIdCreator
-from commons.exceptions import ParameterValidationException
+from src.commons.exceptions import ParameterValidationException
 
 
 class TestDatasetIdCreator(unittest.TestCase):

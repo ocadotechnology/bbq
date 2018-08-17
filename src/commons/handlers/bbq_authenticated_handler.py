@@ -1,5 +1,5 @@
-from commons.secured_handler import SecuredHandler
-from src.configuration import configuration
+from src.commons.handlers.secured_handler import SecuredHandler
+from src.commons.config.configuration import configuration
 
 
 class BbqAuthenticatedHandler(SecuredHandler):

@@ -1,11 +1,17 @@
 import jsonpickle
 import os
 from datetime import datetime
+
+from jsonpickle import json
+from mock.mock import Mock
+
+from src.backup.copy_job_async.copy_job_result import CopyJobResult
+from src.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 
 from src.backup.datastore.Table import Table
 from src.big_query.big_query import BigQuery
-from src.table_reference import TableReference
+from src.commons.table_reference import TableReference
 from tests.backup.copy_job_async.result_check.job_result_example import \
   JobResultExample
 from tests.test_utils import content
@@ -16,7 +22,7 @@ from mock import patch
 import webtest
 from google.appengine.ext import testbed
 from apiclient.http import HttpMockSequence
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from src.backup import after_backup_action_handler
 from src.big_query.big_query_table import BigQueryTable
 
@@ -46,9 +52,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         ])
 
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -63,6 +70,7 @@ class TestAfterBackupActionHandler(unittest.TestCase):
             "data": data,
             "jobJson": JobResultExample.DONE}
         )
+        copy_job_result = CopyJobResult(json.loads(payload).get('jobJson'))
 
         # when
         response = self.under_test.post(
@@ -75,6 +83,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(backup.dataset_id, "target_dataset_id")
         self.assertEqual(backup.table_id, "target_table_id")
         self.assertTrue(isinstance(backup.created, datetime))
+        self.assertEqual(backup.created, copy_job_result.end_time)
+
+        self.assertTrue(isinstance(backup.last_modified, datetime))
+        self.assertEqual(backup.last_modified, copy_job_result.start_time)
 
     @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
@@ -87,9 +99,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
              content('tests/json_samples/bigquery_v2_test_schema.json')),
         ])
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -116,8 +129,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertIsNone(backup)
         error_reporting.assert_called_once()
 
+    @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
-    def test_should_not_create_backups_entity_if_source_table_was_deleted(self, _create_http):
+    def test_should_not_create_backups_entity_if_backup_table_doesnt_exist(self, _create_http,error_reporting):
         # given
         _create_http.return_value = HttpMockSequence([
           ({'status': '200'},
@@ -128,9 +142,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         ])
 
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 
@@ -155,24 +170,24 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         # then
         self.assertEqual(response.status_int, 200)
         self.assertIsNone(backup)
+        error_reporting.assert_called_once()
 
+
+    @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())
+    @patch.object(BigQueryTableMetadata, 'table_size_in_bytes', return_value=123)
+    @patch.object(BigQueryTableMetadata, 'has_partition_expiration', return_value=True)
     @patch.object(BigQuery, 'disable_partition_expiration')
-    @patch.object(BigQuery, '_create_http')
-    def test_should_disable_partition_expiration_if_source_table_has_it(
-            self, _create_http, disable_partition_expiration):
+    def test_should_disable_partition_expiration_if_backup_table_has_it(
+            self, disable_partition_expiration, _, _1, _2, _3, _4):
         # given
-        _create_http.return_value = HttpMockSequence([
-            ({'status': '200'},
-             content('tests/json_samples/bigquery_v2_test_schema.json')),
-            ({'status': '200'},
-             content('tests/json_samples/table_get/'
-                     'bigquery_partitioned_table_with_expiration_get.json'))
-        ])
-
         table_entity = Table(
-            project_id="test-project",
-            dataset_id="test-dataset",
-            table_id="test-table"
+            project_id="source_project_id",
+            dataset_id="source_dataset_id",
+            table_id="source_table_id",
+            partition_id="123"
         )
         table_entity.put()
 

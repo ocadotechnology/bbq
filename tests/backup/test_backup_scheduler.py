@@ -5,14 +5,14 @@ from apiclient.errors import HttpError
 from google.appengine.ext import testbed
 from mock import patch, Mock, mock, call
 
-from commons.test_utils import utils
+from src.commons.test_utils import utils
 from mock.mock import PropertyMock
-from src import request_correlation_id
+from src.commons import request_correlation_id
 from src.backup.backup_scheduler import BackupScheduler
 
 
 @patch('src.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
-@patch('src.error_reporting.ErrorReporting.__init__', Mock(return_value=None))
+@patch('src.commons.error_reporting.ErrorReporting.__init__', Mock(return_value=None))
 class TestBackupScheduler(unittest.TestCase):
     http_error_mock = HttpError(mock.Mock(status=500), 'Internal Error')
 
@@ -35,7 +35,7 @@ class TestBackupScheduler(unittest.TestCase):
     @patch.object(request_correlation_id, 'get', return_value='correlation-id')
     def test_dev_environment_happy_path(self, _, _1, _2):
         # given
-        with patch('src.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
+        with patch('src.commons.config.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
             custom_project_list.return_value = ['dev-project-1', 'dev-project-2']
 
             # when
@@ -60,7 +60,7 @@ class TestBackupScheduler(unittest.TestCase):
                   return_value='correlation-id')
     def test_non_dev_environment_happy_path(self, _, _1, _2):
         # given
-        with patch('src.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
+        with patch('src.commons.config.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
             custom_project_list.return_value = []
 
             # when
@@ -78,13 +78,13 @@ class TestBackupScheduler(unittest.TestCase):
            ['project1', 'project2'])
     @patch('src.big_query.big_query.BigQuery.list_dataset_ids.side_effect',
            http_error_mock)
-    @patch('src.error_reporting.ErrorReporting.report')
+    @patch('src.commons.error_reporting.ErrorReporting.report')
     @patch('src.big_query.big_query.BigQuery.list_project_ids')
     @patch('src.big_query.big_query.BigQuery.list_dataset_ids')
     def test_scheduler_wont_stop_if_it_cant_list_datasets_for_any_project(
             self, _, _1, report):
         # given
-        with patch('src.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
+        with patch('src.commons.config.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
             custom_project_list.return_value = []
 
             # when
@@ -99,14 +99,14 @@ class TestBackupScheduler(unittest.TestCase):
            ['this-project-will-fail', 'this-project-will-be-scheduled'])
     @patch('src.big_query.big_query.BigQuery.list_dataset_ids.side_effect',
            [http_error_mock, ['dataset2']])
-    @patch('src.error_reporting.ErrorReporting.report')
+    @patch('src.commons.error_reporting.ErrorReporting.report')
     @patch('src.big_query.big_query.BigQuery.list_project_ids')
     @patch('src.big_query.big_query.BigQuery.list_dataset_ids')
     @patch.object(request_correlation_id, 'get', return_value='correlation-id')
     def test_second_project_is_scheduled_even_if_first_failed(
             self, _, _1, _2, report):
         # given
-        with patch('src.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
+        with patch('src.commons.config.configuration.Configuration.backup_settings_custom_project_list', new_callable=PropertyMock) as custom_project_list:
             custom_project_list.return_value = []
 
             # when

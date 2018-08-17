@@ -13,6 +13,13 @@ class TableReference(object):
     def from_table_entity(table):
         return TableReference(table.project_id, table.dataset_id,
                               table.table_id, table.partition_id)
+    @staticmethod
+    def from_bq_table(bq_table):
+        table_id, partition_id = BigQueryTable.split_table_and_partition_id(bq_table.table_id)
+        return TableReference(project_id=bq_table.project_id,
+                              dataset_id=bq_table.dataset_id,
+                              table_id=table_id,
+                              partition_id=partition_id)
 
     @staticmethod
     def parse_tab_ref(string):
@@ -28,9 +35,15 @@ class TableReference(object):
 
     @staticmethod
     def assure_is_proper_full_table_path(string):
-        pattern = re.compile("^[a-zA-Z1-9\-]+:[a-zA-Z1-9_]+.[a-zA-Z1-9_]+(\$\d{8})?$")
+        regexp = "^[a-zA-Z1-9\-]+:\w+.\w+(\$\d{8})?$"
+        pattern = re.compile(regexp)
         if not pattern.match(string):
-            raise Exception("Full table path name (%s) doesn't match following regexp: ^\w+:\w+.\w+(\$\d{8})?$. Human readable pattern is PROJECT_ID:DATASETID.TABLE_ID or PROJECT_ID:DATASETID.TABLE_ID$20180314"%string)
+            message = "Full table path name ({0}) doesn't match " \
+                      "following regexp: {1}. Human readable pattern is " \
+                      "PROJECT_ID:DATASETID.TABLE_ID or " \
+                      "PROJECT_ID:DATASETID.TABLE_ID$20180314"\
+                .format(string, regexp)
+            raise Exception(message)
 
     def get_project_id(self):
         return self.project_id
