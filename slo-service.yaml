@@ -9,6 +9,19 @@ libraries:
 - name: ssl
   version: 2.7.11
 
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- docs
+- tests
+- src/backup
+- src/datastore_export
+- src/restore
+- src/retention
+
 handlers:
 - url: /favicon.ico
   static_files: static/images/favicon.ico
