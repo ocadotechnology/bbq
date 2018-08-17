@@ -103,6 +103,25 @@ class BigQuery(object):  # pylint: disable=R0904
             maxResults=max_results, pageToken=page_token
         ).execute()
 
+    def execute_query(self, query, use_legacy_sql=True):
+        query_job = self.__sync_query(query=query, use_legacy_sql=use_legacy_sql)
+        results = []
+        page_token = None
+
+        while True:
+            page = self.service.jobs().getQueryResults(
+                pageToken=page_token,
+                **query_job['jobReference']).execute(num_retries=2)
+
+            results.extend(page.get('rows', []))
+
+            page_token = page.get('pageToken')
+            if not page_token:
+                break
+
+        return results
+
+    # @refactor list_table_partitions should reuse execute_query method
     @log_time
     def list_table_partitions(self, project_id, dataset_id, table_id):
         query = self.create_partition_query(project_id, dataset_id,
@@ -137,6 +156,7 @@ class BigQuery(object):  # pylint: disable=R0904
                " AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]" \
             .format(project_id, dataset_id, table_id)
 
+    # @refactor fetch_random_table should reuse execute_query method
     @log_time
     def fetch_random_table(self):
         query_results = self.__sync_query(
@@ -173,7 +193,7 @@ class BigQuery(object):  # pylint: disable=R0904
             body=query_data).execute(num_retries=3)
 
 
-    @retry(HttpError, tries=6, delay=2, backoff=2)
+    @retry(HttpError, tries=1, delay=1, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
         try:
             table = self.service.tables().get(
