@@ -13,7 +13,7 @@ import unittest
 import webtest
 
 from src.backup.copy_job_async.copy_job import copy_job_service_handler
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 from google.appengine.ext import testbed
 from mock import patch
 

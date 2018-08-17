@@ -2,9 +2,9 @@ import logging
 import random
 from datetime import datetime, timedelta
 
-from src.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.decorators.retry import retry
-from src.big_query.big_query import BigQuery, RandomizationError
+from src.commons.big_query.big_query import BigQuery, RandomizationError
 from src.commons.table_reference import TableReference
 
 

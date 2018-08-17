@@ -4,7 +4,7 @@ from freezegun import freeze_time
 
 from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
 from src.backup.copy_job_async.copy_job.copy_job_task_name import CopyJobTaskName
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 
 
 class TestCopyJobNameCreator(unittest.TestCase):

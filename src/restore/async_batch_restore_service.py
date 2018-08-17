@@ -6,7 +6,7 @@ from src.commons.decorators.log_time import log_time
 from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 

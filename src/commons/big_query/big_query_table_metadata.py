@@ -6,7 +6,7 @@ from types import NoneType
 from src.commons.decorators.cached import cached
 from src.commons.error_reporting import ErrorReporting
 from src.commons.table_reference import TableReference
-from src.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery
 
 
 class BigQueryTableMetadata(object):

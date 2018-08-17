@@ -15,7 +15,7 @@ from src.backup.copy_job_async.post_copy_action_request import \
 from src.backup.copy_job_async.result_check.result_check_request import \
     ResultCheckRequest
 from src.backup.copy_job_async.task_creator import TaskCreator
-from src.big_query.big_query_table import BigQueryTable
+from src.commons.big_query.big_query_table import BigQueryTable
 
 
 class TestTaskCreator(unittest.TestCase):
