@@ -42,7 +42,7 @@ class TableRandomizer(object):
                           "It is possible that last backup cycle did not cover"
                           " it. Therefore restoration of this table can fail.")
 
-        if table_metadata.is_daily_partitioned() and not table_metadata.is_single_partition() and not table_metadata.is_empty():
+        if table_metadata.is_daily_partitioned():
             table_metadata = self.__get_random_partition(table_reference)
             logging.info(
                 "Table is partitioned. Partition chosen to be restored: %s",
@@ -54,6 +54,10 @@ class TableRandomizer(object):
         partitions = self.big_query.list_table_partitions(table_reference.project_id,
                                                           table_reference.dataset_id,
                                                           table_reference.table_id)
+        if not partitions:
+            raise DoesNotMeetSampleCriteriaException(
+                "Partitioned table without partitions. Nothing to restore.")
+
         random_partition = self.__get_random_item_of_the_list(partitions)
 
         new_table_reference = TableReference(table_reference.project_id, table_reference.dataset_id, table_reference.table_id, random_partition)

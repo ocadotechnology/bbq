@@ -382,8 +382,8 @@ class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
         self.assertEqual(False, result)
 
 
-# is_single_partition() method tests
-class TestBigQueryTableMetadata_IsSinglePartition(unittest.TestCase):
+# is_partition() method tests
+class TestBigQueryTableMetadata_IsPartition(unittest.TestCase):
 
     def test_should_return_true_for_partition(self):
         # given
@@ -395,7 +395,7 @@ class TestBigQueryTableMetadata_IsSinglePartition(unittest.TestCase):
             }
         })
         # when
-        result = big_query_table_metadata.is_single_partition()
+        result = big_query_table_metadata.is_partition()
         # then
         self.assertEqual(True, result)
 
@@ -409,7 +409,7 @@ class TestBigQueryTableMetadata_IsSinglePartition(unittest.TestCase):
             }
         })
         # when
-        result = big_query_table_metadata.is_single_partition()
+        result = big_query_table_metadata.is_partition()
         # then
         self.assertEqual(False, result)
 

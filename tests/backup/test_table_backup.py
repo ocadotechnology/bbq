@@ -31,7 +31,7 @@ class TestTableBackup(unittest.TestCase):
     @patch.object(BackupProcess, 'start')
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
-    @patch.object(BigQueryTableMetadata, 'is_single_partition', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'is_partition', return_value=True)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     def test_that_backup_are_scheduled_for_non_empty_single_partition(
             self, _, _1, _2,_3, backup_start):
@@ -67,7 +67,7 @@ class TestTableBackup(unittest.TestCase):
     @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
-    @patch.object(BigQueryTableMetadata, 'is_single_partition', return_value=False)
+    @patch.object(BigQueryTableMetadata, 'is_partition', return_value=False)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     @patch.object(TablePartitionsBackupScheduler, 'start')
     def test_that_backup_for_partitions_is_scheduled_for_partitioned_table(
@@ -87,7 +87,7 @@ class TestTableBackup(unittest.TestCase):
     @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
-    @patch.object(BigQueryTableMetadata, 'is_single_partition', return_value=False)
+    @patch.object(BigQueryTableMetadata, 'is_partition', return_value=False)
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     @patch.object(TablePartitionsBackupScheduler, 'start')
     def test_that_backup_for_partitions_is_scheduled_for_empty_partitioned_table(
