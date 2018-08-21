@@ -121,26 +121,11 @@ class BigQuery(object):  # pylint: disable=R0904
 
         return results
 
-    # @refactor list_table_partitions should reuse execute_query method
     @log_time
     def list_table_partitions(self, project_id, dataset_id, table_id):
-        query = self.create_partition_query(project_id, dataset_id,
-                                            table_id)
-        query_job = self.__sync_query(query=query, use_legacy_sql=True)
+        results = self.execute_query(
+            self.create_partition_query(project_id, dataset_id, table_id))
 
-        results = []
-        page_token = None
-
-        while True:
-            page = self.service.jobs().getQueryResults(
-                pageToken=page_token,
-                **query_job['jobReference']).execute(num_retries=2)
-
-            results.extend(page.get('rows', []))
-
-            page_token = page.get('pageToken')
-            if not page_token:
-                break
         partitions = [
             {'partitionId': _partition['f'][0]['v'],
              'creationTime': _partition['f'][1]['v'],
@@ -156,7 +141,6 @@ class BigQuery(object):  # pylint: disable=R0904
                " AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]" \
             .format(project_id, dataset_id, table_id)
 
-    # @refactor fetch_random_table should reuse execute_query method
     @log_time
     def fetch_random_table(self):
         query_results = self.__sync_query(
