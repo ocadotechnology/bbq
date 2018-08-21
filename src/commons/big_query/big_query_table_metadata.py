@@ -105,8 +105,6 @@ class BigQueryTableMetadata(object):
 
     def is_daily_partitioned(self):
         if self.table_metadata and 'timePartitioning' in self.table_metadata:
-            if self.is_partition():
-                return False
             time_partitioning = self.table_metadata['timePartitioning']
             if 'type' in time_partitioning:
                 type_of_partitioning = time_partitioning['type']
