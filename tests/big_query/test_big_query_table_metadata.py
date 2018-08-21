@@ -307,7 +307,7 @@ class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def test_should_return_False_if_is_a_partition(self):
+    def test_should_return_True_if_is_a_partition(self):
         # given
         big_query_table_metadata = BigQueryTableMetadata(
             {"tableReference":
@@ -318,7 +318,7 @@ class TestBigQueryTableMetadata_IsDailyPartitioned(unittest.TestCase):
         # when
         result = big_query_table_metadata.is_daily_partitioned()
         # then
-        self.assertEqual(False, result)
+        self.assertEqual(True, result)
 
     def test_should_return_False_if_there_is_no_partitioning_field(self):
         # given

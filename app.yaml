@@ -21,6 +21,8 @@ skip_files:
 - ^(.*/)?.*\.py[co]$
 - ^(.*/)?.*/RCS/.*$
 - ^(.*/)?\..*$
+- google_appengine.*
+- gitlab-bbq
 - docs
 - tests
 - src/slo
