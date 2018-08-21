@@ -57,7 +57,6 @@ class TestTableBackup(unittest.TestCase):
                                          dataset_id="test-dataset",
                                          table_id="test-table",
                                          partition_id=None)
-
         # when
         TableBackup.start(table_reference)
 
