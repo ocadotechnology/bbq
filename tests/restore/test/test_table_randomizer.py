@@ -38,7 +38,7 @@ class TestTableRandomizer(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
-    @patch.object(BigQueryTableMetadata, 'is_single_partition', return_value=False)
+    @patch.object(BigQueryTableMetadata, 'is_partition', return_value=False)
     @patch.object(BigQuery, 'list_table_partitions')
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference')
     @patch.object(random, 'randint', return_value=1)
