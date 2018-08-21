@@ -38,12 +38,13 @@ class TestTableRandomizer(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=False)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime')
     @patch.object(BigQueryTableMetadata, 'is_daily_partitioned', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'is_partition', return_value=False)
     @patch.object(BigQuery, 'list_table_partitions')
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference')
     @patch.object(random, 'randint', return_value=1)
     def test_return_random_partition_when_table_is_partitioned(
-            self, _, get_table_by_reference, list_table_partitions, _1,
-            get_last_modified_datetime, _2, _3, _4, fetch_random_table):
+            self, _, get_table_by_reference, list_table_partitions, _1,_2,
+            get_last_modified_datetime, _3, _4, _5, fetch_random_table):
         # given
         get_table_by_reference.return_value= BigQueryTableMetadata(None)
 
