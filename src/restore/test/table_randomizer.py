@@ -42,7 +42,7 @@ class TableRandomizer(object):
                           "It is possible that last backup cycle did not cover"
                           " it. Therefore restoration of this table can fail.")
 
-        if table_metadata.is_daily_partitioned() and not table_metadata.is_empty():
+        if table_metadata.is_daily_partitioned() and not table_metadata.is_single_partition() and not table_metadata.is_empty():
             table_metadata = self.__get_random_partition(table_reference)
             logging.info(
                 "Table is partitioned. Partition chosen to be restored: %s",

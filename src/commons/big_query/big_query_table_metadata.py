@@ -105,8 +105,6 @@ class BigQueryTableMetadata(object):
 
     def is_daily_partitioned(self):
         if self.table_metadata and 'timePartitioning' in self.table_metadata:
-            if self.is_partition():
-                return False
             time_partitioning = self.table_metadata['timePartitioning']
             if 'type' in time_partitioning:
                 type_of_partitioning = time_partitioning['type']
@@ -118,7 +116,7 @@ class BigQueryTableMetadata(object):
 
         return False
 
-    def is_partition(self):
+    def is_single_partition(self):
         table_id = self.table_metadata['tableReference']['tableId']
         return '$' in table_id
 
@@ -126,7 +124,7 @@ class BigQueryTableMetadata(object):
         return 'timePartitioning' in self.table_metadata
 
     def get_partition_id(self):
-        assert self.is_partition() == True
+        assert self.is_single_partition() == True
         table_id = self.table_metadata['tableReference']['tableId']
         return table_id.split('$')[1]
 
@@ -136,7 +134,7 @@ class BigQueryTableMetadata(object):
 
     def table_reference(self):
         table_reference = self.table_metadata['tableReference']
-        if self.is_partition():
+        if self.is_single_partition():
             return TableReference(table_reference['projectId'],
                                   table_reference['datasetId'],
                                   self.get_table_id(), self.get_partition_id())
