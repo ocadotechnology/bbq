@@ -1,10 +1,3 @@
-variable "bbq_project" {}
-variable "census_project" {}
-
-provider "google" {
-  version = "1.16"
-}
-
 resource "google_bigquery_dataset" "SLO_views_legacy_dataset" {
   dataset_id = "SLO_views_legacy"
   project = "${var.bbq_project}"
