@@ -1,4 +1,5 @@
 variable "bbq_project" {}
+variable "slos_views_destination_project" {}
 variable "census_project" {}
 variable "datastore_export_project" {}
 variable "datastore_export_dataset" {}
