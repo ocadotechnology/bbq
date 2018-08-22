@@ -15,19 +15,6 @@ class OrganizationRetentionHandler(webapp2.RequestHandler):
         cursor = Cursor(urlsafe=self.request.get('cursor'))
         self.__schedule_retention_starting_from_cursor(cursor)
 
-    @staticmethod
-    def __create_table_retention_task(table):
-        params = {'projectId': table.project_id,
-                  'datasetId': table.dataset_id,
-                  'tableId': table.table_id,
-                  'tableKey': table.key.urlsafe()}
-        if table.partition_id:
-            params['partitionId'] = table.partition_id
-        return Task(
-            method='GET',
-            url='/tasks/retention/table',
-            params=params)
-
     @classmethod
     def __schedule_retention_starting_from_cursor(cls, table_cursor):
         results, next_cursor, more = Table.query().fetch_page(
@@ -46,6 +33,19 @@ class OrganizationRetentionHandler(webapp2.RequestHandler):
                 })
 
             Tasks.schedule(queue_name='table-retention-scheduler', tasks=[task])
+
+    @staticmethod
+    def __create_table_retention_task(table):
+        params = {'projectId': table.project_id,
+                  'datasetId': table.dataset_id,
+                  'tableId': table.table_id,
+                  'tableKey': table.key.urlsafe()}
+        if table.partition_id:
+            params['partitionId'] = table.partition_id
+        return Task(
+            method='GET',
+            url='/tasks/retention/table',
+            params=params)
 
 
 class OrganizationRetentionAuthenticatedHandler(
