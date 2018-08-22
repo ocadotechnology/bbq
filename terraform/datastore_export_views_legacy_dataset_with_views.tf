@@ -1,8 +1,8 @@
-variable "bbq_project" {}
-variable "slos_views_destination_project" {}
-variable "census_project" {}
-variable "datastore_export_project" {}
-variable "datastore_export_dataset" {}
+variable "bbq_project" {}   //it is needed to filter out backups from SLI
+variable "slos_views_destination_project" {} //all SLO views will be created in this view
+variable "census_project" {} //project where census data resides. More specifically we need bigquery.table_metadata_v1_0 and bigquery.partition_metadata_v1_0 table from that project
+variable "datastore_export_project" {} //project where datastore export tables can be get from
+variable "datastore_export_dataset" {} //dataset in project ${var.datastore_export_project} where datastore export tables can be get from
 
 provider "google" {
   version = "1.16"
@@ -10,12 +10,12 @@ provider "google" {
 
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
   dataset_id = "datastore_export_views_legacy"
-  project = "${var.bbq_project}"
+  project = "${var.datastore_export_project}"
   location = "EU"
 }
 
 resource "google_bigquery_table" "last_table_view" {
-  project = "${var.bbq_project}"
+  project = "${var.datastore_export_project}"
   dataset_id = "datastore_export_views_legacy"
   table_id = "last_table"
 
@@ -34,7 +34,7 @@ resource "google_bigquery_table" "last_table_view" {
 }
 
 resource "google_bigquery_table" "last_backup_view" {
-  project = "${var.bbq_project}"
+  project = "${var.datastore_export_project}"
   dataset_id = "datastore_export_views_legacy"
   table_id = "last_backup"
 
@@ -70,7 +70,7 @@ resource "google_bigquery_table" "last_backup_view" {
 }
 
 resource "google_bigquery_table" "all_backups_view" {
-  project = "${var.bbq_project}"
+  project = "${var.datastore_export_project}"
   dataset_id = "datastore_export_views_legacy"
   table_id = "all_backups"
 
@@ -101,7 +101,7 @@ resource "google_bigquery_table" "all_backups_view" {
 }
 
 resource "google_bigquery_table" "last_available_backup_for_every_table_entity_view" {
-  project = "${var.bbq_project}"
+  project = "${var.datastore_export_project}"
   dataset_id = "datastore_export_views_legacy"
   table_id = "last_available_backup_for_every_table_entity"
 
