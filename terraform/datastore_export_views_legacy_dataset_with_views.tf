@@ -1,8 +1,8 @@
 variable "bbq_project" {}   //it is needed to filter out backups from SLI
 variable "slos_views_destination_project" {} //all SLO views will be created in this view
 variable "census_project" {} //project where census data resides. More specifically we need bigquery.table_metadata_v1_0 and bigquery.partition_metadata_v1_0 table from that project
-variable "datastore_export_project" {} //project where datastore export tables can be get from
-variable "datastore_export_dataset" {} //dataset in project ${var.datastore_export_project} where datastore export tables can be get from
+variable "datastore_export_project" {} //project where datastore export tables can be get from (also datastore export views will be stored here)
+variable "datastore_export_dataset" {} //dataset in project ${var.datastore_export_project} where datastore export tables can be get from (also datastore export views will be stored here)
 
 provider "google" {
   version = "1.16"
