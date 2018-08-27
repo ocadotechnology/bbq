@@ -41,16 +41,6 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(dataset_ids), 3)
 
-    def test_get_table_should_ignore_400_error(self):
-        # given
-        self._create_http.return_value = self.__create_get_table_400_responses()
-
-        # when
-        table = BigQuery().get_table("project_id", "dataset_id", "table_id")
-
-        # then
-        self.assertIsNone(table)
-
     def test_iterating_tables(self):
         # given
         self._create_http.return_value = self.__create_tables_list_responses()
