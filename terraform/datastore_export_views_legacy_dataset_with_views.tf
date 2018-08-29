@@ -4,6 +4,7 @@ variable "census_project" {} //project where census data resides. More specifica
 variable "datastore_export_project" {} //project where datastore export tables can be get from (also datastore export views will be stored here)
 variable "datastore_export_dataset" {} //dataset in project ${var.datastore_export_project} where datastore export tables can be get from (also datastore export views will be stored here)
 variable "datastore_export_views_legacy" {default = "datastore_export_views_legacy"}
+variable "SLO_views_legacy" {default = "SLO_views_legacy"}
 
 provider "google" {
   version = "1.16"
