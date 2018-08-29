@@ -1,6 +1,6 @@
 resource "google_bigquery_table" "census_data_5_days_ago_view" {
   project = "${var.slos_views_destination_project}"
-  dataset_id = "SLO_views_legacy"
+  dataset_id = "${var.SLO_views_legacy}"
   table_id = "census_data_5_days_ago"
 
   view {
@@ -43,7 +43,7 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
 
 resource "google_bigquery_table" "SLI_5_days_view" {
   project = "${var.slos_views_destination_project}"
-  dataset_id = "SLO_views_legacy"
+  dataset_id = "${var.SLO_views_legacy}"
   table_id = "SLI_5_days"
 
   view {
@@ -59,7 +59,7 @@ resource "google_bigquery_table" "SLI_5_days_view" {
             IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
             IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
           FROM
-            [${var.slos_views_destination_project}.SLO_views_legacy.census_data_5_days_ago] AS census
+            [${var.slos_views_destination_project}.${var.SLO_views_legacy}.census_data_5_days_ago] AS census
           LEFT JOIN (
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
