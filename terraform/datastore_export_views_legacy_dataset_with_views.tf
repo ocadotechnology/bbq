@@ -5,6 +5,7 @@ variable "datastore_export_project" {} //project where datastore export tables c
 variable "datastore_export_dataset" {} //dataset in project ${var.datastore_export_project} where datastore export tables can be get from (also datastore export views will be stored here)
 variable "datastore_export_views_legacy" {default = "datastore_export_views_legacy"}
 variable "SLO_views_legacy" {default = "SLO_views_legacy"}
+variable "SLO_views_location" {default = "EU"}
 
 provider "google" {
   version = "1.16"
@@ -13,7 +14,7 @@ provider "google" {
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
   dataset_id = "${var.datastore_export_views_legacy}"
   project = "${var.datastore_export_project}"
-  location = "EU"
+  location = "${var.SLO_views_location}"
 }
 
 resource "google_bigquery_table" "last_table_view" {

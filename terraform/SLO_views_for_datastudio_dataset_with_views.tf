@@ -1,7 +1,7 @@
 resource "google_bigquery_dataset" "SLO_views_for_datastudio_legacy_dataset" {
   dataset_id = "SLO_views_for_datastudio"
   project = "${var.slos_views_destination_project}"
-  location = "EU"
+  location = "${var.SLO_views_location}"
 }
 
 resource "google_bigquery_table" "SLI_X_days_view" {
