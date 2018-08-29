@@ -28,21 +28,21 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import time
 from functools import wraps
 
 import logging
 
+from apiclient.errors import HttpError
 
-def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=logging):
-    """Retry calling the decorated function using an exponential backoff.
 
-    http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
-    original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
+def google_http_error_retry(tries=4, delay=3, backoff=2, logger=logging):
+    """
+    Retry calling the decorated function using an exponential backoff.
+    It retries HttpErrors with status code > 400(except 404).
+    Errors with another status code are reraised
 
-    :param ExceptionToCheck: the exception to check. may be a tuple of
-        exceptions to check
-    :type ExceptionToCheck: Exception or tuple
     :param tries: number of times to try (not retry) before giving up
     :type tries: int
     :param delay: initial delay between retries in seconds
@@ -61,17 +61,21 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=logging):
             while mtries > 1:
                 try:
                     return f(*args, **kwargs)
-                except ExceptionToCheck as e:
-                    msg = "%s, Retrying '%s' because of %s args: %s " \
-                          "in %d seconds..." \
-                          % (str(e), f.__name__, type(e), e.args, mdelay)
-                    if logger:
-                        logger.warning(msg)
+                except HttpError as e:
+                    if e.resp.status > 400 and e.resp.status != 404:
+                        msg = "%s, Retrying '%s' because of %s args: %s " \
+                              "in %d seconds..." \
+                              % (str(e), f.__name__, type(e), e.args, mdelay)
+                        if logger:
+                            logger.warning(msg)
+                        else:
+                            print(msg) # pylint: disable=C0325
+                        time.sleep(mdelay)
+                        mtries -= 1
+                        mdelay *= backoff
                     else:
-                        print(msg) # pylint: disable=C0325
-                    time.sleep(mdelay)
-                    mtries -= 1
-                    mdelay *= backoff
+                        raise e
+
             return f(*args, **kwargs)
 
         return f_retry  # true decorator

@@ -2,11 +2,10 @@ import datetime
 import logging
 from types import NoneType
 
-
+from src.commons.big_query.big_query import BigQuery
 from src.commons.decorators.cached import cached
 from src.commons.error_reporting import ErrorReporting
 from src.commons.table_reference import TableReference
-from src.commons.big_query.big_query import BigQuery
 
 
 class BigQueryTableMetadata(object):
@@ -45,13 +44,13 @@ class BigQueryTableMetadata(object):
 
     def create_the_same_empty_table(self, target_reference):
         body = {
-            "tableReference":{
-                "projectId":target_reference.get_project_id(),
-                "datasetId":target_reference.get_dataset_id(),
-                "tableId":target_reference.get_table_id(),
+            "tableReference": {
+                "projectId": target_reference.get_project_id(),
+                "datasetId": target_reference.get_dataset_id(),
+                "tableId": target_reference.get_table_id(),
             },
-            "timePartitioning":self.table_metadata.get("timePartitioning"),
-            "schema":self.table_metadata.get("schema")
+            "timePartitioning": self.table_metadata.get("timePartitioning"),
+            "schema": self.table_metadata.get("schema")
         }
         BigQuery().create_table(target_reference.get_project_id(), target_reference.get_dataset_id(), body)
 
