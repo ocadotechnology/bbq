@@ -5,7 +5,7 @@ from src.commons.big_query.big_query import BigQuery
 
 class SLIResultsStreamer(object):
     def __init__(self):
-        self.bigQuery = BigQuery()
+        self.big_query = BigQuery()
 
     def stream(self, sli_results):
         logging.info("TODO here results should be streamed into BQ")
