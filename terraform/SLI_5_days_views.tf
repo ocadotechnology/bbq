@@ -64,7 +64,7 @@ resource "google_bigquery_table" "SLI_5_days_view" {
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
             FROM
-              [${var.datastore_export_project}.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
+              [${var.datastore_export_project}.${var.datastore_export_views_legacy}.last_available_backup_for_every_table_entity]
           ) AS last_backups
           ON
             census.projectId=last_backups.source_project_id AND
