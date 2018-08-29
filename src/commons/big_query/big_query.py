@@ -7,6 +7,8 @@ from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
 from src.commons.decorators.cached import cached
+from src.commons.decorators.google_http_error_retry import \
+    google_http_error_retry
 from src.commons.decorators.log_time import log_time, measure_time_and_log
 from src.commons.decorators.retry import retry
 from src.commons.big_query.big_query_table import BigQueryTable
@@ -172,8 +174,7 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=configuration.backup_project_id,
             body=query_data).execute(num_retries=3)
 
-
-    @retry(HttpError, tries=6, delay=2, backoff=2)
+    @google_http_error_retry(tries=6, delay=2, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
         try:
             table = self.service.tables().get(
@@ -192,13 +193,7 @@ class BigQuery(object):  # pylint: disable=R0904
                     TableReference(project_id, dataset_id, table_id)
                 )
                 return None
-            elif ex.resp.status == 400:
-                error_message = "Received 400 error while retrieving {}" \
-                    .format(TableReference(project_id, dataset_id, table_id))
-                logging.exception(error_message)
-                return None
-            else:
-                raise ex
+            raise ex
 
     def __log_table(self, table):
         table_copy = table.copy()
@@ -206,7 +201,7 @@ class BigQuery(object):  # pylint: disable=R0904
             del table_copy['schema']
         logging.info("Table: " + json.dumps(table_copy))
 
-    @retry(HttpError, tries=6, delay=2, backoff=2)
+    @google_http_error_retry(tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):
         try:
             dataset = self.service.datasets().get(
