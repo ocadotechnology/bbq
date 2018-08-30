@@ -1,7 +1,7 @@
 resource "google_bigquery_dataset" "SLO_views_for_datastudio_legacy_dataset" {
   dataset_id = "SLO_views_for_datastudio"
   project = "${var.slos_views_destination_project}"
-  location = "EU"
+  location = "${var.SLO_views_location}"
 }
 
 resource "google_bigquery_table" "SLI_X_days_view" {
@@ -13,10 +13,10 @@ resource "google_bigquery_table" "SLI_X_days_view" {
     query = <<EOF
           #legacySQL
           SELECT * FROM
-            (select *, "3" as days from [${var.slos_views_destination_project}.SLO_views_legacy.SLI_3_days]),
-            (select *, "4" as days from [${var.slos_views_destination_project}.SLO_views_legacy.SLI_4_days]),
-            (select *, "5" as days from [${var.slos_views_destination_project}.SLO_views_legacy.SLI_5_days]),
-            (select *, "7" as days from [${var.slos_views_destination_project}.SLO_views_legacy.SLI_7_days])
+            (select *, "3" as days from [${var.slos_views_destination_project}.${var.SLO_views_legacy_dataset}.SLI_3_days]),
+            (select *, "4" as days from [${var.slos_views_destination_project}.${var.SLO_views_legacy_dataset}.SLI_4_days]),
+            (select *, "5" as days from [${var.slos_views_destination_project}.${var.SLO_views_legacy_dataset}.SLI_5_days]),
+            (select *, "7" as days from [${var.slos_views_destination_project}.${var.SLO_views_legacy_dataset}.SLI_7_days])
         EOF
     use_legacy_sql = true
   }
