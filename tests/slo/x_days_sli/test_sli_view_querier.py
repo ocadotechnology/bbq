@@ -16,8 +16,8 @@ class TestSLIViewQuerier(unittest.TestCase):
         # given
         query_results = [
             {
-                "f": [{"v": "dev-cymes-osp-eu-dataplatform"},
-                      {"v": "invalid_dev_atm_use1_om_events_raw"},
+                "f": [{"v": "project1"},
+                      {"v": "dataset1"},
                       {"v": "UNKNOWN_EVENT_v1"},
                       {"v": "20180726"},
                       {"v": "1.524727885462E9"},
@@ -25,8 +25,8 @@ class TestSLIViewQuerier(unittest.TestCase):
                       {"v": "1.532668961889E9"},
                       {"v": "1.53262467938E9"}]
             }, {
-                "f": [{"v": "dev-cymes-osp-eu-dataplatform"},
-                      {"v": "invalid_dev_atm_use1_storepick_flux_events_raw"},
+                "f": [{"v": "project2"},
+                      {"v": "dataset2"},
                       {"v": "UNKNOWN_EVENT_v1"},
                       {"v": "20180726"},
                       {"v": "1.524725829453E9"},
@@ -41,8 +41,8 @@ class TestSLIViewQuerier(unittest.TestCase):
         expected_output = [
             {
                 'snapshotTime': 1535624154.94896,
-                'projectId': 'dev-cymes-osp-eu-dataplatform',
-                'datasetId': 'invalid_dev_atm_use1_om_events_raw',
+                'projectId': 'project1',
+                'datasetId': 'dataset1',
                 'tableId': 'UNKNOWN_EVENT_v1',
                 'partitionId': '20180726',
                 'lastModifiedTime': 1533016.802,
@@ -52,8 +52,8 @@ class TestSLIViewQuerier(unittest.TestCase):
                 'xDays': '3'},
             {
                 'snapshotTime': 1535624154.94896,
-                'projectId': 'dev-cymes-osp-eu-dataplatform',
-                'datasetId': 'invalid_dev_atm_use1_storepick_flux_events_raw',
+                'projectId': 'project2',
+                'datasetId': 'dataset2',
                 'tableId': 'UNKNOWN_EVENT_v1',
                 'partitionId': '20180726',
                 'creationTime': 1524725.829453,
