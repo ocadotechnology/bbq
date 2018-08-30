@@ -1,11 +1,10 @@
 import logging
 
-from src.commons.big_query.big_query import BigQuery
-
 
 class SLIResultsStreamer(object):
-    def __init__(self):
-        self.big_query = BigQuery()
+
+    def __init__(self, big_query):
+        self.big_query = big_query
 
     def stream(self, sli_results):
         logging.info("TODO here results should be streamed into BQ")

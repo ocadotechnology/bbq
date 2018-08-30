@@ -1,18 +1,19 @@
+import logging
 from datetime import datetime
 
 
-from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
 
 
 class SLIViewQuerier(object):
-    def __init__(self):
-        self.big_query = BigQuery()
+
+    def __init__(self, big_query):
+        self.big_query = big_query
 
     def query(self, x_days):
-
-        query_results = self.big_query.execute_query(
-            self.__generate_x_days_sli_query(x_days))
+        query = self.__generate_x_days_sli_query(x_days)
+        logging.info("Executing query: %s", query)
+        query_results = self.big_query.execute_query(query)
 
         return self.__format_query_results(query_results, x_days,
                                            datetime.now())
