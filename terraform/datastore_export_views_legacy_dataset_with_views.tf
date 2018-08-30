@@ -1,16 +1,12 @@
-provider "google" {
-  version = "1.16"
-}
-
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
-  dataset_id = "${var.datastore_export_views_legacy}"
+  dataset_id = "${var.datastore_export_views_dataset}"
   project = "${var.datastore_export_project}"
   location = "${var.SLO_views_location}"
 }
 
 resource "google_bigquery_table" "last_table_view" {
   project = "${var.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_legacy}"
+  dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_table"
 
   view {
@@ -29,7 +25,7 @@ resource "google_bigquery_table" "last_table_view" {
 
 resource "google_bigquery_table" "last_backup_view" {
   project = "${var.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_legacy}"
+  dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_backup"
 
   view {
@@ -65,7 +61,7 @@ resource "google_bigquery_table" "last_backup_view" {
 
 resource "google_bigquery_table" "all_backups_view" {
   project = "${var.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_legacy}"
+  dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "all_backups"
 
   view {
@@ -84,8 +80,8 @@ resource "google_bigquery_table" "all_backups_view" {
               b.table_id as backup_table_id,
               b.dataset_id as backup_dataset_id,
               b.key AS backupBqKey
-            FROM [${var.datastore_export_views_legacy}.last_backup] AS b
-            JOIN [${var.datastore_export_views_legacy}.last_table] AS t
+            FROM [${var.datastore_export_views_dataset}.last_backup] AS b
+            JOIN [${var.datastore_export_views_dataset}.last_table] AS t
             ON b.parent_id = t.id
         EOF
     use_legacy_sql = true
@@ -96,14 +92,14 @@ resource "google_bigquery_table" "all_backups_view" {
 
 resource "google_bigquery_table" "last_available_backup_for_every_table_entity_view" {
   project = "${var.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_legacy}"
+  dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_available_backup_for_every_table_entity"
 
   view {
     query = <<EOF
           SELECT * FROM (
             SELECT *, row_number() OVER (PARTITION BY table_entity_id order by backup_created DESC) as rownum
-            FROM [${var.datastore_export_views_legacy}.all_backups]
+            FROM [${var.datastore_export_views_dataset}.all_backups]
             WHERE backup_deleted IS NULL
           )
           WHERE rownum=1
