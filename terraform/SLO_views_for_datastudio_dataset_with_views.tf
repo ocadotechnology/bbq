@@ -37,5 +37,5 @@ resource "google_bigquery_table" "SLI_days_by_count_view" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_table.SLI_X_days_view"]
+  depends_on = ["google_bigquery_table.SLI_X_days_view", "google_bigquery_dataset.SLO_views_for_datastudio_legacy_dataset"]
 }

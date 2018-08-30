@@ -1,0 +1,52 @@
+[
+   {
+    "name": "snapshotTime",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "projectId",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "datasetId",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "tableId",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "partitionId",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "creationTime",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "lastModifiedTime",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "backupCreated",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "backupLastModified",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+   },
+   {
+    "name": "xDays",
+    "type": "STRING",
+    "mode": "NULLABLE"
+   }
+  ]
