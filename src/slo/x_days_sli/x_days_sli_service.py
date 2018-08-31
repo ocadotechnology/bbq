@@ -30,7 +30,8 @@ class XDaysSLIService(object):
     def __exists(self, table):
         return self.filter.exists(self.__create_table_reference(table))
 
-    def __create_table_reference(self, table):
+    @staticmethod
+    def __create_table_reference(table):
         return TableReference(project_id=table['projectId'],
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
