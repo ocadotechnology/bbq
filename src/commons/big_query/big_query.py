@@ -105,12 +105,8 @@ class BigQuery(object):  # pylint: disable=R0904
             maxResults=max_results, pageToken=page_token
         ).execute()
 
-    @log_time
-    def list_table_partitions(self, project_id, dataset_id, table_id):
-        query = self.create_partition_query(project_id, dataset_id,
-                                            table_id)
-        query_job = self.__sync_query(query=query, use_legacy_sql=True)
-
+    def execute_query(self, query, use_legacy_sql=True):
+        query_job = self.__sync_query(query=query, use_legacy_sql=use_legacy_sql)
         results = []
         page_token = None
 
@@ -124,6 +120,14 @@ class BigQuery(object):  # pylint: disable=R0904
             page_token = page.get('pageToken')
             if not page_token:
                 break
+
+        return results
+
+    @log_time
+    def list_table_partitions(self, project_id, dataset_id, table_id):
+        results = self.execute_query(
+            self.create_partition_query(project_id, dataset_id, table_id))
+
         partitions = [
             {'partitionId': _partition['f'][0]['v'],
              'creationTime': _partition['f'][1]['v'],
@@ -174,7 +178,7 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=configuration.backup_project_id,
             body=query_data).execute(num_retries=3)
 
-    @google_http_error_retry(tries=6, delay=2, backoff=2)
+    @google_http_error_retry(tries=1, delay=1, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
         try:
             table = self.service.tables().get(
