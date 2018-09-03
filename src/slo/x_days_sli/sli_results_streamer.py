@@ -7,7 +7,7 @@ from src.commons.config.configuration import configuration
 class SLIResultsStreamer(object):
     def __init__(self,
                  project_id=configuration.backup_project_id,
-                 dataset_id="SLI_history_legacy",
+                 dataset_id="SLI_history",
                  table_id="SLI_filtered"
                  ):
         self.data_streamer = DataStreamer(project_id=project_id, dataset_id=dataset_id, table_id=table_id)

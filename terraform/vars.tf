@@ -32,8 +32,8 @@ variable "SLI_views_legacy_dataset" {
   default = "SLI_views_legacy"
 }
 
-variable "SLI_history_legacy_dataset" {
-  default = "SLI_history_legacy"
+variable "SLI_history_dataset" {
+  default = "SLI_history"
 }
 
 variable "SLI_views_location" {
