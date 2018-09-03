@@ -1,7 +1,7 @@
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
   dataset_id = "${var.datastore_export_views_dataset}"
   project = "${var.datastore_export_project}"
-  location = "${var.SLO_views_location}"
+  location = "${var.SLI_views_location}"
 }
 
 resource "google_bigquery_table" "last_table_view" {
