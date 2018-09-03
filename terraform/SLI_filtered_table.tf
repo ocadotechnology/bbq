@@ -1,6 +1,6 @@
 resource "google_bigquery_table" "SLI_filtered_table" {
   project = "${var.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_legacy_dataset}"
+  dataset_id = "${var.SLI_history_dataset}"
   table_id = "SLI_filtered"
 
   time_partitioning {
@@ -9,5 +9,5 @@ resource "google_bigquery_table" "SLI_filtered_table" {
 
   schema= "${file("SLI_filtered_table_schema.json")}"
 
-  depends_on = ["google_bigquery_dataset.SLI_history_legacy_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
 }
