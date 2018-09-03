@@ -13,7 +13,7 @@ class SLIResultsStreamer(object):
         self.data_streamer = DataStreamer(project_id=project_id, dataset_id=dataset_id, table_id=table_id)
 
     def stream(self, sli_results):
-        if len(sli_results)==0:
+        if len(sli_results) == 0:
             logging.info("Nothing to stream")
             return
 

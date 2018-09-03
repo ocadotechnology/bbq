@@ -10,6 +10,7 @@ from oauth2client.client import GoogleCredentials
 
 from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.decorators.retry import retry
+from src.commons.error_reporting import ErrorReporting
 
 
 class DataStreamer(object):
@@ -29,19 +30,22 @@ class DataStreamer(object):
         )
 
     def stream_stats(self, rows, insert_id=None):
-        if insert_id is None: insert_id = uuid.uuid4()
+        insert_id = insert_id or uuid.uuid4()
         insert_all_data = {
             'rows': [{
                 'json': data,
                 'insertId': str(insert_id)
             } for data in rows]
         }
-        logging.info("Streaming data to table %s (insertId:%s)", self.big_query_table, insert_id)
+        logging.info("Streaming data to table %s (insertId:%s)",
+                     self.big_query_table, insert_id)
         insert_all_response = self._stream_metadata(insert_all_data)
         if 'insertErrors' in insert_all_response:
             logging.debug("Sent json: \n%s", json.dumps(insert_all_data))
-            logging.error("Error during streaming metadata to BigQuery: \n%s",
-                          json.dumps(insert_all_response['insertErrors']))
+            error_message = "Error during streaming metadata to BigQuery: \n{}"\
+                .format(json.dumps(insert_all_response['insertErrors']))
+            logging.error(error_message)
+            ErrorReporting().report(error_message)
         else:
             logging.debug("Stats have been sent successfully to %s table",
                           self.big_query_table)
@@ -52,5 +56,6 @@ class DataStreamer(object):
         return self.service.tabledata().insertAll(
             projectId=self.big_query_table.get_project_id(),
             datasetId=self.big_query_table.get_dataset_id(),
-            tableId='{}${}'.format(self.big_query_table.get_table_id(), partition),
+            tableId='{}${}'.format(self.big_query_table.get_table_id(),
+                                   partition),
             body=insert_all_data).execute(num_retries=3)

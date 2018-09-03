@@ -1,52 +1,62 @@
 [
-   {
-    "name": "snapshotTime",
-    "type": "TIMESTAMP",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "projectId",
-    "type": "STRING",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "datasetId",
-    "type": "STRING",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "tableId",
-    "type": "STRING",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "partitionId",
-    "type": "STRING",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "creationTime",
-    "type": "TIMESTAMP",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "lastModifiedTime",
-    "type": "TIMESTAMP",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "backupCreated",
-    "type": "TIMESTAMP",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "backupLastModified",
-    "type": "TIMESTAMP",
-    "mode": "NULLABLE"
-   },
-   {
-    "name": "xDays",
-    "type": "STRING",
-    "mode": "NULLABLE"
-   }
-  ]
+    {
+        "name": "snapshotTime",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "projectId",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "datasetId",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "tableId",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "partitionId",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": ""
+    },
+    {
+        "name": "creationTime",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "lastModifiedTime",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "backupCreated",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "backupLastModified",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED",
+        "description": ""
+    },
+    {
+        "name": "xDays",
+        "type": "STRING",
+        "mode": "REQUIRED",
+        "description": ""
+    }
+]
