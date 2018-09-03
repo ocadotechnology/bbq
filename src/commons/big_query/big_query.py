@@ -180,6 +180,7 @@ class BigQuery(object):  # pylint: disable=R0904
 
     @google_http_error_retry(tries=1, delay=1, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
+        logging.info("getting table %s", BigQueryTable(project_id, dataset_id, table_id))
         try:
             table = self.service.tables().get(
                 projectId=project_id, datasetId=dataset_id, tableId=table_id
