@@ -1,0 +1,62 @@
+[
+  {
+    "name": "snapshotTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Where the data was filtered and put into the table"
+  },
+  {
+    "name": "projectId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "ProjectId of table that could not be backed up"
+  },
+  {
+    "name": "datasetId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "DatasetId of table that could not be backed up"
+  },
+  {
+    "name": "tableId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "TableId of table that could not be backed up"
+  },
+  {
+    "name": "partitionId",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "PartitionId of table that could not be backed up"
+  },
+  {
+    "name": "creationTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "CreationTime of table that could not be backed up"
+  },
+  {
+    "name": "lastModifiedTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "LastModifiedTime of table that could not be backed up"
+  },
+  {
+    "name": "backupCreated",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "date of backup table creation (copyJob end)"
+  },
+  {
+    "name": "backupLastModified",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "date of last modification that will be included in the Backup (copyJob start time - as it is atomic operation and every change before that point is included in copy)"
+  },
+  {
+    "name": "xDays",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "the number of days, the table was not backed up"
+  }
+]
