@@ -32,6 +32,10 @@ variable "SLO_views_legacy_dataset" {
   default = "SLO_views_legacy"
 }
 
+variable "SLI_history_legacy_dataset" {
+  default = "SLI_history_legacy"
+}
+
 variable "SLO_views_location" {
   default = "EU"
 }
