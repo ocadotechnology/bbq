@@ -21,12 +21,11 @@ class DataStreamer(object):
 
     def __init__(self, project_id, dataset_id, table_id):
         self.big_query_table = BigQueryTable(project_id, dataset_id, table_id)
-        self.http = self._create_http()
         self.service = googleapiclient.discovery.build(
             'bigquery',
             'v2',
             credentials=GoogleCredentials.get_application_default(),
-            http=self.http
+            http=self._create_http()
         )
 
     def stream_stats(self, rows, insert_id=None):
