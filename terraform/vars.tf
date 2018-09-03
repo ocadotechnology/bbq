@@ -6,8 +6,8 @@ variable "bbq_project" {
   description = "it is needed to filter out backups from SLI"
 }
 
-variable "slos_views_destination_project" {
-  description = "all SLO views will be created in this project"
+variable "SLI_views_destination_project" {
+  description = "all SLI views will be created in this project"
 }
 
 variable "census_project" {
@@ -28,10 +28,14 @@ variable "datastore_export_views_dataset" {
   default = "datastore_export_views_legacy"
 }
 
-variable "SLO_views_legacy_dataset" {
-  default = "SLO_views_legacy"
+variable "SLI_views_legacy_dataset" {
+  default = "SLI_views_legacy"
 }
 
-variable "SLO_views_location" {
+variable "SLI_history_dataset" {
+  default = "SLI_history"
+}
+
+variable "SLI_views_location" {
   default = "EU"
 }

@@ -13,7 +13,7 @@ class XDaysSLIService(object):
         self.x_days = x_days
         big_query = BigQuery()
         self.querier = SLIViewQuerier(big_query)
-        self.streamer = SLIResultsStreamer(big_query)
+        self.streamer = SLIResultsStreamer()
         self.filter = SLITableExistsFilter(big_query)
 
     def recalculate_sli(self):
