@@ -37,7 +37,7 @@ resource "google_bigquery_table" "census_data_4_days_ago_view" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset"]
 }
 
 
