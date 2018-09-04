@@ -1,13 +1,13 @@
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
   dataset_id = "${var.datastore_export_views_dataset}"
-  project = "${var.datastore_export_project}"
+  project = "${local.datastore_export_project}"
   location = "${var.SLI_views_location}"
 
   labels {"bbq_metadata"=""}
 }
 
 resource "google_bigquery_table" "last_table_view" {
-  project = "${var.datastore_export_project}"
+  project = "${local.datastore_export_project}"
   dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_table"
 
@@ -15,8 +15,8 @@ resource "google_bigquery_table" "last_table_view" {
     query = <<EOF
           SELECT project_id, dataset_id, table_id, partition_id, last_checked, __key__.id AS id
           FROM TABLE_QUERY(
-            [${var.datastore_export_project}:${var.datastore_export_dataset}],
-            'table_id=(SELECT MAX(table_id) FROM [${var.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")'
+            [${local.datastore_export_project}:${var.datastore_export_dataset}],
+            'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")'
           )
         EOF
     use_legacy_sql = true
@@ -26,7 +26,7 @@ resource "google_bigquery_table" "last_table_view" {
 }
 
 resource "google_bigquery_table" "last_backup_view" {
-  project = "${var.datastore_export_project}"
+  project = "${local.datastore_export_project}"
   dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_backup"
 
@@ -52,8 +52,8 @@ resource "google_bigquery_table" "last_backup_view" {
               NTH(2, SPLIT(__key__.path, ',')) AS parent_id,
               TO_BASE64(BYTES(__key__.path)) AS key
             FROM
-              TABLE_QUERY( [${var.datastore_export_project}:${var.datastore_export_dataset}],
-                'table_id=(SELECT MAX(table_id) FROM [${var.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")' ) )
+              TABLE_QUERY( [${local.datastore_export_project}:${var.datastore_export_dataset}],
+                'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")' ) )
         EOF
     use_legacy_sql = true
   }
@@ -62,7 +62,7 @@ resource "google_bigquery_table" "last_backup_view" {
 }
 
 resource "google_bigquery_table" "all_backups_view" {
-  project = "${var.datastore_export_project}"
+  project = "${local.datastore_export_project}"
   dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "all_backups"
 
@@ -93,7 +93,7 @@ resource "google_bigquery_table" "all_backups_view" {
 }
 
 resource "google_bigquery_table" "last_available_backup_for_every_table_entity_view" {
-  project = "${var.datastore_export_project}"
+  project = "${local.datastore_export_project}"
   dataset_id = "${var.datastore_export_views_dataset}"
   table_id = "last_available_backup_for_every_table_entity"
 

@@ -12,8 +12,17 @@ Metric is implemented as a BigQuery query, which uses data about modifications o
 To measure SLI, please follow all the steps below:
 1. Install [GCP Census](https://github.com/ocadotechnology/gcp-census) application that periodical collects metadata about BigQuery tables. 
 1. Configure [Cloud Datastore export](./SETUP.md#cloud-datastore-export), 
-which periodically exports backup metadata and stores it in BigQuery, 
-1. Create all views/tables using [Terraform](https://www.terraform.io/),
+which periodically exports backup metadata and stores it in BigQuery,
+1. Export BBQ and GCP Census project ids: 
+      ```bash
+      export TF_VAR_bbq_project=${BBQ_PROJECT_ID}
+      export TF_VAR_gcp_census_project=${GCP_CENSUS_PROJECT_ID}
+      ```
+1. Create all views/tables using [Terraform](https://www.terraform.io/) by running the following commands:
+      ```bash
+      terraform init
+      terraform apply
+      ```
 1. Deploy SLO service (it's a separate [GAE service](https://cloud.google.com/appengine/docs/standard/python/an-overview-of-app-engine#services)):
       ```bash
       gcloud app deploy --project ${BBQ_PROJECT_ID} slo-service.yaml
@@ -31,3 +40,7 @@ which periodically exports backup metadata and stores it in BigQuery,
       ```bash
       gcloud app deploy --project ${BBQ_PROJECT_ID} config/cron.yaml
       ```
+
+## SLI results
+
+All delayed backups will be streamed to ``SLI_history.SLI_backup_creation_latency`` table.
