@@ -13,8 +13,8 @@ BBQ (read: barbecue) is a python app that runs on Google App Engine (GAE) and cr
   * [Backup process](#backup-process)
   * [Restore process](#restore-process)
   * [Retention process](#retention-process)
-
 * [Usage](#usage)
+* [Contributing](#contributing)
 
 # Setup
 To install BBQ in GCP, follow installation steps from [Setup.md](./SETUP.md) doc.
@@ -199,4 +199,10 @@ There are several options to restore data, available from _\<your-project-id>_._
  * **restorationStatusEndpoint** - it shows all information about progress and each copy job.
  
  We advise to use *restorationWarningsOnlyStatusEndpoint* for bigger datasets as the response time is quicker and response size smaller.
+ 
+# Contributing
+
+Feel free to submit feature requests and bug reports under Issues.
+
+If you would like to contribute to our development efforts, please review our [contributing guidelines](/CONTRIBUTING.md) and submit a pull request.
  
