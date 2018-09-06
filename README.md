@@ -199,6 +199,10 @@ There are several options to restore data, available from _\<your-project-id>_._
  * **restorationStatusEndpoint** - it shows all information about progress and each copy job.
  
  We advise to use *restorationWarningsOnlyStatusEndpoint* for bigger datasets as the response time is quicker and response size smaller.
+
+# Community
+
+Subscribe or post to [backup-big-query@googlegroups.com](https://groups.google.com/forum/#!forum/backup-big-query) to follow along and ask questions about the BBQ.
  
 # Contributing
 
