@@ -19,7 +19,7 @@ resource "google_bigquery_table" "tables_modified_more_than_3_days_ago" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
 }
 
 resource "google_bigquery_table" "last_backup_in_census" {
@@ -54,7 +54,7 @@ resource "google_bigquery_table" "last_backup_in_census" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
 }
 
 resource "google_bigquery_table" "SLI_quality" {
@@ -79,13 +79,13 @@ resource "google_bigquery_table" "SLI_quality" {
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
-              [${local.datastore_export_project}.${var.datastore_export_views_dataset}.tables_modified_more_than_3_days_ago]
+              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_modified_more_than_3_days_ago]
             AS source_table
             LEFT JOIN (
               SELECT
                 source_project_id, source_dataset_id, source_table_id, source_partition_id,
                 backup_dataset_id, backup_table_id, backup_last_modified, backup_num_bytes, backup_num_rows
-              FROM [${local.datastore_export_project}.${var.datastore_export_views_dataset}.last_backup_in_census]
+              FROM [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census]
             ) AS last_backup_in_census
             ON source_table.projectId=last_backup_in_census.source_project_id AND
                source_table.datasetId=last_backup_in_census.source_dataset_id AND
@@ -97,5 +97,5 @@ resource "google_bigquery_table" "SLI_quality" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
 }
