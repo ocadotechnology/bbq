@@ -69,10 +69,10 @@ resource "google_bigquery_table" "SLI_4_days_view" {
           ON
             census.projectId=last_backups.source_project_id AND
             census.datasetId=last_backups.source_dataset_id AND
-            census.tableId=last_backups.source_table_id AND
-            census.partitionId=last_backups.source_partition_id
+            census.tableId=last_backups.source_table_id
           WHERE
-            projectId != "${var.bbq_project}"
+            NVL(census.partitionId, 'null')=NVL(last_backups.source_partition_id, 'null')
+            AND projectId != "${var.bbq_project}"
             AND partitionId != "__UNPARTITIONED__"
             AND backup_created < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -4 , "DAY"))
             AND backup_last_modified < lastModifiedTime
