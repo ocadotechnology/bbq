@@ -1,5 +1,10 @@
 terraform {
   required_version = "> 0.11"
+
+  backend "gcs" {
+    bucket = "dev-atm-data-lake-drain-tf-state"
+    prefix = "/terraform-sli.tfstate"
+  }
 }
 
 provider "google" {
@@ -41,6 +46,10 @@ variable "datastore_export_views_dataset" {
 
 variable "SLI_views_legacy_dataset" {
   default = "SLI_views_legacy"
+}
+
+variable "SLI_backup_quality_views_dataset" {
+  default = "SLI_backup_quality_views"
 }
 
 variable "SLI_history_dataset" {
