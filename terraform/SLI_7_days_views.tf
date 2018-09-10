@@ -74,8 +74,8 @@ resource "google_bigquery_table" "SLI_7_days_view" {
             WHERE
               projectId != "${var.bbq_project}"
               AND partitionId != "__UNPARTITIONED__"
-              AND backup_created < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -7 , "DAY"))
-              AND backup_last_modified < lastModifiedTime
+              AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -7 , "DAY"))
+              AND IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) < lastModifiedTime
         EOF
     use_legacy_sql = true
   }
