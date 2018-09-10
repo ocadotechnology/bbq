@@ -73,6 +73,7 @@ resource "google_bigquery_table" "SLI_5_days_view" {
             census.partitionId=last_backups.source_partition_id
           WHERE
             projectId != "${var.bbq_project}"
+            AND partitionId != "__UNPARTITIONED__"
             AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -5 , "DAY"))
             AND IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) < lastModifiedTime
         EOF
