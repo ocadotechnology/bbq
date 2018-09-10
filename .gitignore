@@ -6,3 +6,4 @@ target
 lib
 node_modules
 datastore.bin
+terraform/.terraform
