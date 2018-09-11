@@ -47,7 +47,7 @@ class CopyJobService(object):
             "projectId": source_big_query_table.get_project_id(),
             "jobReference": {
                 "jobId": job_id,
-                "projectId": source_big_query_table.get_project_id()
+                "projectId": target_big_query_table.get_project_id()
             },
             "configuration": {
                 "copy": {
