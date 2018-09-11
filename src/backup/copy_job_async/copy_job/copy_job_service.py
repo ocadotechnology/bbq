@@ -44,7 +44,6 @@ class CopyJobService(object):
     def __schedule(source_big_query_table, target_big_query_table, job_id):
         logging.info("Scheduling job ID: " + job_id)
         job_data = {
-            "projectId": source_big_query_table.get_project_id(),
             "jobReference": {
                 "jobId": job_id,
                 "projectId": target_big_query_table.get_project_id()
