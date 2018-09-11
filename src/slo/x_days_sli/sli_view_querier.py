@@ -1,6 +1,6 @@
 import logging
-import time
 
+import time
 
 from src.commons.config.configuration import configuration
 
@@ -19,10 +19,12 @@ class SLIViewQuerier(object):
 
     @staticmethod
     def __generate_x_days_sli_query(x_days):
-        return "SELECT * FROM [{}:SLI_views_legacy.SLI_{}_days]".format(
-            configuration.backup_project_id, x_days)
+        return \
+            "SELECT * FROM [{}:SLI_backup_creation_latency_views.SLI_{}_days]"\
+            .format(configuration.backup_project_id, x_days)
 
-    def __format_query_results(self, results, x_days):
+    @staticmethod
+    def __format_query_results(results, x_days):
         return [{
             "snapshotTime": time.time(),
             "projectId": result['f'][0]['v'],
