@@ -1,7 +1,7 @@
-resource "google_bigquery_table" "tables_modified_more_than_3_days_ago" {
+resource "google_bigquery_table" "tables_not_modified_since_3_days" {
   project = "${local.SLI_views_destination_project}"
   dataset_id = "${var.SLI_backup_quality_views_dataset}"
-  table_id = "tables_modified_more_than_3_days_ago"
+  table_id = "tables_not_modified_since_3_days"
 
   view {
     query = <<EOF
@@ -46,10 +46,9 @@ resource "google_bigquery_table" "last_backup_in_census" {
             LEFT OUTER JOIN (
               SELECT datasetId, tableId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.table_metadata_v1_0]
-              WHERE projectId = "${var.bbq_project}" AND DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3
+              WHERE projectId = "${var.bbq_project}"
             ) AS census
             ON census.datasetId=last_backup.backup_dataset_id AND census.tableId=last_backup.backup_table_id
-            WHERE DATEDIFF(CURRENT_TIMESTAMP(), last_backup.backup_last_modified) >= 3
         EOF
     use_legacy_sql = true
   }
@@ -79,7 +78,7 @@ resource "google_bigquery_table" "SLI_quality" {
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
-              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_modified_more_than_3_days_ago]
+              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_not_modified_since_3_days]
             AS source_table
             LEFT JOIN (
               SELECT
