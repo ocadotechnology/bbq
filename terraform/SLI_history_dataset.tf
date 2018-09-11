@@ -15,7 +15,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency" {
     type = "DAY"
   }
 
-  schema= "${file("SLI_backup_creation_latency_filtered_table_schema®.json")}"
+  schema= "${file("SLI_backup_creation_latency_filtered_table_schema.json")}"
 
   depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
 }
