@@ -69,10 +69,10 @@ resource "google_bigquery_table" "SLI_7_days_view" {
             ON
               census.projectId=last_backups.source_project_id AND
               census.datasetId=last_backups.source_dataset_id AND
-              census.tableId=last_backups.source_table_id AND
-              census.partitionId=last_backups.source_partition_id
+              census.tableId=last_backups.source_table_id
             WHERE
-              projectId != "${var.bbq_project}"
+              IFNULL(census.partitionId, 'null')=IFNULL(last_backups.source_partition_id, 'null')
+              AND projectId != "${var.bbq_project}"
               AND partitionId != "__UNPARTITIONED__"
               AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -7 , "DAY"))
               AND IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) < lastModifiedTime
