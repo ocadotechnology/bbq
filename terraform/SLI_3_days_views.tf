@@ -1,6 +1,6 @@
 resource "google_bigquery_table" "census_data_3_days_ago_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_views_legacy_dataset}"
+  dataset_id = "${var.SLI_backup_creation_latency_views_dataset}"
   table_id = "census_data_3_days_ago"
 
   view {
@@ -37,13 +37,13 @@ resource "google_bigquery_table" "census_data_3_days_ago_view" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_views_legacy_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_creation_latency_views_dataset"]
 }
 
 
 resource "google_bigquery_table" "SLI_3_days_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_views_legacy_dataset}"
+  dataset_id = "${var.SLI_backup_creation_latency_views_dataset}"
   table_id = "SLI_3_days"
 
   view {
@@ -59,7 +59,7 @@ resource "google_bigquery_table" "SLI_3_days_view" {
             IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
             IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
           FROM
-            [${local.SLI_views_destination_project}.${var.SLI_views_legacy_dataset}.census_data_3_days_ago] AS census
+            [${local.SLI_views_destination_project}.${var.SLI_backup_creation_latency_views_dataset}.census_data_3_days_ago] AS census
           LEFT JOIN (
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id

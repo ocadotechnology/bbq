@@ -44,8 +44,8 @@ variable "datastore_export_views_dataset" {
   default = "datastore_export_views_legacy"
 }
 
-variable "SLI_views_legacy_dataset" {
-  default = "SLI_views_legacy"
+variable "SLI_backup_creation_latency_views_dataset" {
+  default = "SLI_backup_creation_latency_views"
 }
 
 variable "SLI_backup_quality_views_dataset" {
