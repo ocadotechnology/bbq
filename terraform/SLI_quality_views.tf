@@ -88,10 +88,9 @@ resource "google_bigquery_table" "SLI_quality" {
             ) AS last_backup_in_census
             ON source_table.projectId=last_backup_in_census.source_project_id AND
                source_table.datasetId=last_backup_in_census.source_dataset_id AND
-               source_table.tableId=last_backup_in_census.source_table_id AND
-               source_table.partitionId=last_backup_in_census.source_partition_id
-            WHERE (source_table.numBytes-last_backup_in_census.backup_num_bytes) != 0
-               OR (source_table.numRows-last_backup_in_census.backup_num_rows) != 0
+               source_table.tableId=last_backup_in_census.source_table_id
+            WHERE IFNULL(source_table.partitionId, 'null')=IFNULL(last_backup_in_census.source_partition_id, 'null')
+              AND ((source_table.numBytes-last_backup_in_census.backup_num_bytes) != 0 OR (source_table.numRows-last_backup_in_census.backup_num_rows) != 0)
         EOF
     use_legacy_sql = true
   }
