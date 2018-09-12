@@ -175,6 +175,8 @@ class TestCopyJobService(unittest.TestCase):
                                                    create_copy_job_result_check):
         # given
         self._create_http.return_value = HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
             ({'status': '503'},
              content('tests/json_samples/bigquery_503_error.json')),
             ({'status': '409'},
