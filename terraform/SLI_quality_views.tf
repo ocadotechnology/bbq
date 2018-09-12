@@ -46,6 +46,8 @@ resource "google_bigquery_table" "last_backup_in_census" {
               last_backup.source_dataset_id AS source_dataset_id,
               last_backup.source_table_id AS source_table_id,
               last_backup.source_partition_id AS source_partition_id,
+              last_backup.backup_last_modified AS backup_entity_last_modified_time,
+              last_backup.backup_num_bytes AS backup_entity_num_bytes,
               census.datasetId AS backup_dataset_id,
               census.tableId AS backup_table_id,
               census.lastModifiedTime as backup_last_modified,
@@ -85,8 +87,10 @@ resource "google_bigquery_table" "SLI_quality" {
               last_backup_in_census.backup_table_id AS backup_table_id,
               source_table.lastModifiedTime AS source_last_modified,
               last_backup_in_census.backup_last_modified AS backup_last_modified,
+              last_backup_in_census.backup_entity_last_modified_time AS backup_entity_last_modified,
               source_table.numBytes AS source_num_bytes,
               last_backup_in_census.backup_num_bytes AS backup_num_bytes,
+              last_backup_in_census.backup_entity_num_bytes AS backup_entity_num_bytes,
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
@@ -95,7 +99,9 @@ resource "google_bigquery_table" "SLI_quality" {
             LEFT JOIN (
               SELECT
                 source_project_id, source_dataset_id, source_table_id, source_partition_id,
-                backup_dataset_id, backup_table_id, backup_last_modified, backup_num_bytes, backup_num_rows
+                backup_dataset_id, backup_table_id,
+                backup_last_modified, backup_entity_last_modified_time,
+                backup_num_bytes, backup_entity_num_bytes, backup_num_rows
               FROM [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census]
             ) AS last_backup_in_census
             ON source_table.projectId=last_backup_in_census.source_project_id AND
