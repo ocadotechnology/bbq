@@ -58,7 +58,7 @@ class TestBigQuery(unittest.TestCase):
     @patch('time.sleep', return_value=None)
     @patch.object(TestClass, "func_for_test")
     def test_iterating_tables_should_retry_if_gets_http_503_response_once(
-            self, func,_):
+            self, func, _):
         # given
         self._create_http.return_value = self.__create_tables_list_responses_with_503()
 
@@ -68,7 +68,8 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEquals(5, func.call_count)
 
-    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
+    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(
+            self):
         # given
         self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
 
@@ -194,7 +195,7 @@ class TestBigQuery(unittest.TestCase):
             {
                 "f": [
                     {
-                        "v": "local-project-bbq"
+                        "v": "a-gcp-project2"
                     },
                     {
                         "v": "test1"
@@ -204,7 +205,7 @@ class TestBigQuery(unittest.TestCase):
             {
                 "f": [
                     {
-                        "v": "project-bbq-restoration"
+                        "v": "a-gcp-project3"
                     },
                     {
                         "v": "smoke_test_US"
