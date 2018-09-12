@@ -6,6 +6,7 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
   view {
     query = <<EOF
             #legacySQL
+              -- Shows all tables modified more than 3 days ago
             SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows FROM (
               SELECT projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.table_metadata_v1_0]
@@ -30,6 +31,7 @@ resource "google_bigquery_table" "last_backup_in_census" {
   view {
     query = <<EOF
             #legacySQL
+              -- Return last available backup in GCP Census for every table entity from Datastore
             SELECT
               last_backup.source_project_id AS source_project_id,
               last_backup.source_dataset_id AS source_dataset_id,
@@ -64,6 +66,7 @@ resource "google_bigquery_table" "SLI_quality" {
   view {
     query = <<EOF
             #legacySQL
+            -- Shows all tables which last backup differs in numRows or numBytes
             SELECT
               source_table.projectId AS source_project_id,
               source_table.datasetId AS source_dataset_id,
