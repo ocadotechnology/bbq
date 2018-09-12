@@ -8,10 +8,19 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
             #legacySQL
               -- Shows all tables modified more than 3 days ago
             SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows FROM (
-              SELECT projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows
-              FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.table_metadata_v1_0]
-              WHERE DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
-              ), (
+              SELECT * FROM (
+                SELECT
+                  projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows,
+                  ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
+                FROM [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
+                WHERE
+                  _PARTITIONTIME BETWEEN TIMESTAMP(UTC_USEC_TO_DAY(NOW() - 3 * 24 * 60 * 60 * 1000000)) AND TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
+                  AND timePartitioning.type IS NULL AND type='TABLE'
+              ),
+              WHERE
+                rownum=1 AND
+                DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
+            ), (
               SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.partition_metadata_v1_0]
               WHERE DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
