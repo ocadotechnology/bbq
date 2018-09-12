@@ -16,7 +16,7 @@
     ]
   },
   "jobReference": {
-    "projectId": "project-bbq",
+    "projectId": "a-gcp-project-name",
     "jobId": "job_6h2TY5uZbZao5rKXkRRGgUvEgApI",
     "location": "EU"
   },
@@ -25,7 +25,7 @@
     {
       "f": [
         {
-          "v": "local-project-bbq"
+          "v": "a-gcp-project2"
         },
         {
           "v": "test1"
@@ -35,7 +35,7 @@
     {
       "f": [
         {
-          "v": "project-bbq-restoration"
+          "v": "a-gcp-project3"
         },
         {
           "v": "smoke_test_US"
