@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from apiclient.errors import HttpError
 from src.commons.decorators.retry import retry
@@ -15,7 +16,9 @@ class CopyJobService(object):
         target_big_query_table = copy_job_request.target_big_query_table
         retry_count = copy_job_request.retry_count
 
-        job_id = CopyJobService.__schedule(source_big_query_table, target_big_query_table)
+        job_id = CopyJobService.__schedule(source_big_query_table,
+                                           target_big_query_table,
+                                           job_id=CopyJobService._create_random_job_id())
         if job_id:
             TaskCreator.create_copy_job_result_check(
                 ResultCheckRequest(
@@ -38,9 +41,13 @@ class CopyJobService(object):
 
     @staticmethod
     @retry(Exception, tries=6, delay=2, backoff=2)
-    def __schedule(source_big_query_table, target_big_query_table):
+    def __schedule(source_big_query_table, target_big_query_table, job_id):
+        logging.info("Scheduling job ID: " + job_id)
         job_data = {
-            "projectId": source_big_query_table.get_project_id(),
+            "jobReference": {
+                "jobId": job_id,
+                "projectId": target_big_query_table.get_project_id()
+            },
             "configuration": {
                 "copy": {
                     "sourceTable": {
@@ -59,14 +66,17 @@ class CopyJobService(object):
             }
         }
         try:
-            job_id = BigQuery().insert_job(
+            response_job_id = BigQuery().insert_job(
                 target_big_query_table.get_project_id(), job_data)
-            logging.info("Job ID: " + job_id)
-            return job_id
+            logging.info("Response job ID: " + response_job_id)
+            return response_job_id
         except HttpError as bq_error:
             if bq_error.resp.status == 404:
                 logging.exception('404 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
                 return None
+            elif bq_error.resp.status == 409:
+                logging.exception('409 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
+                return job_id
             else:
                 raise
         except Exception as error:
@@ -101,3 +111,7 @@ class CopyJobService(object):
                 }
             }
         }
+
+    @staticmethod
+    def _create_random_job_id():
+        return "bbq_copy_job_" + str(uuid.uuid4())
