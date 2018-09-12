@@ -1,0 +1,49 @@
+{
+  "kind": "bigquery#getQueryResultsResponse",
+  "etag": "wMuFW2dF3iB9tEUKtgpe7A==",
+  "schema": {
+    "fields": [
+      {
+        "name": "projectId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "datasetId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "jobReference": {
+    "projectId": "project-bbq",
+    "jobId": "job_6h2TY5uZbZao5rKXkRRGgUvEgApI",
+    "location": "EU"
+  },
+  "totalRows": "28",
+  "rows": [
+    {
+      "f": [
+        {
+          "v": "local-project-bbq"
+        },
+        {
+          "v": "test1"
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "project-bbq-restoration"
+        },
+        {
+          "v": "smoke_test_US"
+        }
+      ]
+    }
+  ],
+  "totalBytesProcessed": "5294435269",
+  "jobComplete": true,
+  "cacheHit": false
+}
