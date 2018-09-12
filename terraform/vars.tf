@@ -2,7 +2,7 @@ terraform {
   required_version = "> 0.11"
 
   backend "gcs" {
-    bucket = "dev-atm-data-lake-drain-tf-state"
+    bucket = {}
     prefix = "/terraform-sli.tfstate"
   }
 }
