@@ -111,15 +111,15 @@ class BigQuery(object):  # pylint: disable=R0904
         page_token = None
 
         while True:
-            page = self.service.jobs().getQueryResults(
+            response = self.service.jobs().getQueryResults(
                 pageToken=page_token,
                 **query_job['jobReference']).execute(num_retries=2)
-
-            results.extend(page.get('rows', []))
-
-            page_token = page.get('pageToken')
-            if not page_token:
-                break
+            job_complete = response.get('jobComplete')
+            if job_complete:
+                results.extend(response.get('rows', []))
+                page_token = response.get('pageToken')
+                if not page_token:
+                    break
 
         return results
 

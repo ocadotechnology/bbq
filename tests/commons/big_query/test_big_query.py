@@ -184,6 +184,46 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_table_list_page_last.json'))
         ])
 
+    def test_execute_query_when_executing_long_query(self):
+        # given
+        self._create_http.return_value = self.__execute_long_query_responses()
+        # when
+        result = BigQuery().execute_query("SELECT * FROM tableXYZ")
+        # then
+        self.assertEqual(result, [
+    {
+      "f": [
+        {
+          "v": "local-project-bbq"
+        },
+        {
+          "v": "test1"
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "project-bbq-restoration"
+        },
+        {
+          "v": "smoke_test_US"
+        }
+      ]
+    }
+        ])
+
+
+    @staticmethod
+    def __execute_long_query_responses():
+        return HttpMockSequence([
+            ({'status': '200'}, content('tests/json_samples/big_query/discovery_v1_apis_bigquery_v2_rest.json')),
+            ({'status': '200'}, content('tests/json_samples/big_query/query_response.json')),
+            ({'status': '200'}, content('tests/json_samples/big_query/get_query_results_job_not_completed.json')),
+            ({'status': '200'}, content('tests/json_samples/big_query/get_query_results_job_completed.json'))
+        ])
+
+
     @staticmethod
     def __create_tables_list_responses_with_503():
         return HttpMockSequence([
