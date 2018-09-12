@@ -26,7 +26,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
   table_id = "SLI_backup_creation_latency_view"
 
   view {
-    query = "SELECT * FROM [${var.SLI_views_destination_project}}:${var.SLI_history_dataset}.SLI_backup_creation_latency]"
+    query = "SELECT * FROM [${var.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]"
     use_legacy_sql = true
   }
 
