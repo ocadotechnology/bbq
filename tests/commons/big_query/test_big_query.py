@@ -57,7 +57,8 @@ class TestBigQuery(unittest.TestCase):
 
     @patch('time.sleep', return_value=None)
     @patch.object(TestClass, "func_for_test")
-    def test_iterating_tables_should_retry_if_gets_http_503_response_once(self, func,_):
+    def test_iterating_tables_should_retry_if_gets_http_503_response_once(
+            self, func, _):
         # given
         self._create_http.return_value = self.__create_tables_list_responses_with_503()
 
@@ -67,7 +68,8 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEquals(5, func.call_count)
 
-    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(self):
+    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(
+            self):
         # given
         self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
 
@@ -103,7 +105,6 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual('test_set', random_table.get_dataset_id())
         self.assertEqual('O_PRODUCT_SUPPLIER_20151127',
                          random_table.get_table_id())
-
 
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
             self):
@@ -182,6 +183,48 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_table_list_page_1.json')),
             ({'status': '200'},
              content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
+
+    def test_execute_query_when_executing_long_query(self):
+        # given
+        self._create_http.return_value = self.__execute_long_query_responses()
+        # when
+        result = BigQuery().execute_query("SELECT * FROM tableXYZ")
+        # then
+        self.assertEqual(result, [
+            {
+                "f": [
+                    {
+                        "v": "a-gcp-project2"
+                    },
+                    {
+                        "v": "test1"
+                    }
+                ]
+            },
+            {
+                "f": [
+                    {
+                        "v": "a-gcp-project3"
+                    },
+                    {
+                        "v": "smoke_test_US"
+                    }
+                ]
+            }
+        ])
+
+    @staticmethod
+    def __execute_long_query_responses():
+        return HttpMockSequence([
+            ({'status': '200'}, content(
+                'tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '200'},
+             content('tests/json_samples/big_query/query_response.json')),
+            ({'status': '200'}, content(
+                'tests/json_samples/big_query/get_query_results_job_not_completed.json')),
+            ({'status': '200'}, content(
+                'tests/json_samples/big_query/get_query_results_job_completed.json'))
         ])
 
     @staticmethod

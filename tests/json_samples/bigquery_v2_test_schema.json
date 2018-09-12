@@ -1,11 +1,11 @@
 {
   "kind": "discovery#restDescription",
-  "etag": "\"tbys6C40o18GZwyMen5GMkdK-3s/Hw3ocLnACFZ8pfeMZhrBTel37_8\"",
+  "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/SPuWedTgj_3h1hPuEz9c6cjT4fM\"",
   "discoveryVersion": "v1",
   "id": "bigquery:v2",
   "name": "bigquery",
   "version": "v2",
-  "revision": "20170319",
+  "revision": "20180902",
   "title": "BigQuery API",
   "description": "A data platform for customers to create, manage, share and query data.",
   "ownerDomain": "google.com",
@@ -20,7 +20,7 @@
   "basePath": "/bigquery/v2/",
   "rootUrl": "https://www.googleapis.com/",
   "servicePath": "bigquery/v2/",
-  "batchPath": "batch",
+  "batchPath": "batch/bigquery/v2",
   "parameters": {
     "alt": {
       "type": "string",
@@ -57,12 +57,12 @@
     },
     "quotaUser": {
       "type": "string",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+      "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
       "location": "query"
     },
     "userIp": {
       "type": "string",
-      "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+      "description": "Deprecated. Please use quotaUser instead.",
       "location": "query"
     }
   },
@@ -94,6 +94,22 @@
     }
   },
   "schemas": {
+    "BigQueryModelTraining": {
+      "id": "BigQueryModelTraining",
+      "type": "object",
+      "properties": {
+        "currentIteration": {
+          "type": "integer",
+          "description": "[Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.",
+          "format": "int32"
+        },
+        "expectedTotalIterations": {
+          "type": "string",
+          "description": "[Output-only, Beta] Expected number of iterations for the create model query job specified as num_iterations in the input query. The actual total number of iterations may be less than this number due to early stop.",
+          "format": "int64"
+        }
+      }
+    },
     "BigtableColumn": {
       "id": "BigtableColumn",
       "type": "object",
@@ -171,6 +187,19 @@
         "readRowkeyAsString": {
           "type": "boolean",
           "description": "[Optional] If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false."
+        }
+      }
+    },
+    "Clustering": {
+      "id": "Clustering",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "description": "[Repeated] One or more fields on which data should be clustered. Only top-level, non-repeated, simple-type fields are supported. When you cluster a table using multiple columns, the order of columns you specify is important. The order of the specified columns determines the sort order of the data.",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -253,6 +282,11 @@
           "$ref": "DatasetReference",
           "description": "[Required] A reference that identifies the dataset."
         },
+        "defaultPartitionExpirationMs": {
+          "type": "string",
+          "description": "[Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.",
+          "format": "int64"
+        },
         "defaultTableExpirationMs": {
           "type": "string",
           "description": "[Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.",
@@ -281,7 +315,7 @@
         },
         "labels": {
           "type": "object",
-          "description": "The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Labeling Datasets for more information.",
+          "description": "The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.",
           "additionalProperties": {
             "type": "string"
           }
@@ -293,7 +327,7 @@
         },
         "location": {
           "type": "string",
-          "description": "The geographic location where the dataset should reside. Possible values include EU and US. The default value is US."
+          "description": "The geographic location where the dataset should reside. The default value is US. See details at https://cloud.google.com/bigquery/docs/dataset-locations."
         },
         "selfLink": {
           "type": "string",
@@ -334,6 +368,10 @@
                 "additionalProperties": {
                   "type": "string"
                 }
+              },
+              "location": {
+                "type": "string",
+                "description": "[Experimental] The geographic location where the data resides."
               }
             }
           }
@@ -377,6 +415,30 @@
         }
       }
     },
+    "DestinationTableProperties": {
+      "id": "DestinationTableProperties",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "[Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail."
+        },
+        "friendlyName": {
+          "type": "string",
+          "description": "[Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail."
+        }
+      }
+    },
+    "EncryptionConfiguration": {
+      "id": "EncryptionConfiguration",
+      "type": "object",
+      "properties": {
+        "kmsKeyName": {
+          "type": "string",
+          "description": "[Optional] Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key."
+        }
+      }
+    },
     "ErrorProto": {
       "id": "ErrorProto",
       "type": "object",
@@ -403,6 +465,21 @@
       "id": "ExplainQueryStage",
       "type": "object",
       "properties": {
+        "completedParallelInputs": {
+          "type": "string",
+          "description": "Number of parallel input segments completed.",
+          "format": "int64"
+        },
+        "computeMsAvg": {
+          "type": "string",
+          "description": "Milliseconds the average shard spent on CPU-bound tasks.",
+          "format": "int64"
+        },
+        "computeMsMax": {
+          "type": "string",
+          "description": "Milliseconds the slowest shard spent on CPU-bound tasks.",
+          "format": "int64"
+        },
         "computeRatioAvg": {
           "type": "number",
           "description": "Relative amount of time the average shard spent on CPU-bound tasks.",
@@ -413,14 +490,42 @@
           "description": "Relative amount of time the slowest shard spent on CPU-bound tasks.",
           "format": "double"
         },
+        "endMs": {
+          "type": "string",
+          "description": "Stage end time represented as milliseconds since epoch.",
+          "format": "int64"
+        },
         "id": {
           "type": "string",
           "description": "Unique ID for stage within plan.",
           "format": "int64"
         },
+        "inputStages": {
+          "type": "array",
+          "description": "IDs for stages that are inputs to this stage.",
+          "items": {
+            "type": "string",
+            "format": "int64"
+          }
+        },
         "name": {
           "type": "string",
           "description": "Human-readable name for stage."
+        },
+        "parallelInputs": {
+          "type": "string",
+          "description": "Number of parallel input segments to be processed.",
+          "format": "int64"
+        },
+        "readMsAvg": {
+          "type": "string",
+          "description": "Milliseconds the average shard spent reading input.",
+          "format": "int64"
+        },
+        "readMsMax": {
+          "type": "string",
+          "description": "Milliseconds the slowest shard spent reading input.",
+          "format": "int64"
         },
         "readRatioAvg": {
           "type": "number",
@@ -442,6 +547,21 @@
           "description": "Number of records written by the stage.",
           "format": "int64"
         },
+        "shuffleOutputBytes": {
+          "type": "string",
+          "description": "Total number of bytes written to shuffle.",
+          "format": "int64"
+        },
+        "shuffleOutputBytesSpilled": {
+          "type": "string",
+          "description": "Total number of bytes written to shuffle and spilled to disk.",
+          "format": "int64"
+        },
+        "startMs": {
+          "type": "string",
+          "description": "Stage start time represented as milliseconds since epoch.",
+          "format": "int64"
+        },
         "status": {
           "type": "string",
           "description": "Current status for the stage."
@@ -453,6 +573,16 @@
             "$ref": "ExplainQueryStep"
           }
         },
+        "waitMsAvg": {
+          "type": "string",
+          "description": "Milliseconds the average shard spent waiting to be scheduled.",
+          "format": "int64"
+        },
+        "waitMsMax": {
+          "type": "string",
+          "description": "Milliseconds the slowest shard spent waiting to be scheduled.",
+          "format": "int64"
+        },
         "waitRatioAvg": {
           "type": "number",
           "description": "Relative amount of time the average shard spent waiting to be scheduled.",
@@ -462,6 +592,16 @@
           "type": "number",
           "description": "Relative amount of time the slowest shard spent waiting to be scheduled.",
           "format": "double"
+        },
+        "writeMsAvg": {
+          "type": "string",
+          "description": "Milliseconds the average shard spent on writing output.",
+          "format": "int64"
+        },
+        "writeMsMax": {
+          "type": "string",
+          "description": "Milliseconds the slowest shard spent on writing output.",
+          "format": "int64"
         },
         "writeRatioAvg": {
           "type": "number",
@@ -522,7 +662,7 @@
         },
         "maxBadRecords": {
           "type": "integer",
-          "description": "[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.",
+          "description": "[Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.",
           "format": "int32"
         },
         "schema": {
@@ -535,7 +675,7 @@
         },
         "sourceUris": {
           "type": "array",
-          "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified, and it must end with '.backup_info'. Also, the '*' wildcard character is not allowed.",
+          "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the '*' wildcard character is not allowed.",
           "items": {
             "type": "string"
           }
@@ -552,7 +692,7 @@
         },
         "errors": {
           "type": "array",
-          "description": "[Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
+          "description": "[Output-only] The first errors or warnings encountered during the running of the job. The final message includes the number of errors that caused the process to stop. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
           "items": {
             "$ref": "ErrorProto"
           }
@@ -606,14 +746,64 @@
         }
       }
     },
+    "GetServiceAccountResponse": {
+      "id": "GetServiceAccountResponse",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The service account email address."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The resource type of the response.",
+          "default": "bigquery#getServiceAccountResponse"
+        }
+      }
+    },
     "GoogleSheetsOptions": {
       "id": "GoogleSheetsOptions",
       "type": "object",
       "properties": {
+        "range": {
+          "type": "string",
+          "description": "[Beta] [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: !:"
+        },
         "skipLeadingRows": {
           "type": "string",
           "description": "[Optional] The number of rows at the top of a sheet that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows that should be skipped. When autodetect is on, behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N \u003e 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.",
           "format": "int64"
+        }
+      }
+    },
+    "IterationResult": {
+      "id": "IterationResult",
+      "type": "object",
+      "properties": {
+        "durationMs": {
+          "type": "string",
+          "description": "[Output-only, Beta] Time taken to run the training iteration in milliseconds.",
+          "format": "int64"
+        },
+        "evalLoss": {
+          "type": "number",
+          "description": "[Output-only, Beta] Eval loss computed on the eval data at the end of the iteration. The eval loss is used for early stopping to avoid overfitting. No eval loss if eval_split_method option is specified as no_split or auto_split with input data size less than 500 rows.",
+          "format": "double"
+        },
+        "index": {
+          "type": "integer",
+          "description": "[Output-only, Beta] Index of the ML training iteration, starting from zero for each training run.",
+          "format": "int32"
+        },
+        "learnRate": {
+          "type": "number",
+          "description": "[Output-only, Beta] Learning rate used for this iteration, it varies for different training iterations if learn_rate_strategy option is not constant.",
+          "format": "double"
+        },
+        "trainingLoss": {
+          "type": "number",
+          "description": "[Output-only, Beta] Training loss computed on the training data at the end of the iteration. The training loss function is defined by model type.",
+          "format": "double"
         }
       }
     },
@@ -691,9 +881,18 @@
           "$ref": "JobConfigurationExtract",
           "description": "[Pick one] Configures an extract job."
         },
+        "jobTimeoutMs": {
+          "type": "string",
+          "description": "[Optional] Job timeout in milliseconds. If this time limit is exceeded, BigQuery may attempt to terminate the job.",
+          "format": "int64"
+        },
+        "jobType": {
+          "type": "string",
+          "description": "[Output-only] The type of the job. Can be QUERY, LOAD, EXTRACT, COPY or UNKNOWN."
+        },
         "labels": {
           "type": "object",
-          "description": "[Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.",
+          "description": "The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.",
           "additionalProperties": {
             "type": "string"
           }
@@ -714,7 +913,7 @@
       "properties": {
         "compression": {
           "type": "string",
-          "description": "[Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE."
+          "description": "[Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro."
         },
         "destinationFormat": {
           "type": "string",
@@ -760,15 +959,27 @@
         },
         "autodetect": {
           "type": "boolean",
-          "description": "Indicates if we should automatically infer the options and schema for CSV and JSON sources."
+          "description": "[Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources."
+        },
+        "clustering": {
+          "$ref": "Clustering",
+          "description": "[Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered."
         },
         "createDisposition": {
           "type": "string",
           "description": "[Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion."
         },
+        "destinationEncryptionConfiguration": {
+          "$ref": "EncryptionConfiguration",
+          "description": "Custom encryption configuration (e.g., Cloud KMS keys)."
+        },
         "destinationTable": {
           "$ref": "TableReference",
           "description": "[Required] The destination table to load the data into."
+        },
+        "destinationTableProperties": {
+          "$ref": "DestinationTableProperties",
+          "description": "[Beta] [Optional] Properties with which to create the destination table if it is new."
         },
         "encoding": {
           "type": "string",
@@ -784,12 +995,12 @@
         },
         "maxBadRecords": {
           "type": "integer",
-          "description": "[Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.",
+          "description": "[Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.",
           "format": "int32"
         },
         "nullMarker": {
           "type": "string",
-          "description": "[Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify \"\\N\", BigQuery interprets \"\\N\" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery still interprets the empty string as a null value for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value."
+          "description": "[Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify \"\\N\", BigQuery interprets \"\\N\" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value."
         },
         "projectionFields": {
           "type": "array",
@@ -818,7 +1029,7 @@
         },
         "schemaUpdateOptions": {
           "type": "array",
-          "description": "[Experimental] Allows the schema of the desitination table to be updated as a side effect of the load job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
+          "description": "Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
           "items": {
             "type": "string"
           }
@@ -830,14 +1041,18 @@
         },
         "sourceFormat": {
           "type": "string",
-          "description": "[Optional] The format of the data files. For CSV files, specify \"CSV\". For datastore backups, specify \"DATASTORE_BACKUP\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Avro, specify \"AVRO\". The default value is CSV."
+          "description": "[Optional] The format of the data files. For CSV files, specify \"CSV\". For datastore backups, specify \"DATASTORE_BACKUP\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\". For Avro, specify \"AVRO\". For parquet, specify \"PARQUET\". For orc, specify \"ORC\". The default value is CSV."
         },
         "sourceUris": {
           "type": "array",
-          "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.",
+          "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.",
           "items": {
             "type": "string"
           }
+        },
+        "timePartitioning": {
+          "$ref": "TimePartitioning",
+          "description": "Time-based partitioning specification for the destination table."
         },
         "writeDisposition": {
           "type": "string",
@@ -851,7 +1066,12 @@
       "properties": {
         "allowLargeResults": {
           "type": "boolean",
-          "description": "If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set."
+          "description": "[Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed. However, you must still set destinationTable when result size exceeds the allowed maximum response size.",
+          "default": "false"
+        },
+        "clustering": {
+          "$ref": "Clustering",
+          "description": "[Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered."
         },
         "createDisposition": {
           "type": "string",
@@ -859,15 +1079,19 @@
         },
         "defaultDataset": {
           "$ref": "DatasetReference",
-          "description": "[Optional] Specifies the default dataset to use for unqualified table names in the query."
+          "description": "[Optional] Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names."
+        },
+        "destinationEncryptionConfiguration": {
+          "$ref": "EncryptionConfiguration",
+          "description": "Custom encryption configuration (e.g., Cloud KMS keys)."
         },
         "destinationTable": {
           "$ref": "TableReference",
-          "description": "[Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results."
+          "description": "[Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results. This property must be set for large results that exceed the maximum response size."
         },
         "flattenResults": {
           "type": "boolean",
-          "description": "[Optional] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.",
+          "description": "[Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.",
           "default": "true"
         },
         "maximumBillingTier": {
@@ -895,7 +1119,7 @@
         },
         "query": {
           "type": "string",
-          "description": "[Required] BigQuery SQL query to execute."
+          "description": "[Required] SQL query text to execute. The useLegacySql field can be used to indicate whether the query uses legacy SQL or standard SQL."
         },
         "queryParameters": {
           "type": "array",
@@ -906,7 +1130,7 @@
         },
         "schemaUpdateOptions": {
           "type": "array",
-          "description": "[Experimental] Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
+          "description": "Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.",
           "items": {
             "type": "string"
           }
@@ -918,9 +1142,14 @@
             "$ref": "ExternalDataConfiguration"
           }
         },
+        "timePartitioning": {
+          "$ref": "TimePartitioning",
+          "description": "Time-based partitioning specification for the destination table."
+        },
         "useLegacySql": {
           "type": "boolean",
-          "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false."
+          "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.",
+          "default": "true"
         },
         "useQueryCache": {
           "type": "boolean",
@@ -936,7 +1165,7 @@
         },
         "writeDisposition": {
           "type": "string",
-          "description": "[Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion."
+          "description": "[Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion."
         }
       }
     },
@@ -947,6 +1176,10 @@
         "createDisposition": {
           "type": "string",
           "description": "[Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion."
+        },
+        "destinationEncryptionConfiguration": {
+          "$ref": "EncryptionConfiguration",
+          "description": "Custom encryption configuration (e.g., Cloud KMS keys)."
         },
         "destinationTable": {
           "$ref": "TableReference",
@@ -1047,6 +1280,10 @@
             ]
           }
         },
+        "location": {
+          "type": "string",
+          "description": "The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location."
+        },
         "projectId": {
           "type": "string",
           "description": "[Required] The ID of the project containing this job.",
@@ -1062,6 +1299,11 @@
       "id": "JobStatistics",
       "type": "object",
       "properties": {
+        "completionRatio": {
+          "type": "number",
+          "description": "[TrustedTester] [Output-only] Job progress (0.0 -\u003e 1.0) for LOAD and EXTRACT jobs.",
+          "format": "double"
+        },
         "creationTime": {
           "type": "string",
           "description": "[Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.",
@@ -1083,6 +1325,13 @@
         "query": {
           "$ref": "JobStatistics2",
           "description": "[Output-only] Statistics for a query job."
+        },
+        "quotaDeferments": {
+          "type": "array",
+          "description": "[Output-only] Quotas which delayed this job's start time.",
+          "items": {
+            "type": "string"
+          }
         },
         "startTime": {
           "type": "string",
@@ -1109,6 +1358,33 @@
           "type": "boolean",
           "description": "[Output-only] Whether the query result was fetched from the query cache."
         },
+        "ddlOperationPerformed": {
+          "type": "string",
+          "description": "The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): \"CREATE\": The query created the DDL target. \"SKIP\": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. \"REPLACE\": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. \"DROP\": The query deleted the DDL target."
+        },
+        "ddlTargetTable": {
+          "$ref": "TableReference",
+          "description": "The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries."
+        },
+        "estimatedBytesProcessed": {
+          "type": "string",
+          "description": "[Output-only] The original estimate of bytes processed for the job.",
+          "format": "int64"
+        },
+        "modelTraining": {
+          "$ref": "BigQueryModelTraining",
+          "description": "[Output-only, Beta] Information about create model query job progress."
+        },
+        "modelTrainingCurrentIteration": {
+          "type": "integer",
+          "description": "[Output-only, Beta] Deprecated; do not use.",
+          "format": "int32"
+        },
+        "modelTrainingExpectedTotalIteration": {
+          "type": "string",
+          "description": "[Output-only, Beta] Deprecated; do not use.",
+          "format": "int64"
+        },
         "numDmlAffectedRows": {
           "type": "string",
           "description": "[Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.",
@@ -1123,18 +1399,43 @@
         },
         "referencedTables": {
           "type": "array",
-          "description": "[Output-only, Experimental] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.",
+          "description": "[Output-only] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.",
           "items": {
             "$ref": "TableReference"
           }
         },
+        "reservationUsage": {
+          "type": "array",
+          "description": "[Output-only] Job resource usage breakdown by reservation.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "[Output-only] Reservation name or \"unreserved\" for on-demand resources usage."
+              },
+              "slotMs": {
+                "type": "string",
+                "description": "[Output-only] Slot-milliseconds the job spent in the given reservation.",
+                "format": "int64"
+              }
+            }
+          }
+        },
         "schema": {
           "$ref": "TableSchema",
-          "description": "[Output-only, Experimental] The schema of the results. Present only for successful dry run of non-legacy SQL queries."
+          "description": "[Output-only] The schema of the results. Present only for successful dry run of non-legacy SQL queries."
         },
         "statementType": {
           "type": "string",
-          "description": "[Output-only, Experimental] The type of query statement, if valid."
+          "description": "The type of query statement, if valid. Possible values (new values might be added in the future): \"SELECT\": SELECT query. \"INSERT\": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language \"UPDATE\": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language \"DELETE\": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language \"MERGE\": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language \"CREATE_TABLE\": CREATE [OR REPLACE] TABLE without AS SELECT. \"CREATE_TABLE_AS_SELECT\": CREATE [OR REPLACE] TABLE ... AS SELECT ... \"DROP_TABLE\": DROP TABLE query. \"CREATE_VIEW\": CREATE [OR REPLACE] VIEW ... AS SELECT ... \"DROP_VIEW\": DROP VIEW query."
+        },
+        "timeline": {
+          "type": "array",
+          "description": "[Output-only] [Beta] Describes a timeline of job execution.",
+          "items": {
+            "$ref": "QueryTimelineSample"
+          }
         },
         "totalBytesBilled": {
           "type": "string",
@@ -1146,9 +1447,19 @@
           "description": "[Output-only] Total bytes processed for the job.",
           "format": "int64"
         },
+        "totalPartitionsProcessed": {
+          "type": "string",
+          "description": "[Output-only] Total number of partitions processed from all partitioned tables referenced in the job.",
+          "format": "int64"
+        },
+        "totalSlotMs": {
+          "type": "string",
+          "description": "[Output-only] Slot-milliseconds for the job.",
+          "format": "int64"
+        },
         "undeclaredQueryParameters": {
           "type": "array",
-          "description": "[Output-only, Experimental] Standard SQL only: list of undeclared query parameters detected during a dry run validation.",
+          "description": "Standard SQL only: list of undeclared query parameters detected during a dry run validation.",
           "items": {
             "$ref": "QueryParameter"
           }
@@ -1159,6 +1470,11 @@
       "id": "JobStatistics3",
       "type": "object",
       "properties": {
+        "badRecords": {
+          "type": "string",
+          "description": "[Output-only] The number of bad records encountered. Note that if the job has failed because of more bad records encountered than the maximum allowed in the load job configuration, then this number can be less than the total number of bad records present in the input data.",
+          "format": "int64"
+        },
         "inputFileBytes": {
           "type": "string",
           "description": "[Output-only] Number of bytes of source data in a load job.",
@@ -1205,7 +1521,7 @@
         },
         "errors": {
           "type": "array",
-          "description": "[Output-only] All errors encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
+          "description": "[Output-only] The first errors encountered during the running of the job. The final message includes the number of errors that caused the process to stop. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
           "items": {
             "$ref": "ErrorProto"
           }
@@ -1227,6 +1543,37 @@
     "JsonValue": {
       "id": "JsonValue",
       "type": "any"
+    },
+    "ModelDefinition": {
+      "id": "ModelDefinition",
+      "type": "object",
+      "properties": {
+        "modelOptions": {
+          "type": "object",
+          "description": "[Output-only, Beta] Model options used for the first training run. These options are immutable for subsequent training runs. Default values are used for any options not specified in the input query.",
+          "properties": {
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "lossType": {
+              "type": "string"
+            },
+            "modelType": {
+              "type": "string"
+            }
+          }
+        },
+        "trainingRuns": {
+          "type": "array",
+          "description": "[Output-only, Beta] Information about ml training runs, each training run comprises of multiple iterations and there may be multiple training runs for the model if warm start is used or if a user decides to continue a previously cancelled query.",
+          "items": {
+            "$ref": "TrainingRun"
+          }
+        }
+      }
     },
     "ProjectList": {
       "id": "ProjectList",
@@ -1387,6 +1734,10 @@
           "description": "The resource type of the request.",
           "default": "bigquery#queryRequest"
         },
+        "location": {
+          "type": "string",
+          "description": "The geographic location where the job should run. Required except for US and EU."
+        },
         "maxResults": {
           "type": "integer",
           "description": "[Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.",
@@ -1423,7 +1774,7 @@
         },
         "useLegacySql": {
           "type": "boolean",
-          "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the values of allowLargeResults and flattenResults are ignored; query will be run as if allowLargeResults is true and flattenResults is false.",
+          "description": "Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.",
           "default": "true"
         },
         "useQueryCache": {
@@ -1443,7 +1794,7 @@
         },
         "errors": {
           "type": "array",
-          "description": "[Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
+          "description": "[Output-only] The first errors or warnings encountered during the running of the job. The final message includes the number of errors that caused the process to stop. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
           "items": {
             "$ref": "ErrorProto"
           }
@@ -1493,6 +1844,37 @@
         }
       }
     },
+    "QueryTimelineSample": {
+      "id": "QueryTimelineSample",
+      "type": "object",
+      "properties": {
+        "activeUnits": {
+          "type": "string",
+          "description": "Total number of units currently being processed by workers. This does not correspond directly to slot usage. This is the largest value observed since the last sample.",
+          "format": "int64"
+        },
+        "completedUnits": {
+          "type": "string",
+          "description": "Total parallel units of work completed by this query.",
+          "format": "int64"
+        },
+        "elapsedMs": {
+          "type": "string",
+          "description": "Milliseconds elapsed since the start of query execution.",
+          "format": "int64"
+        },
+        "pendingUnits": {
+          "type": "string",
+          "description": "Total parallel units of work remaining for the active stages.",
+          "format": "int64"
+        },
+        "totalSlotMs": {
+          "type": "string",
+          "description": "Cumulative slot-ms consumed by the query.",
+          "format": "int64"
+        }
+      }
+    },
     "Streamingbuffer": {
       "id": "Streamingbuffer",
       "type": "object",
@@ -1518,6 +1900,10 @@
       "id": "Table",
       "type": "object",
       "properties": {
+        "clustering": {
+          "$ref": "Clustering",
+          "description": "[Beta] Clustering specification for the table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered."
+        },
         "creationTime": {
           "type": "string",
           "description": "[Output-only] The time when this table was created, in milliseconds since the epoch.",
@@ -1527,13 +1913,17 @@
           "type": "string",
           "description": "[Optional] A user-friendly description of this table."
         },
+        "encryptionConfiguration": {
+          "$ref": "EncryptionConfiguration",
+          "description": "Custom encryption configuration (e.g., Cloud KMS keys)."
+        },
         "etag": {
           "type": "string",
-          "description": "[Output-only] A hash of this resource."
+          "description": "[Output-only] A hash of the table metadata. Used to ensure there were no concurrent modifications to the resource when attempting an update. Not guaranteed to change when the table contents or the fields numRows, numBytes, numLongTermBytes or lastModifiedTime change."
         },
         "expirationTime": {
           "type": "string",
-          "description": "[Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.",
+          "description": "[Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed. The defaultTableExpirationMs property of the encapsulating dataset can be used to set a default expirationTime on newly created tables.",
           "format": "int64"
         },
         "externalDataConfiguration": {
@@ -1555,7 +1945,7 @@
         },
         "labels": {
           "type": "object",
-          "description": "[Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.",
+          "description": "The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.",
           "additionalProperties": {
             "type": "string"
           }
@@ -1568,6 +1958,10 @@
         "location": {
           "type": "string",
           "description": "[Output-only] The geographic location where the table resides. This value is inherited from the dataset."
+        },
+        "model": {
+          "$ref": "ModelDefinition",
+          "description": "[Output-only, Beta] Present iff this table represents a ML model. Describes the training information for the model, and it is required to run 'PREDICT' queries."
         },
         "numBytes": {
           "type": "string",
@@ -1602,7 +1996,7 @@
         },
         "timePartitioning": {
           "$ref": "TimePartitioning",
-          "description": "[Experimental] If specified, configures time-based partitioning for this table."
+          "description": "Time-based partitioning specification for this table."
         },
         "type": {
           "type": "string",
@@ -1732,7 +2126,7 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "[Optional] The field description. The maximum length is 16K characters."
+          "description": "[Optional] The field description. The maximum length is 1,024 characters."
         },
         "fields": {
           "type": "array",
@@ -1778,6 +2172,20 @@
           "items": {
             "type": "object",
             "properties": {
+              "clustering": {
+                "$ref": "Clustering",
+                "description": "[Beta] Clustering specification for this table, if configured."
+              },
+              "creationTime": {
+                "type": "string",
+                "description": "The time when this table was created, in milliseconds since the epoch.",
+                "format": "int64"
+              },
+              "expirationTime": {
+                "type": "string",
+                "description": "[Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.",
+                "format": "int64"
+              },
               "friendlyName": {
                 "type": "string",
                 "description": "The user-friendly name for this table."
@@ -1793,7 +2201,7 @@
               },
               "labels": {
                 "type": "object",
-                "description": "[Experimental] The labels associated with this table. You can use these to organize and group your tables.",
+                "description": "The labels associated with this table. You can use these to organize and group your tables.",
                 "additionalProperties": {
                   "type": "string"
                 }
@@ -1801,6 +2209,10 @@
               "tableReference": {
                 "$ref": "TableReference",
                 "description": "A reference uniquely identifying the table."
+              },
+              "timePartitioning": {
+                "$ref": "TimePartitioning",
+                "description": "The time-based partitioning specification for this table, if configured."
               },
               "type": {
                 "type": "string",
@@ -1891,12 +2303,82 @@
       "properties": {
         "expirationMs": {
           "type": "string",
-          "description": "[Optional] Number of milliseconds for which to keep the storage for a partition.",
+          "description": "[Optional] Number of milliseconds for which to keep the storage for partitions in the table. The storage in a partition will have an expiration time of its partition time plus this value.",
           "format": "int64"
+        },
+        "field": {
+          "type": "string",
+          "description": "[Beta] [Optional] If not set, the table is partitioned by pseudo column, referenced via either '_PARTITIONTIME' as TIMESTAMP type, or '_PARTITIONDATE' as DATE type. If field is specified, the table is instead partitioned by this field. The field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED."
+        },
+        "requirePartitionFilter": {
+          "type": "boolean",
+          "description": "[Beta] [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.",
+          "default": "false"
         },
         "type": {
           "type": "string",
-          "description": "[Required] The only type supported is DAY, which will generate one partition per day based on data loading time."
+          "description": "[Required] The only type supported is DAY, which will generate one partition per day."
+        }
+      }
+    },
+    "TrainingRun": {
+      "id": "TrainingRun",
+      "type": "object",
+      "properties": {
+        "iterationResults": {
+          "type": "array",
+          "description": "[Output-only, Beta] List of each iteration results.",
+          "items": {
+            "$ref": "IterationResult"
+          }
+        },
+        "startTime": {
+          "type": "string",
+          "description": "[Output-only, Beta] Training run start time in milliseconds since the epoch.",
+          "format": "date-time"
+        },
+        "state": {
+          "type": "string",
+          "description": "[Output-only, Beta] Different state applicable for a training run. IN PROGRESS: Training run is in progress. FAILED: Training run ended due to a non-retryable failure. SUCCEEDED: Training run successfully completed. CANCELLED: Training run cancelled by the user."
+        },
+        "trainingOptions": {
+          "type": "object",
+          "description": "[Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.",
+          "properties": {
+            "earlyStop": {
+              "type": "boolean"
+            },
+            "l1Reg": {
+              "type": "number",
+              "format": "double"
+            },
+            "l2Reg": {
+              "type": "number",
+              "format": "double"
+            },
+            "learnRate": {
+              "type": "number",
+              "format": "double"
+            },
+            "learnRateStrategy": {
+              "type": "string"
+            },
+            "lineSearchInitLearnRate": {
+              "type": "number",
+              "format": "double"
+            },
+            "maxIteration": {
+              "type": "string",
+              "format": "int64"
+            },
+            "minRelProgress": {
+              "type": "number",
+              "format": "double"
+            },
+            "warmStart": {
+              "type": "boolean"
+            }
+          }
         }
       }
     },
@@ -2161,6 +2643,11 @@
               "required": true,
               "location": "path"
             },
+            "location": {
+              "type": "string",
+              "description": "[Experimental] The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.",
+              "location": "query"
+            },
             "projectId": {
               "type": "string",
               "description": "[Required] Project ID of the job to cancel",
@@ -2191,6 +2678,11 @@
               "description": "[Required] Job ID of the requested job",
               "required": true,
               "location": "path"
+            },
+            "location": {
+              "type": "string",
+              "description": "[Experimental] The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.",
+              "location": "query"
             },
             "projectId": {
               "type": "string",
@@ -2223,6 +2715,11 @@
               "description": "[Required] Job ID of the query job",
               "required": true,
               "location": "path"
+            },
+            "location": {
+              "type": "string",
+              "description": "[Experimental] The geographic location where the job should run. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.",
+              "location": "query"
             },
             "maxResults": {
               "type": "integer",
@@ -2324,10 +2821,22 @@
               "description": "Whether to display jobs owned by all users in the project. Default false",
               "location": "query"
             },
+            "maxCreationTime": {
+              "type": "string",
+              "description": "Max value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created before or at this timestamp are returned",
+              "format": "uint64",
+              "location": "query"
+            },
             "maxResults": {
               "type": "integer",
               "description": "Maximum number of results to return",
               "format": "uint32",
+              "location": "query"
+            },
+            "minCreationTime": {
+              "type": "string",
+              "description": "Min value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created after or at this timestamp are returned",
+              "format": "uint64",
               "location": "query"
             },
             "pageToken": {
@@ -2415,6 +2924,31 @@
     },
     "projects": {
       "methods": {
+        "getServiceAccount": {
+          "id": "bigquery.projects.getServiceAccount",
+          "path": "projects/{projectId}/serviceAccount",
+          "httpMethod": "GET",
+          "description": "Returns the email address of the service account for your project used for interactions with Google Cloud KMS.",
+          "parameters": {
+            "projectId": {
+              "type": "string",
+              "description": "Project ID for which the service account is requested.",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "parameterOrder": [
+            "projectId"
+          ],
+          "response": {
+            "$ref": "GetServiceAccountResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/bigquery",
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only"
+          ]
+        },
         "list": {
           "id": "bigquery.projects.list",
           "path": "projects",
