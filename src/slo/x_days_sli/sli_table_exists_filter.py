@@ -1,5 +1,7 @@
 import logging
 
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+
 
 class SLITableExistsFilter(object):
 
@@ -12,14 +14,23 @@ class SLITableExistsFilter(object):
             dataset_id=table_reference.dataset_id,
             table_id=table_reference.table_id)
 
-        if not table:
+        table_metadata = BigQueryTableMetadata(table)
+
+        if not table_metadata.table_exists():
             logging.info("Table doesn't exist anymore: %s", table_reference)
             return False
 
+        if not table_metadata.is_schema_defined():
+            logging.info("Table doesn't have schema. Ignoring table: %s",
+                         table_reference)
+            return False
+
         if not table_reference.is_partition():
+            logging.info("Non-partitioned table exist: %s", table_reference)
             return True
 
         if self.__is_partition_exists(table_reference):
+            logging.info("Table partition exist: %s", table_reference)
             return True
 
         logging.info("Partition doesn't exist anymore: %s", table_reference)
