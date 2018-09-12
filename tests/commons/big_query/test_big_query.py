@@ -1,6 +1,5 @@
 import unittest
 
-from apiclient.errors import HttpError
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
@@ -233,7 +232,7 @@ class TestBigQuery(unittest.TestCase):
             ({'status': '200'},
              content('tests/json_samples/bigquery_v2_test_schema.json')),
             ({'status': '503'},
-             content('tests/json_samples/bigquery_table_list_503_error.json')),
+             content('tests/json_samples/bigquery_503_error.json')),
             ({'status': '200'},
              content('tests/json_samples/bigquery_table_list_page_1.json')),
             ({'status': '200'},
