@@ -1,0 +1,10 @@
+{
+  "kind": "bigquery#getQueryResultsResponse",
+  "etag": "7VSjCR5BwV54v+5+bmZCzQ==",
+  "jobReference": {
+    "projectId": "a-gcp-project-name",
+    "jobId": "job_6h2TY5uZbZao5rKXkRRGgUvEgApI",
+    "location": "EU"
+  },
+  "jobComplete": false
+}

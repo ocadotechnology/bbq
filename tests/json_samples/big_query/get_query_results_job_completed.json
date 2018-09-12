@@ -1,0 +1,49 @@
+{
+  "kind": "bigquery#getQueryResultsResponse",
+  "etag": "wMuFW2dF3iB9tEUKtgpe7A==",
+  "schema": {
+    "fields": [
+      {
+        "name": "projectId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "datasetId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  "jobReference": {
+    "projectId": "a-gcp-project-name",
+    "jobId": "job_6h2TY5uZbZao5rKXkRRGgUvEgApI",
+    "location": "EU"
+  },
+  "totalRows": "28",
+  "rows": [
+    {
+      "f": [
+        {
+          "v": "a-gcp-project2"
+        },
+        {
+          "v": "test1"
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "a-gcp-project3"
+        },
+        {
+          "v": "smoke_test_US"
+        }
+      ]
+    }
+  ],
+  "totalBytesProcessed": "5294435269",
+  "jobComplete": true,
+  "cacheHit": false
+}
