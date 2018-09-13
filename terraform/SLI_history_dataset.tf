@@ -15,7 +15,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency" {
     type = "DAY"
   }
 
-  schema= "${file("SLI_backup_creation_latency_filtered_table_schema®.json")}"
+  schema= "${file("SLI_backup_creation_latency_filtered_table_schema.json")}"
 
   depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
 }
@@ -26,7 +26,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
   table_id = "SLI_backup_creation_latency_view"
 
   view {
-    query = "SELECT * FROM [${var.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]"
+    query = "SELECT * FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]"
     use_legacy_sql = true
   }
 

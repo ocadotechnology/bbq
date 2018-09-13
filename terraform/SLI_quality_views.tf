@@ -1,16 +1,25 @@
-resource "google_bigquery_table" "tables_modified_more_than_3_days_ago" {
+resource "google_bigquery_table" "tables_not_modified_since_3_days" {
   project = "${local.SLI_views_destination_project}"
   dataset_id = "${var.SLI_backup_quality_views_dataset}"
-  table_id = "tables_modified_more_than_3_days_ago"
+  table_id = "tables_not_modified_since_3_days"
 
   view {
     query = <<EOF
             #legacySQL
             SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows FROM (
-              SELECT projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows
-              FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.table_metadata_v1_0]
-              WHERE DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
-              ), (
+              SELECT * FROM (
+                SELECT
+                  projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows,
+                  ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
+                FROM [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
+                WHERE
+                  _PARTITIONTIME BETWEEN TIMESTAMP(UTC_USEC_TO_DAY(NOW() - 3 * 24 * 60 * 60 * 1000000)) AND TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
+                  AND timePartitioning.type IS NULL AND type='TABLE'
+              )
+              WHERE
+                rownum=1 AND
+                DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
+            ), (
               SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.partition_metadata_v1_0]
               WHERE DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
@@ -30,11 +39,14 @@ resource "google_bigquery_table" "last_backup_in_census" {
   view {
     query = <<EOF
             #legacySQL
+              -- Return last available backup in GCP Census for every table entity from Datastore
             SELECT
               last_backup.source_project_id AS source_project_id,
               last_backup.source_dataset_id AS source_dataset_id,
               last_backup.source_table_id AS source_table_id,
               last_backup.source_partition_id AS source_partition_id,
+              last_backup.backup_last_modified AS backup_entity_last_modified_time,
+              last_backup.backup_num_bytes AS backup_entity_num_bytes,
               census.datasetId AS backup_dataset_id,
               census.tableId AS backup_table_id,
               census.lastModifiedTime as backup_last_modified,
@@ -46,10 +58,9 @@ resource "google_bigquery_table" "last_backup_in_census" {
             LEFT OUTER JOIN (
               SELECT datasetId, tableId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.table_metadata_v1_0]
-              WHERE projectId = "${var.bbq_project}" AND DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3
+              WHERE projectId = "${var.bbq_project}"
             ) AS census
             ON census.datasetId=last_backup.backup_dataset_id AND census.tableId=last_backup.backup_table_id
-            WHERE DATEDIFF(CURRENT_TIMESTAMP(), last_backup.backup_last_modified) >= 3
         EOF
     use_legacy_sql = true
   }
@@ -65,6 +76,7 @@ resource "google_bigquery_table" "SLI_quality" {
   view {
     query = <<EOF
             #legacySQL
+            -- Shows all tables which last backup differs in numRows or numBytes
             SELECT
               source_table.projectId AS source_project_id,
               source_table.datasetId AS source_dataset_id,
@@ -74,25 +86,28 @@ resource "google_bigquery_table" "SLI_quality" {
               last_backup_in_census.backup_table_id AS backup_table_id,
               source_table.lastModifiedTime AS source_last_modified,
               last_backup_in_census.backup_last_modified AS backup_last_modified,
+              last_backup_in_census.backup_entity_last_modified_time AS backup_entity_last_modified,
               source_table.numBytes AS source_num_bytes,
               last_backup_in_census.backup_num_bytes AS backup_num_bytes,
+              last_backup_in_census.backup_entity_num_bytes AS backup_entity_num_bytes,
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
-              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_modified_more_than_3_days_ago]
+              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_not_modified_since_3_days]
             AS source_table
             LEFT JOIN (
               SELECT
                 source_project_id, source_dataset_id, source_table_id, source_partition_id,
-                backup_dataset_id, backup_table_id, backup_last_modified, backup_num_bytes, backup_num_rows
+                backup_dataset_id, backup_table_id,
+                backup_last_modified, backup_entity_last_modified_time,
+                backup_num_bytes, backup_entity_num_bytes, backup_num_rows
               FROM [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census]
             ) AS last_backup_in_census
             ON source_table.projectId=last_backup_in_census.source_project_id AND
                source_table.datasetId=last_backup_in_census.source_dataset_id AND
-               source_table.tableId=last_backup_in_census.source_table_id AND
-               source_table.partitionId=last_backup_in_census.source_partition_id
-            WHERE (source_table.numBytes-last_backup_in_census.backup_num_bytes) != 0
-               OR (source_table.numRows-last_backup_in_census.backup_num_rows) != 0
+               source_table.tableId=last_backup_in_census.source_table_id
+            WHERE IFNULL(source_table.partitionId, 'null') = IFNULL(last_backup_in_census.source_partition_id, 'null')
+              AND (source_table.numBytes != last_backup_in_census.backup_num_bytes OR source_table.numRows != last_backup_in_census.backup_num_rows)
         EOF
     use_legacy_sql = true
   }
