@@ -6,7 +6,6 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
   view {
     query = <<EOF
             #legacySQL
-              -- Shows all tables modified more than 3 days ago
             SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows FROM (
               SELECT * FROM (
                 SELECT
@@ -16,7 +15,7 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
                 WHERE
                   _PARTITIONTIME BETWEEN TIMESTAMP(UTC_USEC_TO_DAY(NOW() - 3 * 24 * 60 * 60 * 1000000)) AND TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
                   AND timePartitioning.type IS NULL AND type='TABLE'
-              ),
+              )
               WHERE
                 rownum=1 AND
                 DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
