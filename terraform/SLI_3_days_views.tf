@@ -71,7 +71,7 @@ resource "google_bigquery_table" "SLI_3_days_view" {
             census.datasetId=last_backups.source_dataset_id AND
             census.tableId=last_backups.source_table_id
           WHERE
-            IFNULL(census.partitionId, 'null')=IFNULL(last_backups.source_partition_id, 'null')
+            (census.partitionId=last_backups.source_partition_id OR last_backups.source_partition_id IS NULL)
             AND projectId != "${var.bbq_project}"
             AND partitionId != "__UNPARTITIONED__"
             AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -3 , "DAY"))
