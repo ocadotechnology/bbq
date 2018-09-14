@@ -27,9 +27,6 @@ class XDaysSLIService(object):
                      len(all_tables), len(filtered_tables))
         self.streamer.stream(filtered_tables)
 
-    # def __should_stay_as_SLI_violation(self, table):
-    #     return self.filter.exists(self.__create_table_reference(table))
-
     def __should_stay_as_SLI_violation(self, table):
         try:
             exist = self.filter.exists(self.__create_table_reference(table))
