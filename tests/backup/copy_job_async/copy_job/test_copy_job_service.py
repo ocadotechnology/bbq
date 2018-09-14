@@ -164,11 +164,11 @@ class TestCopyJobService(unittest.TestCase):
     @patch.object(TaskCreator, 'create_copy_job_result_check')
     @patch.object(CopyJobService, '_create_random_job_id',
                   return_value="random_job_123")
-    @patch('time.sleep', side_effect=lambda _: None)
     @patch.object(BigQuery, 'insert_job',
                   side_effect=[HttpError(Mock(status=503), "internal error"),
                                HttpError(Mock(status=409), "job exists")])
-    def test_should_handle_job_already_exist_error(self, _, _1,
+    @patch('time.sleep', side_effect=lambda _: None)
+    def test_should_handle_job_already_exist_error(self, _, insert_job,
                                                    _create_random_job_id,
                                                    create_copy_job_result_check):
         # given
@@ -188,6 +188,7 @@ class TestCopyJobService(unittest.TestCase):
         )
 
         # then
+        self.assertEqual(insert_job.call_count, 2)
         create_copy_job_result_check.assert_called_once_with(
             ResultCheckRequest(
                 task_name_suffix='task_name_suffix',
