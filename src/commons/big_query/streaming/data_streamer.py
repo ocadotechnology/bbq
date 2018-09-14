@@ -1,11 +1,10 @@
 import datetime
 import json
 import logging
-import uuid
 
-from apiclient.errors import Error
-import httplib2
 import googleapiclient.discovery
+import httplib2
+from apiclient.errors import Error
 from oauth2client.client import GoogleCredentials
 
 from src.commons.big_query.big_query_table import BigQueryTable
@@ -28,16 +27,13 @@ class DataStreamer(object):
             http=self._create_http()
         )
 
-    def stream_stats(self, rows, insert_id=None):
-        insert_id = insert_id or uuid.uuid4()
+    def stream_stats(self, rows):
         insert_all_data = {
             'rows': [{
-                'json': data,
-                'insertId': str(insert_id)
+                'json': data
             } for data in rows]
         }
-        logging.info("Streaming data to table %s (insertId:%s)",
-                     self.big_query_table, insert_id)
+        logging.info("Streaming data to table %s", self.big_query_table)
         insert_all_response = self._stream_metadata(insert_all_data)
         if 'insertErrors' in insert_all_response:
             logging.debug("Sent json: \n%s", json.dumps(insert_all_data))
