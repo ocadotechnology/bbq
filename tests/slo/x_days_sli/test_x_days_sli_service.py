@@ -10,6 +10,14 @@ from src.slo.x_days_sli.x_days_sli_service import XDaysSLIService
 
 class TestXDaysSLIService(unittest.TestCase):
 
+    def setUp(self):
+        patch('googleapiclient.discovery.build').start()
+        patch('oauth2client.client.GoogleCredentials.get_application_default') \
+            .start()
+
+    def tearDown(self):
+        patch.stopall()
+
     @patch.object(SLIViewQuerier, 'query', return_value=[
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
