@@ -193,7 +193,7 @@ class BigQuery(object):  # pylint: disable=R0904
 
         except HttpError as ex:
             if ex.resp.status == 404:
-                logging.warning(
+                logging.info(
                     "Table '%s' Not Found",
                     TableReference(project_id, dataset_id, table_id)
                 )
