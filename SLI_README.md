@@ -13,9 +13,10 @@ To measure SLI, please follow all the steps below:
 1. Install [GCP Census](https://github.com/ocadotechnology/gcp-census) application that periodical collects metadata about BigQuery tables. 
 1. Configure [Cloud Datastore export](./SETUP.md#cloud-datastore-export), 
 which periodically exports backup metadata and stores it in BigQuery,
-1. Export BBQ and GCP Census project ids: 
+1. Export BBQ, BBQ restoration project and GCP Census project ids: 
       ```bash
       export TF_VAR_bbq_project=${BBQ_PROJECT_ID}
+      export TF_VAR_bbq_restoration_project=${BBQ_RESTORATION_PROJECT_ID}
       export TF_VAR_gcp_census_project=${GCP_CENSUS_PROJECT_ID}
       ```
 1. Create all views/tables using [Terraform](https://www.terraform.io/) by running the following commands:
