@@ -11,10 +11,15 @@ from src.slo.x_days_sli.x_days_sli_service import XDaysSLIService
 class TestXDaysSLIService(unittest.TestCase):
 
     @patch.object(SLIViewQuerier, 'query', return_value=[
-        {"projectId":"p1", "datasetId":"d1", "tableId":"t1", "partitionId":"part1"}
+        {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
+         "partitionId": "part1"}
     ])
-    @patch.object(SLITableExistsFilter, 'exists', side_effect=Exception("An error"))
+    @patch.object(SLITableExistsFilter, 'exists',
+                  side_effect=Exception("An error"))
     @patch.object(SLIResultsStreamer, 'stream')
-    def test_table_that_caused_exception_should_not_be_filtered_out(self, stream, _, query):
+    def test_table_that_caused_exception_should_not_be_filtered_out(self,
+                                                                    stream,
+                                                                    _, _1):
         XDaysSLIService(3).recalculate_sli()
-        stream.assert_called_with([{"projectId":"p1", "datasetId":"d1", "tableId":"t1", "partitionId":"part1"}])
+        stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
+                                    "tableId": "t1", "partitionId": "part1"}])
