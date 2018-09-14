@@ -25,7 +25,8 @@ class SLITableExistsFilter(object):
                          table_reference)
             return False
 
-        if not table_reference.is_partition():
+        if not table_reference.is_partition() or \
+           not table_metadata.has_time_partitioning():
             logging.info("Non-partitioned table exist: %s", table_reference)
             return True
 

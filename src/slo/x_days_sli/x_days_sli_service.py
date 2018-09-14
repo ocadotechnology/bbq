@@ -21,19 +21,19 @@ class XDaysSLIService(object):
 
         all_tables = self.querier.query(self.x_days)
         filtered_tables = [table for table in all_tables
-                           if self.__should_stay_as_SLI_violation(table)]
+                           if self.__should_stay_as_sli_violation(table)]
 
         logging.info("%s days SLI tables filtered from %s to %s", self.x_days,
                      len(all_tables), len(filtered_tables))
         self.streamer.stream(filtered_tables)
 
-    def __should_stay_as_SLI_violation(self, table):
+    def __should_stay_as_sli_violation(self, table):
         try:
-            exist = self.filter.exists(self.__create_table_reference(table))
-        except:
-            logging.error("An error occured while filtering table %s", table)
+            return self.filter.exists(self.__create_table_reference(table))
+        except Exception:
+            logging.exception("An error occurred while filtering table %s, "
+                              "still it will be streamed", table)
             return True
-        return exist
 
     @staticmethod
     def __create_table_reference(table):
