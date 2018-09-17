@@ -7,6 +7,12 @@ This metric is measuring number of tables which are not backed up since X days f
 
 Metric is implemented as a BigQuery query, which uses data about modifications of tables (collected by Census) and data about existing backups. 
 
+### Number of tables not modified since 3 days and which have no equal backup
+
+This metric is measuring number of tables that were not modified since 3 days and which last available backup does not contain the same data as source.
+
+Metric is implemented as a BigQuery query, which list all tables where last modification was over 3 days ago and joins them with last available backup using [Cloud Datastore export](./SETUP.md#cloud-datastore-export) and then compare the number of bytes and rows between source table and its backup (collected by Census). 
+
 ## SLI setup
 
 To measure SLI, please follow all the steps below:
@@ -19,9 +25,11 @@ which periodically exports backup metadata and stores it in BigQuery,
       export TF_VAR_bbq_restoration_project=${BBQ_RESTORATION_PROJECT_ID}
       export TF_VAR_gcp_census_project=${GCP_CENSUS_PROJECT_ID}
       ```
-1. Create all views/tables using [Terraform](https://www.terraform.io/) by running the following commands:
+1. Create a bucket to store remotely infrastructure state and then create all views/tables using [Terraform](https://www.terraform.io/) by running the following commands:
       ```bash
-      terraform init
+      export TERRAFORM_STATE_BUCKET_ID="<your-bucket-id-to-store-terraform-state>"
+      gsutil mb -p ${BBQ_PROJECT_ID} gs://${TERRAFORM_STATE_BUCKET_ID}/
+      terraform init -backend-config="bucket=${TERRAFORM_STATE_BUCKET_ID}"
       terraform apply
       ```
 1. Deploy SLO service (it's a separate [GAE service](https://cloud.google.com/appengine/docs/standard/python/an-overview-of-app-engine#services)):
@@ -44,4 +52,4 @@ which periodically exports backup metadata and stores it in BigQuery,
 
 ## SLI results
 
-All delayed backups will be streamed to ``SLI_history.SLI_backup_creation_latency`` table.
+All delayed backups will be streamed to ``SLI_history.SLI_backup_creation_latency`` table and ``SLI_backup_quality_views.SLI_quality`` view.
