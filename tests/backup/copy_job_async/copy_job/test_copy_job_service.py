@@ -168,9 +168,9 @@ class TestCopyJobService(unittest.TestCase):
                   side_effect=[HttpError(Mock(status=503), "internal error"),
                                HttpError(Mock(status=409), "job exists")])
     @patch('time.sleep', side_effect=lambda _: None)
-    def test_should_handle_job_already_exist_error(self, _, insert_job,
-                                                   _create_random_job_id,
-                                                   create_copy_job_result_check):
+    def test_bug_regression_job_already_exists_after_internal_error(self, _, insert_job,
+                                                                    _create_random_job_id,
+                                                                    create_copy_job_result_check):
         # given
         post_copy_action_request = \
             PostCopyActionRequest(url="/my/url", data={"key1": "value1"})
