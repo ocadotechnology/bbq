@@ -48,7 +48,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_by_count_view" {
   table_id = "SLI_backup_creation_latency_by_count_view"
 
   view {
-    query = "SELECT xDays, count(*) as count FROM [${var.SLI_history_dataset}.SLI_backup_creation_latency_view] GROUP BY xDays"
+    query = "SELECT INTEGER(xDays) as xDays, count(*) as count FROM [${var.SLI_history_dataset}.SLI_backup_creation_latency_view] GROUP BY xDays"
     use_legacy_sql = true
   }
 
