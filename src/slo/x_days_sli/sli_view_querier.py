@@ -31,10 +31,10 @@ class SLIViewQuerier(object):
             "datasetId": result['f'][1]['v'],
             "tableId": result['f'][2]['v'],
             "partitionId": result['f'][3]['v'],
-            "creationTime": float(result['f'][4]['v']) / 1000.0,
-            "lastModifiedTime": float(result['f'][5]['v']) / 1000.0,
-            "backupCreated": float(result['f'][6]['v']) / 1000.0,
-            "backupLastModified": float(result['f'][7]['v']) / 1000.0,
+            "creationTime": float(result['f'][4]['v']),
+            "lastModifiedTime": float(result['f'][5]['v']),
+            "backupCreated": float(result['f'][6]['v']),
+            "backupLastModified": float(result['f'][7]['v']),
             "xDays": x_days
             } for result in results
         ]
