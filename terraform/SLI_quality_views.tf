@@ -9,7 +9,7 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
             SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows FROM (
               SELECT * FROM (
                 SELECT
-                  projectId, datasetId, tableId, 'null' AS partitionId, lastModifiedTime, numBytes, numRows,
+                  projectId, datasetId, tableId, 'None' AS partitionId, lastModifiedTime, numBytes, numRows,
                   ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
                 FROM [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
                 WHERE
@@ -76,7 +76,7 @@ resource "google_bigquery_table" "SLI_quality" {
   view {
     query = <<EOF
             #legacySQL
-            -- Shows all tables which last backup differs in numRows or numBytes
+              -- Shows all tables which last backup differs in numRows or numBytes
             SELECT
               source_table.projectId AS source_project_id,
               source_table.datasetId AS source_dataset_id,
@@ -93,21 +93,30 @@ resource "google_bigquery_table" "SLI_quality" {
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
-              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_not_modified_since_3_days]
-            AS source_table
+              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_not_modified_since_3_days] AS source_table
             LEFT JOIN (
               SELECT
-                source_project_id, source_dataset_id, source_table_id, source_partition_id,
-                backup_dataset_id, backup_table_id,
-                backup_last_modified, backup_entity_last_modified_time,
-                backup_num_bytes, backup_entity_num_bytes, backup_num_rows
-              FROM [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census]
-            ) AS last_backup_in_census
-            ON source_table.projectId=last_backup_in_census.source_project_id AND
-               source_table.datasetId=last_backup_in_census.source_dataset_id AND
-               source_table.tableId=last_backup_in_census.source_table_id
-            WHERE IFNULL(source_table.partitionId, 'null') = IFNULL(last_backup_in_census.source_partition_id, 'null')
-              AND (source_table.numBytes != last_backup_in_census.backup_num_bytes OR source_table.numRows != last_backup_in_census.backup_num_rows)
+                source_project_id,
+                source_dataset_id,
+                source_table_id,
+                source_partition_id,
+                backup_dataset_id,
+                backup_table_id,
+                backup_last_modified,
+                backup_entity_last_modified_time,
+                backup_num_bytes,
+                backup_entity_num_bytes,
+                backup_num_rows
+              FROM
+                [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census] ) AS last_backup_in_census
+            ON
+              source_table.projectId=last_backup_in_census.source_project_id
+              AND source_table.datasetId=last_backup_in_census.source_dataset_id
+              AND source_table.tableId=last_backup_in_census.source_table_id
+              AND source_table.partitionId=last_backup_in_census.source_partition_id
+            WHERE
+              (source_table.numBytes != last_backup_in_census.backup_num_bytes
+                OR source_table.numRows != last_backup_in_census.backup_num_rows)
         EOF
     use_legacy_sql = true
   }
