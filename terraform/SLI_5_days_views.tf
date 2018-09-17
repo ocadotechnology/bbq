@@ -11,7 +11,7 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
               SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime
               FROM (
                 SELECT
-                  projectId, datasetId, tableId, creationTime, lastModifiedTime, 'null' AS partitionId,
+                  projectId, datasetId, tableId, creationTime, lastModifiedTime, 'None' AS partitionId,
                   ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
                 FROM
                   [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
