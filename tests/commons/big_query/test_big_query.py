@@ -2,6 +2,7 @@ import unittest
 
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
+from apiclient.errors import HttpError
 from mock import patch
 
 from src.commons.big_query.big_query import BigQuery, RandomizationError
@@ -49,6 +50,28 @@ class TestBigQuery(unittest.TestCase):
 
         # then
         self.assertEqual(self.count(tables_ids), 5)
+
+    def test_insert_job_forwarding_409_error(self):
+        # given
+        self._create_http.return_value = self.__create_409_response()
+
+        # when
+        with self.assertRaises(HttpError) as context:
+            BigQuery().insert_job('project_id', {})
+
+        # then
+        self.assertEqual(context.exception.resp.status, 409)
+
+    def test_insert_job_forwarding_503_error(self):
+        # given
+        self._create_http.return_value = self.__create_503_response()
+
+        # when
+        with self.assertRaises(HttpError) as context:
+            BigQuery().insert_job('project_id', {})
+
+        # then
+        self.assertEqual(context.exception.resp.status, 503)
 
     class TestClass(object):
         def func_for_test(self, project_id, dataset_id, table_id):
@@ -171,6 +194,24 @@ class TestBigQuery(unittest.TestCase):
             ({'status': '400'},
              content(
                  'tests/json_samples/table_get/bigquery_view_get_400_read_partition.json'))
+        ])
+
+    @staticmethod
+    def __create_409_response():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '409'},
+             content('tests/json_samples/bigquery_409_error.json'))
+        ])
+
+    @staticmethod
+    def __create_503_response():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '503'},
+             content('tests/json_samples/bigquery_503_error.json'))
         ])
 
     @staticmethod
