@@ -71,7 +71,7 @@ resource "google_bigquery_table" "SLI_7_days_view" {
               census.datasetId=last_backups.source_dataset_id AND
               census.tableId=last_backups.source_table_id
             WHERE
-              IFNULL(census.partitionId, 'null')=IFNULL(last_backups.source_partition_id, 'null')
+              (last_backups.source_partition_id IS NULL OR last_backups.source_partition_id=census.partitionId)
               AND projectId != "${var.bbq_project}"
               AND projectId != "${var.bbq_restoration_project}"
               AND partitionId != "__UNPARTITIONED__"
