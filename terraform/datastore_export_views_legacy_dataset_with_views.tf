@@ -13,11 +13,16 @@ resource "google_bigquery_table" "last_table_view" {
 
   view {
     query = <<EOF
-          SELECT project_id, dataset_id, table_id, partition_id, last_checked, __key__.id AS id
-          FROM TABLE_QUERY(
-            [${local.datastore_export_project}:${var.datastore_export_dataset}],
-            'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")'
-          )
+        SELECT
+          project_id,
+          dataset_id,
+          table_id,
+          IFNULL(partition_id,'null') as partition_id,
+          last_checked,
+          __key__.id AS id
+        FROM
+          TABLE_QUERY( [${local.datastore_export_project}:${var.datastore_export_dataset}],
+            'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")' )
         EOF
     use_legacy_sql = true
   }
