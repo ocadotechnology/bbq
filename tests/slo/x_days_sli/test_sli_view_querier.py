@@ -45,10 +45,10 @@ class TestSLIViewQuerier(unittest.TestCase):
                 'datasetId': 'dataset1',
                 'tableId': 'UNKNOWN_EVENT_v1',
                 'partitionId': '20180726',
-                'lastModifiedTime': 1533016.802,
-                'creationTime': 1524727.8854619998,
-                'backupCreated': 1532668.961889,
-                'backupLastModified': 1532624.67938,
+                'lastModifiedTime': 1533016802,
+                'creationTime': 1524727885.4619998,
+                'backupCreated': 1532668961.889,
+                'backupLastModified': 1532624679.38,
                 'xDays': '3'},
             {
                 'snapshotTime': 1535624154.94896,
@@ -56,10 +56,10 @@ class TestSLIViewQuerier(unittest.TestCase):
                 'datasetId': 'dataset2',
                 'tableId': 'UNKNOWN_EVENT_v1',
                 'partitionId': '20180726',
-                'creationTime': 1524725.829453,
-                'lastModifiedTime': 1533016.8127980002,
-                'backupCreated': 1532675.823532,
-                'backupLastModified': 1532641.088365,
+                'creationTime': 1524725829.453,
+                'lastModifiedTime': 1533016812.7980002,
+                'backupCreated': 1532675823.532,
+                'backupLastModified': 1532641088.365,
                 'xDays': '3'
             }
         ]
