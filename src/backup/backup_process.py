@@ -1,14 +1,11 @@
 import datetime
-import logging
-
 from google.appengine.api import memcache
 
-from src.commons.config.configuration import configuration
+from src.backup.backup_creator import BackupCreator
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
 from src.backup.should_backup_predicate import ShouldBackupPredicate
-from src.backup.backup_creator import BackupCreator
-from src.commons.table_reference import TableReference
+from src.commons.config.configuration import configuration
 
 
 class BackupProcess(object):
@@ -62,23 +59,13 @@ class BackupProcess(object):
             memcache.add(target_dataset_name, 'exist')
 
     def __update_last_check(self, table_entity):
-        logging.info("Updating last_check in entity entity for %s",
-                     TableReference(self.project_id, self.dataset_id,
-                                    self.table_id, self.partition_id))
-        table_entity.last_checked = self.now
-        table_entity.put()
+        table_entity.update_last_check(self.now)
 
     def __create_table_entity(self):
-        logging.info(
-            "Creating table entity for %s",
-            TableReference(self.project_id, self.dataset_id,
-                           self.table_id, self.partition_id))
-        table_entity = Table(
+        return Table.create(
             project_id=self.project_id,
             dataset_id=self.dataset_id,
             table_id=self.table_id,
             partition_id=self.partition_id,
             last_checked=self.now
         )
-        table_entity.put()
-        return table_entity

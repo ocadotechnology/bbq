@@ -3,8 +3,8 @@ import logging
 from datetime import timedelta, date
 from google.appengine.ext import ndb
 
-from src.commons.decorators.retry import retry
 from src.backup.datastore.Backup import Backup
+from src.commons.decorators.retry import retry
 from src.commons.table_reference import TableReference
 
 
@@ -16,10 +16,34 @@ class Table(ndb.Model):
     partition_id = ndb.StringProperty(indexed=True)
 
     @classmethod
+    @retry(Exception, tries=5, delay=1, backoff=2)
+    def create(cls, project_id, dataset_id, table_id,
+               partition_id, last_checked):
+
+        table_reference = TableReference(project_id, dataset_id,
+                                         table_id, partition_id)
+        logging.info("Creating table entity for %s", table_reference)
+        table_entity = Table(
+            project_id=project_id,
+            dataset_id=dataset_id,
+            table_id=table_id,
+            partition_id=partition_id,
+            last_checked=last_checked
+        )
+        table_entity.put()
+
+    @retry(Exception, tries=5, delay=1, backoff=2)
+    def update_last_check(self, last_checked):
+        table_reference = TableReference(self.project_id, self.dataset_id,
+                                         self.table_id, self.partition_id)
+        logging.info("Updating last_check in entity entity for %s",
+                     table_reference)
+        self.last_checked = last_checked
+        self.put()
+
+    @classmethod
     def get_table_from_backup(cls, backup):
-        parent = backup.key.parent()
-        get = parent.get()
-        return get
+        return backup.key.parent().get()
 
     @classmethod
     def get_table_by_reference(cls, table_reference):
@@ -107,8 +131,8 @@ class Table(ndb.Model):
 
     @classmethod
     def __create_oldest_partition_id_in_range(cls, no_days_back):
-        return (date.today() - timedelta(days=no_days_back-1)) \
-            .strftime("%Y%m%d")
+        oldest_partition_date = date.today() - timedelta(days=no_days_back - 1)
+        return oldest_partition_date.strftime("%Y%m%d")
 
 
 # @refactor move it to common/util file instead of Table.py file. find good name
@@ -120,7 +144,6 @@ def query_using_cursor(query, page_size):
         yield result
     while more and cursor:
         ctx.clear_cache()
-        results, cursor, more = query.fetch_page(page_size,
-                                                 start_cursor=cursor)
+        results, cursor, more = query.fetch_page(page_size, start_cursor=cursor)
         for result in results:
             yield result
