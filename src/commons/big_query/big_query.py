@@ -124,6 +124,7 @@ class BigQuery(object):  # pylint: disable=R0904
         return results
 
     @log_time
+    @retry(Error, tries=5, delay=1, backoff=2)
     def list_table_partitions(self, project_id, dataset_id, table_id):
         results = self.execute_query(
             self.create_partition_query(project_id, dataset_id, table_id))
