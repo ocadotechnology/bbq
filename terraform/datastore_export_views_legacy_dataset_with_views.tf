@@ -17,7 +17,7 @@ resource "google_bigquery_table" "last_table_view" {
           project_id,
           dataset_id,
           table_id,
-          IFNULL(partition_id,'null') as partition_id,
+          IFNULL(partition_id,'None') as partition_id,
           last_checked,
           __key__.id AS id
         FROM
