@@ -1,6 +1,7 @@
 import logging
 
 from datetime import timedelta, date
+from google.appengine.api.urlfetch_errors import DeadlineExceededError
 from google.appengine.ext import ndb
 
 from src.backup.datastore.Backup import Backup
@@ -16,7 +17,7 @@ class Table(ndb.Model):
     partition_id = ndb.StringProperty(indexed=True)
 
     @classmethod
-    @retry(Exception, tries=5, delay=1, backoff=2)
+    @retry(DeadlineExceededError, tries=5, delay=1, backoff=2)
     def create(cls, project_id, dataset_id, table_id,
                partition_id, last_checked):
 
@@ -32,7 +33,7 @@ class Table(ndb.Model):
         )
         table_entity.put()
 
-    @retry(Exception, tries=5, delay=1, backoff=2)
+    @retry(DeadlineExceededError, tries=5, delay=1, backoff=2)
     def update_last_check(self, last_checked):
         table_reference = TableReference(self.project_id, self.dataset_id,
                                          self.table_id, self.partition_id)

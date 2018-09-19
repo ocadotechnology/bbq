@@ -4,15 +4,16 @@ import logging
 import googleapiclient.discovery
 import httplib2
 from apiclient.errors import HttpError, Error
+from google.appengine.api.urlfetch_errors import DeadlineExceededError
 from oauth2client.client import GoogleCredentials
 
+from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.config.configuration import configuration
 from src.commons.decorators.cached import cached
 from src.commons.decorators.google_http_error_retry import \
     google_http_error_retry
 from src.commons.decorators.log_time import log_time, measure_time_and_log
 from src.commons.decorators.retry import retry
-from src.commons.big_query.big_query_table import BigQueryTable
-from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
@@ -124,7 +125,7 @@ class BigQuery(object):  # pylint: disable=R0904
         return results
 
     @log_time
-    @retry(Error, tries=5, delay=1, backoff=2)
+    @retry(DeadlineExceededError, tries=5, delay=1, backoff=2)
     def list_table_partitions(self, project_id, dataset_id, table_id):
         results = self.execute_query(
             self.create_partition_query(project_id, dataset_id, table_id))
