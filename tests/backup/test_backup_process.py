@@ -50,7 +50,7 @@ class TestBackupProcess(unittest.TestCase):
 
         # when
         BackupProcess(table_reference, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
         table_in_datastore = Table.get_table("test-project", "test-dataset",
                                              "test-table")
 
@@ -71,7 +71,7 @@ class TestBackupProcess(unittest.TestCase):
 
         # when
         BackupProcess(table_reference, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
 
         ancestor_of_partition = Table.get_table("test-project", "test-dataset",
                                                 "test-table")
@@ -94,7 +94,7 @@ class TestBackupProcess(unittest.TestCase):
 
         # when
         BackupProcess(table_reference, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
 
         table_entity = Table.get_table("test-project", "test-dataset",
                                        "test-table")
@@ -121,7 +121,7 @@ class TestBackupProcess(unittest.TestCase):
         table.put()
 
         BackupProcess(table_reference, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
 
         table_entity = Table.get_table("test-project", "test-dataset",
                                        "test-table")
@@ -149,7 +149,7 @@ class TestBackupProcess(unittest.TestCase):
         table.put()
 
         BackupProcess(table_reference, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
 
         table_entity = Table.get_table("test-project", "test-dataset",
                                        "test-table")
@@ -158,6 +158,35 @@ class TestBackupProcess(unittest.TestCase):
         self.assertEqual(table_entity.last_checked,
                          datetime.datetime(2017, 04, 4))
         copy_table.assert_not_called()
+
+    @patch.object(ShouldBackupPredicate, 'test', return_value=False)
+    @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
+    @patch.object(BackupCreator, 'create_backup')
+    def test_that_table_will_be_backed_up_if_forced_manually_even_if_predicate_says_that_should_not_be_backed_up( # nopep8 pylint: disable=C0301
+        self, copy_table, _1, _2):
+      # given
+      table = Table(project_id="test-project",
+                    dataset_id="test-dataset",
+                    table_id="test-table",
+                    last_checked=datetime.datetime(2017, 3, 3))
+
+      table_reference = TableReference(project_id="test-project",
+                                       dataset_id="test-dataset",
+                                       table_id="test-table")
+
+      # when
+      table.put()
+
+      BackupProcess(table_reference, self.big_query,
+                    self.big_query_table_metadata, is_on_demand_backup=True).start()
+
+      table_entity = Table.get_table("test-project", "test-dataset",
+                                     "test-table")
+
+      # then
+      self.assertEqual(table_entity.last_checked,
+                       datetime.datetime(2017, 04, 4))
+      copy_table.assert_called()
 
     @patch.object(ShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
@@ -177,9 +206,9 @@ class TestBackupProcess(unittest.TestCase):
         self.big_query.create_dataset = MagicMock()
 
         BackupProcess(table_reference_1, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
         BackupProcess(table_reference_2, self.big_query,
-                      self.big_query_table_metadata).start()
+                      self.big_query_table_metadata, False).start()
 
         # then
         self.big_query.create_dataset.assert_called_once()

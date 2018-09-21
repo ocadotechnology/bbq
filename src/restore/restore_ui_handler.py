@@ -30,10 +30,16 @@ class RestoreTableUIHandler(BaseHandler):
                              configuration.restoration_project_id)
 
 
+class OnDemandTableBackupUIHandler(BaseHandler):
+    def get(self):
+        self.render_response('on_demand_table_backup.html')
+
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/_ah/start', MainPage),
     ('/ui/restoreDataset', RestoreDatasetUIHandler),
     ('/ui/restoreList', RestoreListUIHandler),
-    ('/ui/restoreTable', RestoreTableUIHandler)
+    ('/ui/restoreTable', RestoreTableUIHandler),
+    ('/ui/onDemandTableBackup', OnDemandTableBackupUIHandler)
 ], debug=configuration.debug_mode)
