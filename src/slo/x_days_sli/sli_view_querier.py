@@ -1,5 +1,4 @@
 import logging
-
 import time
 
 from src.commons.config.configuration import configuration
@@ -9,8 +8,10 @@ class SLIViewQuerier(object):
 
     def __init__(self, big_query):
         self.big_query = big_query
+        self.snapshotTime = None
 
     def query(self, x_days):
+        self.snapshotTime = time.time()
         query = self.__generate_x_days_sli_query(x_days)
         logging.info("Executing query: %s", query)
         query_results = self.big_query.execute_query(query)
@@ -23,10 +24,9 @@ class SLIViewQuerier(object):
             "SELECT * FROM [{}:SLI_backup_creation_latency_views.SLI_{}_days]"\
             .format(configuration.backup_project_id, x_days)
 
-    @staticmethod
-    def __format_query_results(results, x_days):
+    def __format_query_results(self, results, x_days):
         return [{
-            "snapshotTime": time.time(),
+            "snapshotTime": self.snapshotTime,
             "projectId": result['f'][0]['v'],
             "datasetId": result['f'][1]['v'],
             "tableId": result['f'][2]['v'],
