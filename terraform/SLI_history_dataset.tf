@@ -31,10 +31,10 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
           SELECT snapshotTime, projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, backupCreated, backupLastModified, xDays
           FROM (
             SELECT snapshotTime, projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, backupCreated, backupLastModified, xDays,
-            ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId, partitionId, xDays ORDER BY snapshotTime DESC) AS rownum
+            DENSE_RANK() OVER (PARTITION BY xDays ORDER BY snapshotTime DESC ) AS newestSnapshotRank
             FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]
             WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
-          ) WHERE rownum=1
+          ) WHERE newestSnapshotRank=1
         EOF
     use_legacy_sql = true
   }
