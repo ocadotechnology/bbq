@@ -143,6 +143,17 @@ It's worth to underline that:
 * Backups for partitions are scheduled randomly within the range of time specified in [config.yaml](./config/config.yaml),
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
+### On-demand table backup
+BBQ provides option for performing on-demand backup for specified table or partition. 
+
+On-demand backups works for:
+* single non-partitioned table
+* single partition of partitioned table
+
+Note that on-demand table backup will be performed regardless of result returned from function checking if backup should be performed in normal flow.
+
+On-demand table backup is available from _\<your-project-id>_.__appspot.com__ site in 'Advanced' section. 
+
 ## How to find backup for given table?
 ### Option 1
 In order to find backup __Y__ for table __X__:

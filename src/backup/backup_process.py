@@ -3,22 +3,23 @@ import logging
 
 from google.appengine.api import memcache
 
-from src.commons.config.configuration import configuration
+from src.backup.backup_creator import BackupCreator
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
 from src.backup.should_backup_predicate import ShouldBackupPredicate
-from src.backup.backup_creator import BackupCreator
+from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
 class BackupProcess(object):
-    def __init__(self, table_reference, big_query, big_query_table_metadata):
+    def __init__(self, table_reference, big_query, big_query_table_metadata, is_on_demand_backup):
         self.project_id = table_reference.get_project_id()
         self.dataset_id = table_reference.get_dataset_id()
         self.table_id = table_reference.get_table_id()
         self.partition_id = table_reference.get_partition_id()
         self.big_query = big_query
         self.big_query_table_metadata = big_query_table_metadata
+        self.is_on_demand_backup = is_on_demand_backup
         self.now = None
 
     def start(self):
@@ -27,12 +28,18 @@ class BackupProcess(object):
         table_entity = Table.get_table(self.project_id, self.dataset_id,
                                        self.table_id, self.partition_id)
 
+        if self.is_on_demand_backup:
+            logging.info(
+                "Performing on-demand backup for %s:%s.%s$%s. It is performed regardless of result shouldBackup predicate",
+                self.project_id, self.dataset_id,
+                self.table_id, self.partition_id)
+
         if self.__backup_ever_done(table_entity):
             self.__update_last_check(table_entity)
-            if self.__should_backup(table_entity):
+            if self.__should_backup(table_entity) or self.is_on_demand_backup:
                 self.__create_backup(table_entity)
         else:
-            if self.__should_backup(table_entity):
+            if self.__should_backup(table_entity) or self.is_on_demand_backup:
                 table_entity = self.__create_table_entity()
                 self.__create_backup(table_entity)
 

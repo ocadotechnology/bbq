@@ -13,7 +13,7 @@ from src.backup import table_backup_handler
 from src.backup.table_backup import TableBackup
 
 
-class TestTableRetentionHandler(unittest.TestCase):
+class TestTableBackupHandler(unittest.TestCase):
     def setUp(self):
         patch('googleapiclient.discovery.build').start()
         app = table_backup_handler.app
@@ -27,7 +27,7 @@ class TestTableRetentionHandler(unittest.TestCase):
         patch.stopall()
 
     @patch.object(TableBackup, 'start')
-    def test_that_partition_table_happy_path(
+    def test_that_backup_endpoint_call_for_partition_is_properly_parsed(
             self, table_backup_start
     ):
         # given
@@ -45,4 +45,68 @@ class TestTableRetentionHandler(unittest.TestCase):
         self.under_test.get(url)
 
         # then
-        table_backup_start.assert_called_with(table_reference)
+        table_backup_start.assert_called_with(table_reference,
+                                              is_on_demand_backup=False)
+
+    @patch.object(TableBackup, 'start')
+    def test_on_demand_request_for_partitioned_table_is_properly_parsed(
+        self, table_backup_start
+    ):
+      # given
+      table_reference = TableReference('example-proj-name',
+                                       'example-dataset-name',
+                                       'example-table-name',
+                                       '20171201')
+      url = '/tasks/backups/table/{}/{}/{}/{}?onDemand=True' \
+        .format(table_reference.get_project_id(),
+                table_reference.get_dataset_id(),
+                table_reference.get_table_id(),
+                table_reference.get_partition_id())
+
+      # when
+      self.under_test.get(url)
+
+      # then
+      table_backup_start.assert_called_with(table_reference,
+                                            is_on_demand_backup=True)
+
+      @patch.object(TableBackup, 'start')
+      def test_that_backup_endpoint_call_for_non_partition_is_properly_parsed(
+          self, table_backup_start
+      ):
+        # given
+        table_reference = TableReference('example-proj-name',
+                                         'example-dataset-name',
+                                         'example-table-name'
+                                         )
+        url = '/tasks/backups/table/{}/{}/{}' \
+          .format(table_reference.get_project_id(),
+                  table_reference.get_dataset_id(),
+                  table_reference.get_table_id())
+
+        # when
+        self.under_test.get(url)
+
+        # then
+        table_backup_start.assert_called_with(table_reference,
+                                        is_on_demand_backup=False)
+
+        @patch.object(TableBackup, 'start')
+        def test_on_demand_request_for_non_partitioned_table_is_properly_parsed(
+            self, table_backup_start
+        ):
+          # given
+          table_reference = TableReference('example-proj-name',
+                                           'example-dataset-name',
+                                           'example-table-name')
+          url = '/tasks/backups/table/{}/{}/{}?onDemand=True' \
+            .format(table_reference.get_project_id(),
+                    table_reference.get_dataset_id(),
+                    table_reference.get_table_id())
+
+          # when
+          self.under_test.get(url)
+
+          # then
+          table_backup_start.assert_called_with(table_reference,
+                                                is_on_demand_backup=True)

@@ -18,7 +18,9 @@ class TableBackupHandler(webapp2.RequestHandler):
     def get(self, project_id, dataset_id, table_id, partition_id=None): # nopep8 pylint: disable=R0201
         table_reference = TableReference(project_id, dataset_id,
                                          table_id, partition_id)
-        TableBackup.start(table_reference)
+        is_on_demand_backup = bool(self.request.get('onDemand', False))
+
+        TableBackup.start(table_reference, is_on_demand_backup=is_on_demand_backup)
 
 
 app = webapp2.WSGIApplication([
