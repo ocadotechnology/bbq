@@ -1,9 +1,10 @@
 import logging
 
-from src.commons.table_reference import TableReference
 from src.commons.big_query.big_query import BigQuery
 from src.slo.x_days_sli.sli_table_exists_filter import SLITableExistsFilter
 from src.slo.x_days_sli.sli_results_streamer import SLIResultsStreamer
+from src.slo.x_days_sli.sli_table_recreation_filter import \
+  SLITableRecreationFilter
 from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
 
 
@@ -14,7 +15,8 @@ class XDaysSLIService(object):
         big_query = BigQuery()
         self.querier = SLIViewQuerier(big_query)
         self.streamer = SLIResultsStreamer()
-        self.filter = SLITableExistsFilter(big_query)
+        self.table_existence_filter = SLITableExistsFilter(big_query)
+        self.table_recreation_filter = SLITableRecreationFilter(big_query)
 
     def recalculate_sli(self):
         logging.info("Recalculating %s days SLI has been started.", self.x_days)
@@ -29,15 +31,10 @@ class XDaysSLIService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
-            return self.filter.exists(self.__create_table_reference(table))
+            if not self.table_existence_filter.exists(SLIViewQuerier.sli_entry_to_table_reference(table)):
+                return False
+            return not self.table_recreation_filter.is_recreated(table)
         except Exception:
             logging.exception("An error occurred while filtering table %s, "
                               "still it will be streamed", table)
             return True
-
-    @staticmethod
-    def __create_table_reference(table):
-        return TableReference(project_id=table['projectId'],
-                              dataset_id=table['datasetId'],
-                              table_id=table['tableId'],
-                              partition_id=table['partitionId'])

@@ -3,6 +3,7 @@ import logging
 import time
 
 from src.commons.config.configuration import configuration
+from src.commons.table_reference import TableReference
 
 
 class SLIViewQuerier(object):
@@ -38,3 +39,10 @@ class SLIViewQuerier(object):
             "xDays": x_days
             } for result in results
         ]
+
+    @staticmethod
+    def sli_entry_to_table_reference(table):
+        return TableReference(project_id=table['projectId'],
+                              dataset_id=table['datasetId'],
+                              table_id=table['tableId'],
+                              partition_id=table['partitionId'])
