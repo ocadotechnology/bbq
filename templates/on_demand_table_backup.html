@@ -19,7 +19,13 @@
     xhttp.setRequestHeader("request_correlation_id", Date.now())
     xhttp.timeout = 1000 * 3600;
 
-    console.log(url);
+    xhttp.onload = function () {
+      document.getElementById("response").innerHTML = 'Http response: '+ xhttp.status
+    };
+    xhttp.ontimeout = function (e) {
+      document.getElementById("response").innerHTML = "Request timeout: " + e;
+    };
+
     xhttp.send();
     return false;
   }
@@ -77,5 +83,8 @@
     </div>
   </div>
 </form>
+
+<br><strong>Response:</strong> <br>
+<pre id="response"></pre>
 
 {% endblock %}
