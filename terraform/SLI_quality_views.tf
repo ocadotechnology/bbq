@@ -65,7 +65,7 @@ resource "google_bigquery_table" "last_backup_in_census" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset", "google_bigquery_table.last_available_backup_for_every_table_entity_view"]
 }
 
 resource "google_bigquery_table" "SLI_quality" {
@@ -121,5 +121,5 @@ resource "google_bigquery_table" "SLI_quality" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
+  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset", "google_bigquery_table.last_backup_in_census"]
 }
