@@ -8,7 +8,6 @@ class SLIViewQuerier(object):
 
     def __init__(self, big_query):
         self.big_query = big_query
-        self.snapshotTime = None
 
     def query(self, x_days):
         self.snapshotTime = time.time()
@@ -25,16 +24,28 @@ class SLIViewQuerier(object):
             .format(configuration.backup_project_id, x_days)
 
     def __format_query_results(self, results, x_days):
-        return [{
-            "snapshotTime": self.snapshotTime,
-            "projectId": result['f'][0]['v'],
-            "datasetId": result['f'][1]['v'],
-            "tableId": result['f'][2]['v'],
-            "partitionId": result['f'][3]['v'],
-            "creationTime": float(result['f'][4]['v']),
-            "lastModifiedTime": float(result['f'][5]['v']),
-            "backupCreated": float(result['f'][6]['v']),
-            "backupLastModified": float(result['f'][7]['v']),
-            "xDays": x_days
-            } for result in results
-        ]
+        formatted_results = [{"snapshotTime": self.snapshotTime,
+                              "projectId": result['f'][0]['v'],
+                              "datasetId": result['f'][1]['v'],
+                              "tableId": result['f'][2]['v'],
+                              "partitionId": result['f'][3]['v'],
+                              "creationTime": float(result['f'][4]['v']),
+                              "lastModifiedTime": float(result['f'][5]['v']),
+                              "backupCreated": float(result['f'][6]['v']),
+                              "backupLastModified": float(result['f'][7]['v']),
+                              "xDays": x_days} for result in results]
+
+        formatted_results.append(self.__create_snapshot_marker_row(x_days))
+        return formatted_results
+
+    def __create_snapshot_marker_row(self, x_days):
+        return {"snapshotTime": self.snapshotTime,
+                "projectId": 'SNAPSHOT_ENTRY',
+                "datasetId": 'SNAPSHOT_ENTRY',
+                "tableId": 'SNAPSHOT_ENTRY',
+                "partitionId": 'SNAPSHOT_ENTRY',
+                "creationTime": float(0),
+                "lastModifiedTime": float(0),
+                "backupCreated": float(0),
+                "backupLastModified": float(0),
+                "xDays": x_days}
