@@ -30,16 +30,18 @@ class BackupProcess(object):
 
         if self.is_on_demand_backup:
             logging.info(
-                "Performing on-demand backup for %s:%s.%s$%s. It is performed regardless of result shouldBackup predicate",
+                "Performing on-demand backup for %s:%s.%s$%s. "
+                "It is performed regardless of result shouldBackup predicate",
                 self.project_id, self.dataset_id,
-                self.table_id, self.partition_id)
+                self.table_id, self.partition_id
+            )
 
         if self.__backup_ever_done(table_entity):
             self.__update_last_check(table_entity)
-            if self.__should_backup(table_entity) or self.is_on_demand_backup:
+            if self.__should_backup(table_entity):
                 self.__create_backup(table_entity)
         else:
-            if self.__should_backup(table_entity) or self.is_on_demand_backup:
+            if self.__should_backup(table_entity):
                 table_entity = self.__create_table_entity()
                 self.__create_backup(table_entity)
 
@@ -48,8 +50,8 @@ class BackupProcess(object):
         return table_entity is not None
 
     def __should_backup(self, table_entity):
-        return ShouldBackupPredicate(self.big_query_table_metadata)\
-            .test(table_entity)
+        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        return predicate.test(table_entity) or self.is_on_demand_backup
 
     def __create_backup(self, table_entity):
         self.__ensure_dataset_for_backups_exists()
