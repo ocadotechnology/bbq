@@ -7,7 +7,7 @@ from src.slo.x_days_sli.sli_table_recreation_filter import \
     SLITableRecreationFilter
 
 
-class TestSLITableExistsFilter(unittest.TestCase):
+class TestSLITableRecreationFilter(unittest.TestCase):
 
     @patch('src.commons.big_query.big_query.BigQuery.__init__',
            Mock(return_value=None))
