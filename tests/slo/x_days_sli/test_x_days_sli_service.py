@@ -3,9 +3,9 @@ import unittest
 from mock import patch
 
 from src.slo.x_days_sli.sli_results_streamer import SLIResultsStreamer
-from src.slo.x_days_sli.sli_table_exists_filter import SLITableExistsFilter
-from src.slo.x_days_sli.sli_table_recreation_filter import \
-    SLITableRecreationFilter
+from src.slo.x_days_sli.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.x_days_sli.sli_table_recreation_predicate import \
+    SLITableRecreationPredicate
 from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
 from src.slo.x_days_sli.x_days_sli_service import XDaysSLIService
 
@@ -24,7 +24,7 @@ class TestXDaysSLIService(unittest.TestCase):
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
     ])
-    @patch.object(SLITableExistsFilter, 'exists')
+    @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_not_exist_should_be_filtered_out(self,
         stream, exists, _):
@@ -39,8 +39,8 @@ class TestXDaysSLIService(unittest.TestCase):
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
     ])
-    @patch.object(SLITableRecreationFilter, 'is_recreated')
-    @patch.object(SLITableExistsFilter, 'exists')
+    @patch.object(SLITableRecreationPredicate, 'is_recreated')
+    @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_exist_and_is_recreated_should_be_filtered_out(self,
         stream, exists, is_recreated, _):
@@ -56,8 +56,8 @@ class TestXDaysSLIService(unittest.TestCase):
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
     ])
-    @patch.object(SLITableRecreationFilter, 'is_recreated')
-    @patch.object(SLITableExistsFilter, 'exists')
+    @patch.object(SLITableRecreationPredicate, 'is_recreated')
+    @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_exist_and_is_not_recreated_should_not_be_filtered_out(
             self, stream, exists, is_recreated, _):
@@ -74,7 +74,7 @@ class TestXDaysSLIService(unittest.TestCase):
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
     ])
-    @patch.object(SLITableExistsFilter, 'exists')
+    @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_caused_exception_in_exist_filter_should_not_be_filtered_out(
             self, stream, exists, _1, ):
@@ -92,8 +92,8 @@ class TestXDaysSLIService(unittest.TestCase):
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
     ])
-    @patch.object(SLITableRecreationFilter, 'is_recreated')
-    @patch.object(SLITableExistsFilter, 'exists')
+    @patch.object(SLITableRecreationPredicate, 'is_recreated')
+    @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_caused_exception_in_recreation_filter_should_not_be_filtered_out(
             self, stream, exists, is_recreated, _1):

@@ -3,8 +3,8 @@ import unittest
 from mock import Mock, MagicMock, patch
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.x_days_sli.sli_table_recreation_filter import \
-    SLITableRecreationFilter
+from src.slo.x_days_sli.sli_table_recreation_predicate import \
+    SLITableRecreationPredicate
 
 
 class TestSLITableRecreationFilter(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
         }
 
         # when
-        is_recreated = SLITableRecreationFilter(BigQuery()).is_recreated(sli_table)
+        is_recreated = SLITableRecreationPredicate(BigQuery()).is_recreated(sli_table)
 
         # then
         self.assertTrue(is_recreated)
@@ -56,7 +56,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
         }
 
         # when
-        is_recreated = SLITableRecreationFilter(BigQuery()).is_recreated(sli_table)
+        is_recreated = SLITableRecreationPredicate(BigQuery()).is_recreated(sli_table)
 
         # then
         self.assertFalse(is_recreated)
@@ -82,7 +82,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
         }
 
         # when
-        is_recreated = SLITableRecreationFilter(BigQuery()).is_recreated(sli_table)
+        is_recreated = SLITableRecreationPredicate(BigQuery()).is_recreated(sli_table)
 
         # then
         self.assertFalse(is_recreated)

@@ -1,14 +1,16 @@
 import logging
 
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
 
 
-class SLITableExistsFilter(object):
+class SLITableExistsPredicate(object):
 
     def __init__(self, big_query):
         self.big_query = big_query
 
-    def exists(self, table_reference):
+    def exists(self, sli_table):
+        table_reference = SLIViewQuerier.sli_entry_to_table_reference(sli_table)
         table = self.big_query.get_table(
             project_id=table_reference.project_id,
             dataset_id=table_reference.dataset_id,
