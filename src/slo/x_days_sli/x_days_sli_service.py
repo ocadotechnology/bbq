@@ -35,7 +35,8 @@ class XDaysSLIService(object):
                 return True
             if not self.table_existence_predicate.exists(table):
                 return False
-            return not self.table_recreation_predicate.is_recreated(table)
+            # return not self.table_recreation_predicate.is_recreated(table)
+            return True
         except Exception:
             logging.exception("An error occurred while filtering table %s, "
                               "still it will be streamed", table)
