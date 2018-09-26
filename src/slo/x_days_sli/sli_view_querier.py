@@ -40,10 +40,10 @@ class SLIViewQuerier(object):
 
     def __create_snapshot_marker_row(self, x_days):
         return {"snapshotTime": self.snapshotTime,
-                "projectId": 'SNAPSHOT_ENTRY',
-                "datasetId": 'SNAPSHOT_ENTRY',
-                "tableId": 'SNAPSHOT_ENTRY',
-                "partitionId": 'SNAPSHOT_ENTRY',
+                "projectId": 'SNAPSHOT_MARKER',
+                "datasetId": 'SNAPSHOT_MARKER',
+                "tableId": 'SNAPSHOT_MARKER',
+                "partitionId": 'SNAPSHOT_MARKER',
                 "creationTime": float(0),
                 "lastModifiedTime": float(0),
                 "backupCreated": float(0),

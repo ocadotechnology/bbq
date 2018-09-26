@@ -34,7 +34,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
             DENSE_RANK() OVER (PARTITION BY xDays ORDER BY snapshotTime DESC ) AS newestSnapshotRank
             FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]
             WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
-          ) WHERE newestSnapshotRank=1 and projectId!='SNAPSHOT_ENTRY'
+          ) WHERE newestSnapshotRank=1 and projectId!='SNAPSHOT_MARKER'
         EOF
     use_legacy_sql = true
   }
