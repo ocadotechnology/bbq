@@ -34,23 +34,23 @@ class TestXDaysSLIService(unittest.TestCase):
         XDaysSLIService(3).recalculate_sli()
         # then
         stream.assert_called_with([])
-    # TODO uncomment after rapiar of comaprision issue
-    # @patch.object(SLIViewQuerier, 'query', return_value=[
-    #     {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
-    #      "partitionId": "part1"}
-    # ])
-    # @patch.object(SLITableRecreationPredicate, 'is_recreated')
-    # @patch.object(SLITableExistsPredicate, 'exists')
-    # @patch.object(SLIResultsStreamer, 'stream')
-    # def test_table_that_exist_and_is_recreated_should_be_filtered_out(self,
-    #     stream, exists, is_recreated, _):
-    #     # given
-    #     exists.return_value = True
-    #     is_recreated.return_value = True
-    #     # when
-    #     XDaysSLIService(3).recalculate_sli()
-    #     # then
-    #     stream.assert_called_with([])
+
+    @patch.object(SLIViewQuerier, 'query', return_value=[
+        {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
+         "partitionId": "part1"}
+    ])
+    @patch.object(SLITableRecreationPredicate, 'is_recreated')
+    @patch.object(SLITableExistsPredicate, 'exists')
+    @patch.object(SLIResultsStreamer, 'stream')
+    def test_table_that_exist_and_is_recreated_should_be_filtered_out(self,
+        stream, exists, is_recreated, _):
+        # given
+        exists.return_value = True
+        is_recreated.return_value = True
+        # when
+        XDaysSLIService(3).recalculate_sli()
+        # then
+        stream.assert_called_with([])
 
     @patch.object(SLIViewQuerier, 'query', return_value=[
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
