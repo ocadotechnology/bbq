@@ -31,6 +31,8 @@ class XDaysSLIService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
+            if self.__is_snapshot_marker_row(table):
+                return True
             if not self.table_existence_predicate.exists(table):
                 return False
             return not self.table_recreation_predicate.is_recreated(table)
@@ -38,3 +40,7 @@ class XDaysSLIService(object):
             logging.exception("An error occurred while filtering table %s, "
                               "still it will be streamed", table)
             return True
+
+    @staticmethod
+    def __is_snapshot_marker_row(table):
+        return table['projectId'] == 'SNAPSHOT_MARKER'
