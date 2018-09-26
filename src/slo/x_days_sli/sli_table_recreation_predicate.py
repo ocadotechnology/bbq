@@ -5,7 +5,7 @@ from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
 
 
-class SLITableRecreationFilter(object):
+class SLITableRecreationPredicate(object):
 
     def __init__(self, big_query):
         self.big_query = big_query

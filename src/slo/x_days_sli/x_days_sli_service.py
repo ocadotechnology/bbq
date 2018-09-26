@@ -1,10 +1,10 @@
 import logging
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.x_days_sli.sli_table_exists_filter import SLITableExistsFilter
+from src.slo.x_days_sli.sli_table_exists_predicate import SLITableExistsPredicate
 from src.slo.x_days_sli.sli_results_streamer import SLIResultsStreamer
-from src.slo.x_days_sli.sli_table_recreation_filter import \
-  SLITableRecreationFilter
+from src.slo.x_days_sli.sli_table_recreation_predicate import \
+  SLITableRecreationPredicate
 from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
 
 
@@ -15,8 +15,8 @@ class XDaysSLIService(object):
         big_query = BigQuery()
         self.querier = SLIViewQuerier(big_query)
         self.streamer = SLIResultsStreamer()
-        self.table_existence_filter = SLITableExistsFilter(big_query)
-        self.table_recreation_filter = SLITableRecreationFilter(big_query)
+        self.table_existence_predicate = SLITableExistsPredicate(big_query)
+        self.table_recreation_predicate = SLITableRecreationPredicate(big_query)
 
     def recalculate_sli(self):
         logging.info("Recalculating %s days SLI has been started.", self.x_days)
@@ -31,9 +31,9 @@ class XDaysSLIService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
-            if not self.table_existence_filter.exists(SLIViewQuerier.sli_entry_to_table_reference(table)):
+            if not self.table_existence_predicate.exists(table):
                 return False
-            return not self.table_recreation_filter.is_recreated(table)
+            return not self.table_recreation_predicate.is_recreated(table)
         except Exception:
             logging.exception("An error occurred while filtering table %s, "
                               "still it will be streamed", table)
