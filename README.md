@@ -144,13 +144,9 @@ It's worth to underline that:
 * It is possible to check the progress via [Task Queues](https://console.cloud.google.com/appengine/taskqueues).
 
 ### On-demand table backup
-BBQ provides option for performing on-demand backup for specified table or partition. 
+BBQ provides option for scheduling on-demand backup for single non-partitioned table or single partition of partitioned table. 
 
-On-demand backups works for:
-* single non-partitioned table
-* single partition of partitioned table
-
-Note that on-demand table backup will be performed regardless of result returned from function checking if backup should be performed in normal flow.
+Note that on-demand flow will ignore checking prerequisites before scheduling copy job, as opposed to normal flow.
 
 On-demand table backup is available from _\<your-project-id>_.__appspot.com__ site in 'Advanced' section. 
 

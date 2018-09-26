@@ -32,7 +32,12 @@
 </script>
 <h2>On-demand table backup</h2>
 <p class="lead">
-  BBQ will perform on-demand backup of given source table. It performs backup regardless of result returned from shouldBackup predicate.
+  BBQ will schedule on-demand backup of given source table. On-demand flow ignores checks for:<br>
+  - table existence<br>
+  - having schema<br>
+  - being view or external type<br>
+  - already having backup of current version of the table<br><br>
+  Note that successfully scheduled on-demand table backup could fail during executing copy job. You need to check results via looking in application logs.
 <br><br>
   On demand backup works for:<br>
   - non partitioned tables<br>
@@ -79,7 +84,7 @@
   </div>
   <div class="form-group row">
     <div class="col-sm-4">
-      <button type="submit" class="btn btn-primary">Perform backup</button>
+      <button type="submit" class="btn btn-primary">Schedule backup</button>
     </div>
   </div>
 </form>
