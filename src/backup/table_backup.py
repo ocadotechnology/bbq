@@ -10,7 +10,7 @@ from src.commons.big_query.big_query import BigQuery
 class TableBackup(object):
 
     @staticmethod
-    def start(table_reference, is_on_demand_backup=False):
+    def start(table_reference):
         big_query = BigQuery()
 
         big_query_table_metadata = BigQueryTableMetadata.get_table_by_reference(table_reference)
@@ -26,5 +26,4 @@ class TableBackup(object):
         else:
             BackupProcess(table_reference=table_reference,
                           big_query=big_query,
-                          big_query_table_metadata=big_query_table_metadata,
-                          is_on_demand_backup=is_on_demand_backup).start()
+                          big_query_table_metadata=big_query_table_metadata).start()

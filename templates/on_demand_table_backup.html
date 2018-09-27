@@ -16,7 +16,7 @@
     xhttp.timeout = 1000 * 3600;
 
     xhttp.onload = function () {
-      document.getElementById("response").innerHTML = 'Http response: '+ xhttp.status
+      document.getElementById("response").innerHTML = 'Http response: '+ xhttp.status + '<br>' + xhttp.response
     };
     xhttp.ontimeout = function (e) {
       document.getElementById("response").innerHTML = "Request timeout: " + e;

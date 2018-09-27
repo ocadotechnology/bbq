@@ -1,6 +1,7 @@
 import os
 
-from src.backup.table_backup import TableBackup
+from src.backup.on_demand import on_demand_table_backup_handler
+from src.backup.on_demand.on_demand_table_backup import OnDemandTableBackup
 from src.commons.table_reference import TableReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
@@ -9,8 +10,6 @@ import unittest
 import webtest
 from google.appengine.ext import testbed
 from mock import patch
-
-from src.backup import on_demand_table_backup_handler
 
 
 class TestOnDemandTableBackupHandler(unittest.TestCase):
@@ -26,10 +25,9 @@ class TestOnDemandTableBackupHandler(unittest.TestCase):
         self.testbed.deactivate()
         patch.stopall()
 
-    @patch.object(TableBackup, 'start')
+    @patch.object(OnDemandTableBackup, 'start')
     def test_on_demand_request_for_partitioned_table_is_properly_parsed(
-        self, table_backup_start
-        ):
+        self, on_demand_table_backup_start):
         # given
         table_reference = TableReference('example-proj-name',
                                          'example-dataset-name',
@@ -45,24 +43,22 @@ class TestOnDemandTableBackupHandler(unittest.TestCase):
         self.under_test.get(url)
 
         # then
-        table_backup_start.assert_called_with(table_reference,
-                                              is_on_demand_backup=True)
+        on_demand_table_backup_start.assert_called_with(table_reference)
 
-    @patch.object(TableBackup, 'start')
+    @patch.object(OnDemandTableBackup, 'start')
     def test_on_demand_request_for_non_partitioned_table_is_properly_parsed(
-          self, table_backup_start):
-          # given
-          table_reference = TableReference('example-proj-name',
+        self, on_demand_table_backup_start):
+        # given
+        table_reference = TableReference('example-proj-name',
                                            'example-dataset-name',
                                            'example-table-name')
-          url = '/tasks/backups/on_demand/table/{}/{}/{}'.format(
-              table_reference.get_project_id(),
-              table_reference.get_dataset_id(),
-              table_reference.get_table_id())
+        url = '/tasks/backups/on_demand/table/{}/{}/{}'.format(
+            table_reference.get_project_id(),
+            table_reference.get_dataset_id(),
+            table_reference.get_table_id())
 
-          # when
-          self.under_test.get(url)
+        # when
+        self.under_test.get(url)
 
-          # then
-          table_backup_start.assert_called_with(table_reference,
-                                                is_on_demand_backup=True)
+        # then
+        on_demand_table_backup_start.assert_called_with(table_reference)

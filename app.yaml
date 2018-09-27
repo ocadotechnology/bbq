@@ -84,7 +84,7 @@ handlers:
   secure: always
   login: admin
 - url: /tasks/backups/on_demand/table.*
-  script: src.backup.on_demand_table_backup_handler.app
+  script: src.backup.on_demand.on_demand_table_backup_handler.app
   secure: always
   login: admin
 - url: /tasks/backups/dataset
