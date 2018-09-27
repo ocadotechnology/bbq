@@ -18,7 +18,7 @@ class SLITableRecreationPredicate(object):
             table_id=table_reference.table_id)
         table_metadata = BigQueryTableMetadata(table)
 
-        is_table_recreated = table_metadata.get_creation_time() > datetime.datetime.utcfromtimestamp(float(sli_table_entry["creationTime"]) / 1000)
+        is_table_recreated = table_metadata.get_creation_time() > datetime.datetime.utcfromtimestamp(sli_table_entry["creationTime"])
 
         if is_table_recreated:
             logging.info("Table is recreated till last census snapshot")
