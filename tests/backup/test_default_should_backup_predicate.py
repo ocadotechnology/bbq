@@ -7,11 +7,11 @@ from google.appengine.ext import testbed
 from mock import patch
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
-from src.backup.should_backup_predicate import ShouldBackupPredicate
+from src.backup.default_should_backup_predicate import DefaultShouldBackupPredicate
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
 
-class TestShouldBackupPredicate(unittest.TestCase):
+class TestDefaultShouldBackupPredicate(unittest.TestCase):
 
     def setUp(self):
         self.initTestBedForDatastore()
@@ -44,7 +44,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_schema_defined', return_value=False)
     def test_should_return_false_if_schema_is_not_defined(self, _):
         # given
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
         # when
         result = predicate.test(self.table)
         # then
@@ -56,7 +56,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
                   return_value=datetime(2016, 11, 13, 15, 00))
     def test_should_return_true_if_table_is_empty(self, _, _1):
         # given
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
         # when
         result = predicate.test(self.table)
         # then
@@ -67,7 +67,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
                   return_value=False)
     def test_should_return_false_if_table_not_exist_anymore(self, _):
         # given
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
         # when
         result = predicate.test(self.table)
         # then
@@ -78,7 +78,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
                   return_value=True)
     def test_should_return_false_if_table_is_external_or_view_type(self, _):
         # given
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
         # when
         result = predicate.test(self.table)
         # then
@@ -89,7 +89,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
                   return_value=datetime(2016, 11, 13, 15, 00))
     def test_should_return_true_if_there_is_no_backups(self, _):
         # given
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
         # when
         result = predicate.test(self.table)
         # then
@@ -105,7 +105,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
 
         # when
         result = predicate.test(self.table)
@@ -122,7 +122,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
 
         # when
         result = predicate.test(self.table)
@@ -140,7 +140,7 @@ class TestShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = DefaultShouldBackupPredicate(self.big_query_table_metadata)
 
         # when
         result = predicate.test(self.table)

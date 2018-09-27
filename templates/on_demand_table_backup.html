@@ -3,16 +3,12 @@
 
 <script type="text/javascript">
   function OnSubmitForm() {
-    var params = {
-      'onDemand': "True"
-    };
-
-    var url = '/tasks/backups/table/' + document.restoreTableForm.projectId.value + '/'
+    var url = '/tasks/backups/on_demand/table/' + document.restoreTableForm.projectId.value + '/'
         + document.restoreTableForm.datasetId.value + '/' + document.restoreTableForm.tableId.value
     if (document.restoreTableForm.partitionId.value) {
       url = url + '/' + document.restoreTableForm.partitionId.value
     }
-    url = url + '?' + encodeQueryData(params);
+
 
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", url, true);
@@ -32,11 +28,9 @@
 </script>
 <h2>On-demand table backup</h2>
 <p class="lead">
-  BBQ will schedule on-demand backup of given source table. On-demand flow ignores checks for:<br>
-  - table existence<br>
-  - having schema<br>
-  - being view or external type<br>
-  - already having backup of current version of the table<br><br>
+  BBQ will schedule on-demand backup of given source table. <br>
+  On-demand flow doesn't check if table already has up to date backup<br>
+
   Note that successfully scheduled on-demand table backup could fail during executing copy job. You need to check results via looking in application logs.
 <br><br>
   On demand backup works for:<br>

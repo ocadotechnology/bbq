@@ -9,8 +9,10 @@ from mock import patch, Mock, MagicMock
 from src.backup.backup_process import BackupProcess
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
-from src.backup.should_backup_predicate import ShouldBackupPredicate
+from src.backup.default_should_backup_predicate import DefaultShouldBackupPredicate
 from src.backup.backup_creator import BackupCreator
+from src.backup.on_demand_should_backup_predicate import \
+  OnDemandShouldBackupPredicate
 from src.commons.table_reference import TableReference
 
 copy_job_constructor = 'src.backup.backup_creator.BackupCreator.__init__'
@@ -37,7 +39,7 @@ class TestBackupProcess(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=True)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_that_copy_job_and_entity_in_datastore_is_created_if_empty_partitioned_table( # nopep8 pylint: disable=C0301
@@ -58,7 +60,7 @@ class TestBackupProcess(unittest.TestCase):
         create_backup.assert_called_once()
         self.assertIsNotNone(table_in_datastore)
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=True)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_copy_job_and_entity_in_datastore_for_single_partition_of_a_table(
@@ -82,7 +84,7 @@ class TestBackupProcess(unittest.TestCase):
         self.assertIsNotNone(partition)
         self.assertIsNone(ancestor_of_partition)
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=True)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_copy_job_and_entity_in_datastore_for_not_partitioned_table(
@@ -102,7 +104,7 @@ class TestBackupProcess(unittest.TestCase):
         # then
         self.assertIsNotNone(table_entity)
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=True)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_that_last_checked_date_is_updated_when_backup_is_processed(
@@ -130,7 +132,7 @@ class TestBackupProcess(unittest.TestCase):
         self.assertEqual(table_entity.last_checked,
                          datetime.datetime(2017, 04, 4))
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=False)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=False)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_that_last_checked_date_is_updated_even_if_table_should_not_be_backed_up( # nopep8 pylint: disable=C0301
@@ -159,11 +161,11 @@ class TestBackupProcess(unittest.TestCase):
                          datetime.datetime(2017, 04, 4))
         copy_table.assert_not_called()
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=False)
+    @patch.object(OnDemandShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     def test_that_table_will_be_backed_up_if_forced_manually_even_if_predicate_says_that_should_not_be_backed_up( # nopep8 pylint: disable=C0301
-        self, copy_table, _1, _2):
+        self, copy_table, _1,_2):
       # given
       table = Table(project_id="test-project",
                     dataset_id="test-dataset",
@@ -188,7 +190,7 @@ class TestBackupProcess(unittest.TestCase):
                        datetime.datetime(2017, 04, 4))
       copy_table.assert_called()
 
-    @patch.object(ShouldBackupPredicate, 'test', return_value=True)
+    @patch.object(DefaultShouldBackupPredicate, 'test', return_value=True)
     @patch.object(DatasetIdCreator, 'create', return_value='target_dataset_id')
     @patch.object(BackupCreator, 'create_backup')
     @patch.object(Table, "get_table")
