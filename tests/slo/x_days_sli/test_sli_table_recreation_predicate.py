@@ -12,7 +12,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
     @patch('src.commons.big_query.big_query.BigQuery.__init__',
            Mock(return_value=None))
     @patch('src.commons.big_query.big_query.BigQuery.get_table',
-           Mock(return_value={'projectId': 'p', 'creationTime': '1600000000000',
+           Mock(return_value={'projectId': 'p', 'creationTime': '1618522714837',
                               'schema': {'fields': []}}))
     def test_should_return_true_if_get_table_has_newer_creation_time_than_census(self):
         # given
@@ -22,7 +22,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
             "datasetId": 'd',
             "tableId": 'd',
             "partitionId": None,
-            "creationTime": '1500000000000',
+            "creationTime": float('1.518522714837E9'),
             "lastModifiedTime": None,
             "backupCreated": None,
             "backupLastModified": None,
@@ -38,7 +38,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
     @patch('src.commons.big_query.big_query.BigQuery.__init__',
            Mock(return_value=None))
     @patch('src.commons.big_query.big_query.BigQuery.get_table',
-           Mock(return_value={'projectId': 'p', 'creationTime': '1600000000000',
+           Mock(return_value={'projectId': 'p', 'creationTime': '1518522714837',
                               'schema': {'fields': []}}))
     def test_should_return_false_if_get_table_has_the_same_creation_time_than_census(self):
         # given
@@ -48,7 +48,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
             "datasetId": 'd',
             "tableId": 'd',
             "partitionId": None,
-            "creationTime": '1600000000000',
+            "creationTime": float('1.518522714837E9'),
             "lastModifiedTime": None,
             "backupCreated": None,
             "backupLastModified": None,
@@ -64,7 +64,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
     @patch('src.commons.big_query.big_query.BigQuery.__init__',
            Mock(return_value=None))
     @patch('src.commons.big_query.big_query.BigQuery.get_table',
-           Mock(return_value={'projectId': 'p', 'creationTime': '1500000000000',
+           Mock(return_value={'projectId': 'p', 'creationTime': '1418522714837',
                               'schema': {'fields': []}}))
     def test_should_return_false_if_get_table_has_the_older_creation_time_than_census(self):
         # given
@@ -74,7 +74,7 @@ class TestSLITableRecreationFilter(unittest.TestCase):
             "datasetId": 'd',
             "tableId": 'd',
             "partitionId": None,
-            "creationTime": '1600000000000',
+            "creationTime": float('1.518522714837E9'),
             "lastModifiedTime": None,
             "backupCreated": None,
             "backupLastModified": None,
