@@ -14,13 +14,13 @@ class DefaultShouldBackupPredicate(AbstractShouldBackupPredicate):
         if big_query_table_metadata.is_empty():
             logging.info('This table is empty')
 
-        if self._is_table_has_up_to_date_backup(big_query_table_metadata, table_entity):
+        if self._table_has_up_to_date_backup(big_query_table_metadata, table_entity):
             logging.info('Backup is up to date')
             return False
 
         return True
 
-    def _is_table_has_up_to_date_backup(self, big_query_table_metadata, table_entity):
+    def _table_has_up_to_date_backup(self, big_query_table_metadata, table_entity):
         # TODO: change name of this class or split this method into two
         if table_entity is None:
             return False
