@@ -8,23 +8,20 @@ from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
 from src.backup.default_should_backup_predicate import \
     DefaultShouldBackupPredicate
-from src.backup.on_demand_should_backup_predicate import \
-    OnDemandShouldBackupPredicate
 from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
 class BackupProcess(object):
-    def __init__(self, table_reference, big_query, big_query_table_metadata, is_on_demand_backup):
+    def __init__(self, table_reference, big_query, big_query_table_metadata,
+                 should_backup_predicate=DefaultShouldBackupPredicate()):
         self.project_id = table_reference.get_project_id()
         self.dataset_id = table_reference.get_dataset_id()
         self.table_id = table_reference.get_table_id()
         self.partition_id = table_reference.get_partition_id()
         self.big_query = big_query
         self.big_query_table_metadata = big_query_table_metadata
-        self.should_backup_predicate = OnDemandShouldBackupPredicate(
-            self.big_query_table_metadata) if is_on_demand_backup else DefaultShouldBackupPredicate(
-            self.big_query_table_metadata)
+        self.should_backup_predicate = should_backup_predicate
         self.now = None
 
     def start(self):
@@ -47,7 +44,8 @@ class BackupProcess(object):
         return table_entity is not None
 
     def __should_backup(self, table_entity):
-        return self.should_backup_predicate.test(table_entity)
+        return self.should_backup_predicate.test(self.big_query_table_metadata,
+                                                 table_entity)
 
     def __create_backup(self, table_entity):
         self.__ensure_dataset_for_backups_exists()

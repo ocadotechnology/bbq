@@ -7,7 +7,7 @@ from google.appengine.ext import testbed
 from mock import patch
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
-from src.backup.on_demand_should_backup_predicate import \
+from src.backup.on_demand.on_demand_should_backup_predicate import \
     OnDemandShouldBackupPredicate
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
@@ -45,9 +45,9 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_schema_defined', return_value=False)
     def test_should_return_false_if_schema_is_not_defined(self, _):
         # given
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
                                 "if table has no schema")
@@ -55,9 +55,9 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     def test_should_return_true_if_table_is_empty(self, _):
         # given
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return TRUE "
                                 "if table is empty")
@@ -66,9 +66,9 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
                   return_value=False)
     def test_should_return_false_if_table_not_exist_anymore(self, _):
         # given
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
                                  "if table not exists")
@@ -77,9 +77,9 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
                   return_value=True)
     def test_should_return_false_if_table_is_external_or_view_type(self, _):
         # given
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
                                  "if object is table or external type")
@@ -88,9 +88,9 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
                   return_value=datetime(2016, 11, 13, 15, 00))
     def test_should_return_true_if_there_is_no_backups(self, _):
         # given
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return TRUE "
                                 "if there is no backups")
@@ -104,10 +104,10 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
 
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return TRUE "
                                 "if table was changed after last backup")
@@ -121,10 +121,10 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
 
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata, self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return False "
                                  "if table was change at the same time when "
@@ -139,10 +139,10 @@ class TestOnDemandShouldBackupPredicate(unittest.TestCase):
             last_modified=datetime(2016, 11, 13, 15, 00)
         )
         backup.put()
-        predicate = OnDemandShouldBackupPredicate(self.big_query_table_metadata)
+        predicate = OnDemandShouldBackupPredicate()
 
         # when
-        result = predicate.test(self.table)
+        result = predicate.test(self.big_query_table_metadata,self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return FALSE "
                                  "if table was changed before "

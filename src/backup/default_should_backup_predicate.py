@@ -5,13 +5,22 @@ from src.backup.abstract_should_backup_predicate import \
 
 
 class DefaultShouldBackupPredicate(AbstractShouldBackupPredicate):
-
     TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-    def __init__(self, big_query_table_metadata):
-        super(DefaultShouldBackupPredicate, self).__init__(big_query_table_metadata)
+    def test(self, big_query_table_metadata, table_entity):
+        if not self._is_possible_to_copy_table(big_query_table_metadata):
+            return False
 
-    def _is_table_has_up_to_date_backup(self, table_entity):
+        if big_query_table_metadata.is_empty():
+            logging.info('This table is empty')
+
+        if self._is_table_has_up_to_date_backup(big_query_table_metadata, table_entity):
+            logging.info('Backup is up to date')
+            return False
+
+        return True
+
+    def _is_table_has_up_to_date_backup(self, big_query_table_metadata, table_entity):
         # TODO: change name of this class or split this method into two
         if table_entity is None:
             return False
@@ -20,7 +29,7 @@ class DefaultShouldBackupPredicate(AbstractShouldBackupPredicate):
             logging.info('No backups so far')
             return False
         source_table_last_modified_time = \
-            self.big_query_table_metadata.get_last_modified_datetime()
+            big_query_table_metadata.get_last_modified_datetime()
         logging.info(
             "Last modification timestamps: last backup '%s', "
             "table metadata: '%s'",
