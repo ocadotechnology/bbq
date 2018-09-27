@@ -6,7 +6,10 @@ from google.appengine.api import memcache
 from src.backup.backup_creator import BackupCreator
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
-from src.backup.should_backup_predicate import ShouldBackupPredicate
+from src.backup.default_should_backup_predicate import \
+    DefaultShouldBackupPredicate
+from src.backup.on_demand_should_backup_predicate import \
+    OnDemandShouldBackupPredicate
 from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
@@ -19,7 +22,9 @@ class BackupProcess(object):
         self.partition_id = table_reference.get_partition_id()
         self.big_query = big_query
         self.big_query_table_metadata = big_query_table_metadata
-        self.is_on_demand_backup = is_on_demand_backup
+        self.should_backup_predicate = OnDemandShouldBackupPredicate(
+            self.big_query_table_metadata) if is_on_demand_backup else DefaultShouldBackupPredicate(
+            self.big_query_table_metadata)
         self.now = None
 
     def start(self):
@@ -27,14 +32,6 @@ class BackupProcess(object):
 
         table_entity = Table.get_table(self.project_id, self.dataset_id,
                                        self.table_id, self.partition_id)
-
-        if self.is_on_demand_backup:
-            logging.info(
-                "Performing on-demand backup for %s:%s.%s$%s. "
-                "It is performed regardless of result shouldBackup predicate",
-                self.project_id, self.dataset_id,
-                self.table_id, self.partition_id
-            )
 
         if self.__backup_ever_done(table_entity):
             self.__update_last_check(table_entity)
@@ -50,8 +47,7 @@ class BackupProcess(object):
         return table_entity is not None
 
     def __should_backup(self, table_entity):
-        predicate = ShouldBackupPredicate(self.big_query_table_metadata)
-        return predicate.test(table_entity) or self.is_on_demand_backup
+        return self.should_backup_predicate.test(table_entity)
 
     def __create_backup(self, table_entity):
         self.__ensure_dataset_for_backups_exists()
