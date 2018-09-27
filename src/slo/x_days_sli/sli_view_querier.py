@@ -57,3 +57,4 @@ class SLIViewQuerier(object):
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
                               partition_id=table['partitionId'])
+    
