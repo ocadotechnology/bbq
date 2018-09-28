@@ -2,7 +2,7 @@ import logging
 from abc import abstractmethod
 
 
-class AbstractShouldBackupPredicate(object):
+class AbstractBackupPredicate(object):
 
     @abstractmethod
     def test(self, big_query_table_metadata, table_entity):
@@ -18,4 +18,7 @@ class AbstractShouldBackupPredicate(object):
             return False
         if big_query_table_metadata.is_external_or_view_type():
             return False
+        if big_query_table_metadata.is_empty():
+            logging.info('This table is empty')
+
         return True
