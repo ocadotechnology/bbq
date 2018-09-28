@@ -6,15 +6,15 @@ from google.appengine.api import memcache
 from src.backup.backup_creator import BackupCreator
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.backup.datastore.Table import Table
-from src.backup.default_should_backup_predicate import \
-    DefaultShouldBackupPredicate
+from src.backup.default_backup_predicate import \
+    DefaultBackupPredicate
 from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
 class BackupProcess(object):
     def __init__(self, table_reference, big_query, big_query_table_metadata,
-                 should_backup_predicate=DefaultShouldBackupPredicate()):
+                 should_backup_predicate=DefaultBackupPredicate()):
         self.project_id = table_reference.get_project_id()
         self.dataset_id = table_reference.get_dataset_id()
         self.table_id = table_reference.get_table_id()
