@@ -1,0 +1,89 @@
+{% extends "bbq-menu.html" %}
+{% block main %}
+
+<script type="text/javascript">
+  function OnSubmitForm() {
+    var url = '/tasks/backups/on_demand/table/' + document.restoreTableForm.projectId.value + '/'
+        + document.restoreTableForm.datasetId.value + '/' + document.restoreTableForm.tableId.value
+    if (document.restoreTableForm.partitionId.value) {
+      url = url + '/' + document.restoreTableForm.partitionId.value
+    }
+
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader("request_correlation_id", Date.now())
+    xhttp.timeout = 1000 * 3600;
+
+    xhttp.onload = function () {
+      document.getElementById("response").innerHTML = 'Http response: '+ xhttp.status + '<br>' + xhttp.response
+    };
+    xhttp.ontimeout = function (e) {
+      document.getElementById("response").innerHTML = "Request timeout: " + e;
+    };
+
+    xhttp.send();
+    return false;
+  }
+</script>
+<h2>On-demand table backup</h2>
+<p class="lead">
+  BBQ will schedule on-demand backup of given source table. <br>
+  On-demand flow doesn't check if table already has up to date backup<br>
+
+  Note that successfully scheduled on-demand table backup could fail during executing copy job. You need to check results by looking in application logs.
+<br><br>
+  On demand backup works for:<br>
+  - non partitioned tables<br>
+  - single partition of partitioned table (not specifying source partition id for partitioned table will not force performing backups)
+
+</p>
+
+<form name="restoreTableForm" onsubmit="return OnSubmitForm();">
+  <div class="form-group row">
+    <label for="sourceProjectId" class="col-sm-2 col-form-label">Source project id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceProjectId" name="projectId"
+             placeholder="project id" required/>
+      <small id="sourceProjectIdHelp" class="form-text text-muted">Source project id
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourceDatasetId" class="col-sm-2 col-form-label">Source dataset id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceDatasetId" name="datasetId"
+             placeholder="dataset id">
+      <small id="sourceDatasetIdHelp" class="form-text text-muted">Source dataset id
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourceTableId" class="col-sm-2 col-form-label">Source table id</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="sourceTableId" name="tableId"
+             placeholder="table id">
+      <small id="sourceTableIdHelp" class="form-text text-muted">Source table id </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="sourcePartitionId" class="col-sm-2 col-form-label">Source partition id</label>
+    <div class="col-sm-8">
+      <input type="number" class="form-control" id="sourcePartitionId" name="partitionId"
+             placeholder="partition id">
+      <small id="sourcePartitionIdHelp" class="form-text text-muted">Source partition id for partitioned table
+      </small>
+    </div>
+  </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Schedule backup</button>
+    </div>
+  </div>
+</form>
+
+<br><strong>Response:</strong> <br>
+<pre id="response"></pre>
+
+{% endblock %}
