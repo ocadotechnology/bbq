@@ -6,11 +6,11 @@ from src.commons.config.configuration import configuration
 from src.commons.tasks import Tasks
 
 
-class XDaysSLIMainHandler(webapp2.RequestHandler):
+class SLIMainHandler(webapp2.RequestHandler):
 
     def get(self):
-        logging.info("Recalculating X days SLIs has been started.")
-        Tasks.schedule("default", self.create_slo_recalculation_tasks())
+        logging.info("Recalculating SLIs has been started.")
+        Tasks.schedule("sli-worker", self.create_slo_recalculation_tasks())
 
     @staticmethod
     def create_slo_recalculation_tasks():
@@ -24,5 +24,5 @@ class XDaysSLIMainHandler(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/cron/slo/calculate', XDaysSLIMainHandler)
+    ('/cron/slo/calculate', SLIMainHandler)
 ], debug=configuration.debug_mode)
