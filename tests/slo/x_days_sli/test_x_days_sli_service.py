@@ -2,12 +2,12 @@ import unittest
 
 from mock import patch
 
-from src.slo.x_days_sli.sli_results_streamer import SLIResultsStreamer
-from src.slo.x_days_sli.sli_table_exists_predicate import SLITableExistsPredicate
-from src.slo.x_days_sli.sli_table_recreation_predicate import \
+from src.slo.sli_results_streamer import SLIResultsStreamer
+from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.predicate.sli_table_recreation_predicate import \
     SLITableRecreationPredicate
-from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
-from src.slo.x_days_sli.x_days_sli_service import XDaysSLIService
+from src.slo.sli_view_querier import SLIViewQuerier
+from src.slo.backup_creation_latency.latency_sli_service import LatencySliService
 
 
 class TestXDaysSLIService(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestXDaysSLIService(unittest.TestCase):
         # given
         exists.return_value = False
         # when
-        XDaysSLIService(3).recalculate_sli()
+        LatencySliService(3).recalculate_sli()
         # then
         stream.assert_called_with([])
 
@@ -48,7 +48,7 @@ class TestXDaysSLIService(unittest.TestCase):
         exists.return_value = True
         is_recreated.return_value = True
         # when
-        XDaysSLIService(3).recalculate_sli()
+        LatencySliService(3).recalculate_sli()
         # then
         stream.assert_called_with([])
 
@@ -65,7 +65,7 @@ class TestXDaysSLIService(unittest.TestCase):
         exists.return_value = True
         is_recreated.return_value = False
         # when
-        XDaysSLIService(3).recalculate_sli()
+        LatencySliService(3).recalculate_sli()
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
                                     "tableId": "t1", "partitionId": "part1"}])
@@ -82,7 +82,7 @@ class TestXDaysSLIService(unittest.TestCase):
         # given
         exists.side_effect = Exception("An error")
         # when
-        XDaysSLIService(3).recalculate_sli()
+        LatencySliService(3).recalculate_sli()
 
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
@@ -103,7 +103,7 @@ class TestXDaysSLIService(unittest.TestCase):
         is_recreated.side_effect = Exception("An error")
 
         # when
-        XDaysSLIService(3).recalculate_sli()
+        LatencySliService(3).recalculate_sli()
 
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",

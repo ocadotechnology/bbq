@@ -17,7 +17,7 @@ class SLIMainHandler(webapp2.RequestHandler):
         return [
             Tasks.create(
                 method='POST',
-                url='/slo/recalculate_x_days',
+                url='/slo/latency_for_x_days',
                 params={'x_days': x_days})
             for x_days in [3, 4, 5, 7]
         ]

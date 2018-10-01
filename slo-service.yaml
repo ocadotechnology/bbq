@@ -34,7 +34,7 @@ handlers:
   secure: always
   login: admin
 - url: /slo/recalculate_x_days
-  script: src.slo.x_days_sli.slo_x_days_handlers.app
+  script: src.slo.backup_creation_latency.slo_x_days_handlers.app
   secure: always
   login: admin
 - url: /.*
