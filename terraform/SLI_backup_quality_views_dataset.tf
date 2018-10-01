@@ -5,4 +5,17 @@ resource "google_bigquery_dataset" "SLI_backup_quality_views_dataset" {
   description = "Contain views to calculate Backup Quality SLI that shows all tables which last backup differs in numRows or numBytes."
 
   labels {"bbq_metadata"=""}
+
+  access {
+    role   = "WRITER"
+    special_group = "projectWriters"
+  }
+  access {
+    role   = "OWNER"
+    special_group = "projectOwners"
+  }
+  access {
+    role   = "WRITER"
+    special_group = "projectReaders"
+  }
 }

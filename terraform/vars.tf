@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  version = "> 1.16"
+  version = ">= 1.18"
 }
 
 variable "bbq_project" {
