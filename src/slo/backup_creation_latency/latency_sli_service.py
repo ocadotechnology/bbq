@@ -1,14 +1,14 @@
 import logging
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.x_days_sli.sli_table_exists_predicate import SLITableExistsPredicate
-from src.slo.x_days_sli.sli_results_streamer import SLIResultsStreamer
-from src.slo.x_days_sli.sli_table_recreation_predicate import \
+from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.sli_results_streamer import SLIResultsStreamer
+from src.slo.predicate.sli_table_recreation_predicate import \
   SLITableRecreationPredicate
-from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
+from src.slo.sli_view_querier import SLIViewQuerier
 
 
-class XDaysSLIService(object):
+class LatencySliService(object):
 
     def __init__(self, x_days):
         self.x_days = x_days
