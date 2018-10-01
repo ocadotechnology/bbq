@@ -18,7 +18,9 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
               )
               WHERE
                 rownum=1 AND
-                DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND projectId != "${var.bbq_project}"
+                DATEDIFF(CURRENT_TIMESTAMP(), lastModifiedTime) >= 3 AND
+                projectId != "${var.bbq_project}" AND
+                projectId != "${var.bbq_restoration_project}"
             ), (
               SELECT projectId, datasetId, tableId, partitionId, lastModifiedTime, numBytes, numRows
               FROM [${var.gcp_census_project}.bigquery_views_legacy_sql.partition_metadata_v1_0]
