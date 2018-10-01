@@ -4,6 +4,19 @@ resource "google_bigquery_dataset" "SLI_history_dataset" {
   location = "${var.SLI_views_location}"
 
   labels {"bbq_metadata"=""}
+
+  access {
+    role   = "WRITER"
+    special_group = "projectWriters"
+  }
+  access {
+    role   = "OWNER"
+    special_group = "projectOwners"
+  }
+  access {
+    role   = "READER"
+    special_group = "projectReaders"
+  }
 }
 
 resource "google_bigquery_table" "SLI_backup_creation_latency" {
