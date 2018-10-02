@@ -14,7 +14,7 @@ class LatencySliService(object):
         self.x_days = x_days
         big_query = BigQuery()
         self.querier = SLIViewQuerier(big_query)
-        self.streamer = SLIResultsStreamer()
+        self.streamer = SLIResultsStreamer(table_id="SLI_backup_creation_latency")
         self.table_existence_predicate = SLITableExistsPredicate(big_query)
         self.table_recreation_predicate = SLITableRecreationPredicate(big_query)
 
