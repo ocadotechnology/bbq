@@ -10,7 +10,7 @@ from src.slo.sli_view_querier import SLIViewQuerier
 from src.slo.backup_creation_latency.latency_sli_service import LatencySliService
 
 
-class TestXDaysSLIService(unittest.TestCase):
+class TestLatencySliService(unittest.TestCase):
 
     def setUp(self):
         patch('googleapiclient.discovery.build').start()
