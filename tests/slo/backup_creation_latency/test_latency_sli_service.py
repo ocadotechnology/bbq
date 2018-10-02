@@ -20,10 +20,10 @@ class TestLatencySliService(unittest.TestCase):
     def tearDown(self):
         patch.stopall()
 
-    @patch.object(SLIViewQuerier, 'query', return_value=[
+    @patch.object(SLIViewQuerier, 'query', return_value=([
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
-    ])
+    ], 21342134324))
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_not_exist_should_be_filtered_out(self,
@@ -33,12 +33,24 @@ class TestLatencySliService(unittest.TestCase):
         # when
         LatencySliService(3).recalculate_sli()
         # then
-        stream.assert_called_with([])
+        stream.assert_called_with([], snapshot_marker=self.__create_snapshot_marker_row(21342134324, 3))
 
-    @patch.object(SLIViewQuerier, 'query', return_value=[
+    def __create_snapshot_marker_row(self, snapshotTime, x_days):
+        return {"snapshotTime": snapshotTime,
+                "projectId": 'SNAPSHOT_MARKER',
+                "datasetId": 'SNAPSHOT_MARKER',
+                "tableId": 'SNAPSHOT_MARKER',
+                "partitionId": 'SNAPSHOT_MARKER',
+                "creationTime": float(0),
+                "lastModifiedTime": float(0),
+                "backupCreated": float(0),
+                "backupLastModified": float(0),
+                "xDays": x_days}
+
+    @patch.object(SLIViewQuerier, 'query', return_value=([
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
-    ])
+    ], 21342134324))
     @patch.object(SLITableRecreationPredicate, 'is_recreated')
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
@@ -50,12 +62,12 @@ class TestLatencySliService(unittest.TestCase):
         # when
         LatencySliService(3).recalculate_sli()
         # then
-        stream.assert_called_with([])
+        stream.assert_called_with([], snapshot_marker=self.__create_snapshot_marker_row(21342134324, 3))
 
-    @patch.object(SLIViewQuerier, 'query', return_value=[
+    @patch.object(SLIViewQuerier, 'query', return_value=([
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
-    ])
+    ], 21342134324))
     @patch.object(SLITableRecreationPredicate, 'is_recreated')
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
@@ -68,16 +80,17 @@ class TestLatencySliService(unittest.TestCase):
         LatencySliService(3).recalculate_sli()
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
-                                    "tableId": "t1", "partitionId": "part1"}])
+                                    "tableId": "t1", "partitionId": "part1"}],
+                                  snapshot_marker=self.__create_snapshot_marker_row(21342134324, 3))
 
-    @patch.object(SLIViewQuerier, 'query', return_value=[
+    @patch.object(SLIViewQuerier, 'query', return_value=([
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
-    ])
+    ], 21342134324))
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_caused_exception_in_exist_filter_should_not_be_filtered_out(
-            self, stream, exists, _1, ):
+            self, stream, exists, _):
 
         # given
         exists.side_effect = Exception("An error")
@@ -86,17 +99,18 @@ class TestLatencySliService(unittest.TestCase):
 
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
-                                    "tableId": "t1", "partitionId": "part1"}])
+                                    "tableId": "t1", "partitionId": "part1"}],
+                                  snapshot_marker=self.__create_snapshot_marker_row(21342134324, 3))
 
-    @patch.object(SLIViewQuerier, 'query', return_value=[
+    @patch.object(SLIViewQuerier, 'query', return_value=([
         {"projectId": "p1", "datasetId": "d1", "tableId": "t1",
          "partitionId": "part1"}
-    ])
+    ], 21342134324))
     @patch.object(SLITableRecreationPredicate, 'is_recreated')
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_caused_exception_in_recreation_filter_should_not_be_filtered_out(
-            self, stream, exists, is_recreated, _1):
+            self, stream, exists, is_recreated, _):
 
         # given
         exists.return_value = True
@@ -107,4 +121,5 @@ class TestLatencySliService(unittest.TestCase):
 
         # then
         stream.assert_called_with([{"projectId": "p1", "datasetId": "d1",
-                                    "tableId": "t1", "partitionId": "part1"}])
+                                    "tableId": "t1", "partitionId": "part1"}],
+                                  snapshot_marker=self.__create_snapshot_marker_row(21342134324, 3))

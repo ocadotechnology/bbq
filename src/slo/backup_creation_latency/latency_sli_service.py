@@ -21,18 +21,16 @@ class LatencySliService(object):
     def recalculate_sli(self):
         logging.info("Recalculating %s days SLI has been started.", self.x_days)
 
-        all_tables = self.querier.query(self.x_days)
+        all_tables, snapshot_time = self.querier.query(self.x_days)
         filtered_tables = [table for table in all_tables
                            if self.__should_stay_as_sli_violation(table)]
 
         logging.info("%s days SLI tables filtered from %s to %s", self.x_days,
                      len(all_tables), len(filtered_tables))
-        self.streamer.stream(filtered_tables)
+        self.streamer.stream(filtered_tables, snapshot_marker=self.__create_snapshot_marker_row(snapshot_time, self.x_days))
 
     def __should_stay_as_sli_violation(self, table):
         try:
-            if self.__is_snapshot_marker_row(table):
-                return True
             if not self.table_existence_predicate.exists(table):
                 return False
             return not self.table_recreation_predicate.is_recreated(table)
@@ -44,3 +42,16 @@ class LatencySliService(object):
     @staticmethod
     def __is_snapshot_marker_row(table):
         return table['projectId'] == 'SNAPSHOT_MARKER'
+
+
+    def __create_snapshot_marker_row(self, snapshotTime, x_days):
+        return {"snapshotTime": snapshotTime,
+                "projectId": 'SNAPSHOT_MARKER',
+                "datasetId": 'SNAPSHOT_MARKER',
+                "tableId": 'SNAPSHOT_MARKER',
+                "partitionId": 'SNAPSHOT_MARKER',
+                "creationTime": float(0),
+                "lastModifiedTime": float(0),
+                "backupCreated": float(0),
+                "backupLastModified": float(0),
+                "xDays": x_days}
