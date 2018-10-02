@@ -1,9 +1,9 @@
 import logging
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.backup_creation_latency.sli_table_exists_predicate import SLITableExistsPredicate
 from src.slo.sli_results_streamer import SLIResultsStreamer
-from src.slo.predicate.sli_table_recreation_predicate import \
+from src.slo.backup_creation_latency.sli_table_recreation_predicate import \
   SLITableRecreationPredicate
 from src.slo.sli_view_querier import SLIViewQuerier
 

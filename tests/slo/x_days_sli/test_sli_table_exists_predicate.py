@@ -2,7 +2,7 @@ import unittest
 
 from mock import Mock, patch
 
-from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.backup_creation_latency.sli_table_exists_predicate import SLITableExistsPredicate
 from src.commons.big_query.big_query import BigQuery
 
 
