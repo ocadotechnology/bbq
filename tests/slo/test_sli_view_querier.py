@@ -61,24 +61,15 @@ class TestSLIViewQuerier(unittest.TestCase):
                 'backupCreated': 1532675823.532,
                 'backupLastModified': 1532641088.365,
                 'xDays': '3'
-            },
-            {
-                'snapshotTime': 1535624154.94896,
-                'projectId': 'SNAPSHOT_MARKER',
-                'datasetId': 'SNAPSHOT_MARKER',
-                'tableId': 'SNAPSHOT_MARKER',
-                'partitionId': 'SNAPSHOT_MARKER',
-                'creationTime': 0,
-                'lastModifiedTime': 0,
-                'backupCreated': 0,
-                'backupLastModified': 0,
-                'xDays': '3'
             }
         ]
+
+        expected_snapshot_time=1535624154.94896
 
         # when
         results = SLIViewQuerier(BigQuery()).query("3")
 
         # then
-        self.assertEqual(3, len(results))
-        self.assertEqual(expected_output, results)
+        self.assertEqual(2, len(results))
+        self.assertEqual(expected_output, results[0])
+        self.assertEqual(expected_snapshot_time, results[1])
