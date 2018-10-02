@@ -67,3 +67,17 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_by_count_view" {
 
   depends_on = ["google_bigquery_table.SLI_backup_creation_latency_view"]
 }
+
+resource "google_bigquery_table" "SLI_backup_quality" {
+  project = "${local.SLI_views_destination_project}"
+  dataset_id = "${var.SLI_history_dataset}"
+  table_id = "SLI_backup_quality"
+
+  time_partitioning {
+    type = "DAY"
+  }
+
+  schema= "${file("SLI_backup_quality_filtered_table_schema.json")}"
+
+  depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
+}
