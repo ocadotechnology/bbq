@@ -3,7 +3,7 @@ import unittest
 from mock import Mock, patch
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.predicate.sli_table_recreation_predicate import \
+from src.slo.backup_creation_latency.sli_table_recreation_predicate import \
     SLITableRecreationPredicate
 
 
