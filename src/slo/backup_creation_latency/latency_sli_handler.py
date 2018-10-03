@@ -12,5 +12,5 @@ class LatencySliHandler(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/slo/latency_for_x_days', LatencySliHandler)
+    ('/sli/latency_for_x_days', LatencySliHandler)
 ], debug=configuration.debug_mode)

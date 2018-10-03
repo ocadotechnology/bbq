@@ -43,7 +43,7 @@ which periodically exports backup metadata and stores it in BigQuery,
 1. Configure periodical SLI export by adding the following [cron entry](./config/cron.yaml)
       ```yaml
       - description: SLI X days calculation
-        url: /cron/slo/calculate
+        url: /cron/sli/calculate
         schedule:  every 6 hours from 00:25 to 23:59
         retry_parameters:
           job_retry_limit: 5

@@ -17,12 +17,12 @@ class SLIMainHandler(webapp2.RequestHandler):
         return [
             Tasks.create(
                 method='POST',
-                url='/slo/latency_for_x_days',
+                url='/sli/latency_for_x_days',
                 params={'x_days': x_days})
             for x_days in [3, 4, 5, 7]
         ]
 
 
 app = webapp2.WSGIApplication([
-    ('/cron/slo/calculate', SLIMainHandler)
+    ('/cron/sli/calculate', SLIMainHandler)
 ], debug=configuration.debug_mode)
