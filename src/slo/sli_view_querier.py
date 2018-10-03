@@ -1,43 +1,21 @@
 import logging
 import time
 
-from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
 class SLIViewQuerier(object):
 
-    def __init__(self, big_query):
+    def __init__(self, big_query, query_specification):
+        self.query_specification = query_specification
         self.big_query = big_query
 
-    def query(self, x_days):
+    def query(self):
         self.snapshot_time = time.time()
-        query = self.__generate_x_days_sli_query(x_days)
+        query = self.query_specification.query_string()
         logging.info("Executing query: %s", query)
         query_results = self.big_query.execute_query(query)
-
-        return self.__format_query_results(query_results, x_days), self.snapshot_time
-
-    @staticmethod
-    def __generate_x_days_sli_query(x_days):
-        return \
-            "SELECT * FROM [{}:SLI_backup_creation_latency_views.SLI_{}_days]"\
-            .format(configuration.backup_project_id, x_days)
-
-    def __format_query_results(self, results, x_days):
-        formatted_results = [{"snapshotTime": self.snapshot_time,
-                              "projectId": result['f'][0]['v'],
-                              "datasetId": result['f'][1]['v'],
-                              "tableId": result['f'][2]['v'],
-                              "partitionId": result['f'][3]['v'],
-                              "creationTime": float(result['f'][4]['v']),
-                              "lastModifiedTime": float(result['f'][5]['v']),
-                              "backupCreated": float(result['f'][6]['v']),
-                              "backupLastModified": float(result['f'][7]['v']),
-                              "xDays": x_days} for result in results]
-        return formatted_results
-
-
+        return self.query_specification.format_query_results(query_results, self.snapshot_time), self.snapshot_time
 
     @staticmethod
     def sli_entry_to_table_reference(table):
