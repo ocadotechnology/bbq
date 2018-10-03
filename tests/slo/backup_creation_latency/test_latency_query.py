@@ -3,10 +3,12 @@ import unittest
 from mock import Mock, MagicMock, patch
 
 from src.commons.big_query.big_query import BigQuery
+from src.slo.backup_creation_latency.latency_query_specification import \
+    LatencyQuerySpecification
 from src.slo.sli_view_querier import SLIViewQuerier
 
 
-class TestSLIViewQuerier(unittest.TestCase):
+class TestLatencyQuery(unittest.TestCase):
 
     @patch('src.commons.big_query.big_query.BigQuery.__init__',
            Mock(return_value=None))
@@ -67,7 +69,7 @@ class TestSLIViewQuerier(unittest.TestCase):
         expected_snapshot_time=1535624154.94896
 
         # when
-        results = SLIViewQuerier(BigQuery()).query("3")
+        results = SLIViewQuerier(BigQuery(), LatencyQuerySpecification("3")).query()
 
         # then
         self.assertEqual(2, len(results))
