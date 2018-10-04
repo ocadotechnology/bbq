@@ -15,8 +15,13 @@ class LatencySliService(object):
     def __init__(self, x_days):
         self.x_days = x_days
         big_query = BigQuery()
-        self.querier = SLIViewQuerier(big_query, LatencyQuerySpecification(self.x_days))
-        self.streamer = SLIResultsStreamer(table_id="SLI_backup_creation_latency")
+        self.querier = SLIViewQuerier(
+            big_query,
+            LatencyQuerySpecification(self.x_days)
+        )
+        self.streamer = SLIResultsStreamer(
+            table_id="SLI_backup_creation_latency"
+        )
         self.table_existence_predicate = SLITableExistsPredicate(big_query)
         self.table_recreation_predicate = SLITableRecreationPredicate(big_query)
 
@@ -29,7 +34,11 @@ class LatencySliService(object):
 
         logging.info("%s days SLI tables filtered from %s to %s", self.x_days,
                      len(all_tables), len(filtered_tables))
-        self.streamer.stream(filtered_tables, snapshot_marker=self.__create_snapshot_marker_row(snapshot_time, self.x_days))
+        self.streamer.stream(
+            filtered_tables,
+            snapshot_marker=self.__create_snapshot_marker_row(
+                snapshot_time, self.x_days)
+        )
 
     def __should_stay_as_sli_violation(self, table):
         try:
