@@ -31,7 +31,7 @@ class BackupEntityMigrationHandler(webapp2.RequestHandler):
                        self.__create_table_backups_migration_tasks(tables))
 
         if more:
-            Tasks.schedule('entity-backup-migration-worker', Tasks.create(
+            Tasks.schedule('entity-backup-migration-scheduler', Tasks.create(
                 method='GET',
                 url='/backup_entity/migrate',
                 params={'cursor': cursor.urlsafe()}))
