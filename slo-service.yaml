@@ -29,12 +29,12 @@ handlers:
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
   application_readable: true
-- url: /cron/slo/calculate
-  script: src.slo.slo_handlers.app
+- url: /cron/sli/calculate
+  script: src.slo.sli_handlers.app
   secure: always
   login: admin
-- url: /slo/recalculate_x_days
-  script: src.slo.x_days_sli.slo_x_days_handlers.app
+- url: /sli/latency_for_x_days
+  script: src.slo.backup_creation_latency.latency_sli_handler.app
   secure: always
   login: admin
 - url: /.*

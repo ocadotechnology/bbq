@@ -1,0 +1,25 @@
+from src.commons.config.configuration import configuration
+
+
+class LatencyQuerySpecification(object):
+
+    def __init__(self, x_days):
+        self.x_days = x_days
+
+    def query_string(self):
+        return \
+            "SELECT * FROM [{}:SLI_backup_creation_latency_views.SLI_{}_days]" \
+                .format(configuration.backup_project_id, self.x_days)
+
+    def format_query_results(self, results, snapshot_time):
+        formatted_results = [{"snapshotTime": snapshot_time,
+                              "projectId": result['f'][0]['v'],
+                              "datasetId": result['f'][1]['v'],
+                              "tableId": result['f'][2]['v'],
+                              "partitionId": result['f'][3]['v'],
+                              "creationTime": float(result['f'][4]['v']),
+                              "lastModifiedTime": float(result['f'][5]['v']),
+                              "backupCreated": float(result['f'][6]['v']),
+                              "backupLastModified": float(result['f'][7]['v']),
+                              "xDays": self.x_days} for result in results]
+        return formatted_results
