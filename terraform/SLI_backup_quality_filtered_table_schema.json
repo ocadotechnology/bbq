@@ -61,31 +61,31 @@
   },
   {
     "name": "numBytes",
-    "type": "TIMESTAMP",
+    "type": "INTEGER",
     "mode": "REQUIRED",
     "description": "Number of bytes of table (from GCP Census) that could not be backed up"
   },
   {
     "name": "backupNumBytes",
-    "type": "TIMESTAMP",
+    "type": "INTEGER",
     "mode": "REQUIRED",
     "description": "Number of bytes of table backup (from GCP Census)"
   },
   {
     "name": "backupEntityNumBytes",
-    "type": "TIMESTAMP",
+    "type": "INTEGER",
     "mode": "REQUIRED",
     "description": "Number of bytes of table backup (from Datastore)"
   },
   {
     "name": "numRows",
-    "type": "TIMESTAMP",
+    "type": "INTEGER",
     "mode": "REQUIRED",
     "description": "Number of rows of table (from GCP Census) that could not be backed up"
   },
   {
     "name": "backupNumRows",
-    "type": "TIMESTAMP",
+    "type": "INTEGER",
     "mode": "REQUIRED",
     "description": "Number of rows of table backup (from GCP Census)"
   }
