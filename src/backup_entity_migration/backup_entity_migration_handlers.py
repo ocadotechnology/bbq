@@ -25,23 +25,25 @@ class BackupEntityMigrationHandler(webapp2.RequestHandler):
         self.schedule_backup_entities(table_cursor)
 
     def schedule_backup_entities(self, table_cursor):
-        tables, cursor, more = Table.get_all_with_cursor(table_cursor)
+        tables, next_cursor, more = Table.get_all_with_cursor(table_cursor)
 
         Tasks.schedule('entity-backup-migration-worker',
                        self.__create_table_backups_migration_tasks(tables))
 
-        if more:
+        if more and next_cursor:
             Tasks.schedule('entity-backup-migration-scheduler', Tasks.create(
                 method='GET',
                 url='/backup_entity/migrate',
-                params={'cursor': cursor.urlsafe()}))
+                params={'cursor': next_cursor.urlsafe()},
+                name='migrationSchedule_' + next_cursor.urlsafe()))
 
     def __create_table_backups_migration_tasks(self, tables):
         return [
             Tasks.create(
                 method='GET',
                 url='/backup_entity/migrate_backup_for_table',
-                params={'table_key': table.key.urlsafe()})
+                params={'table_key': table.key.urlsafe()},
+                name='migrate_backup_for_table_' + table.key.urlsafe())
             for table in tables
         ]
 
