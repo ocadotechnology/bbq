@@ -1,0 +1,92 @@
+[
+  {
+    "name": "snapshotTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Where the data was filtered and put into the table"
+  },
+  {
+    "name": "projectId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "ProjectId of table that could not be backed up"
+  },
+  {
+    "name": "datasetId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "DatasetId of table that could not be backed up"
+  },
+  {
+    "name": "tableId",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "TableId of table that could not be backed up"
+  },
+  {
+    "name": "partitionId",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "PartitionId of table that could not be backed up"
+  },
+  {
+    "name": "backupDatasetId",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "DatasetId of table backup"
+  },
+  {
+    "name": "backupTableId",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "TableId of table backup"
+  },
+  {
+    "name": "lastModifiedTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "LastModifiedTime of table (from GCP Census) that could not be backed up"
+  },
+  {
+    "name": "backupLastModifiedTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "date of last modification (from GCP Census) that will be included in the Backup (copyJob start time - as it is atomic operation and every change before that point is included in copy)"
+  },
+  {
+    "name": "backupEntityLastModifiedTime",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "date of last modification (from Datastore Export) that will be included in the Backup (copyJob start time - as it is atomic operation and every change before that point is included in copy)"
+  },
+  {
+    "name": "numBytes",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Number of bytes of table (from GCP Census) that could not be backed up"
+  },
+  {
+    "name": "backupNumBytes",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Number of bytes of table backup (from GCP Census)"
+  },
+  {
+    "name": "backupEntityNumBytes",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Number of bytes of table backup (from Datastore)"
+  },
+  {
+    "name": "numRows",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Number of rows of table (from GCP Census) that could not be backed up"
+  },
+  {
+    "name": "backupNumRows",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Number of rows of table backup (from GCP Census)"
+  }
+]

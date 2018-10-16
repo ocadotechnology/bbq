@@ -1,7 +1,7 @@
 import logging
 
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.slo.x_days_sli.sli_view_querier import SLIViewQuerier
+from src.slo.sli_view_querier import SLIViewQuerier
 
 
 class SLITableExistsPredicate(object):
