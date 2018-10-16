@@ -35,7 +35,8 @@ class BackupEntityMigrationHandler(webapp2.RequestHandler):
                 method='GET',
                 url='/backup_entity/migrate',
                 params={'cursor': next_cursor.urlsafe()},
-                name='migrationSchedule_' + next_cursor.urlsafe()))
+                name='migrationSchedule_' + str(next_cursor.urlsafe()).replace(
+                    '=', '_').replace('+', '__').replace('/', '___')))
 
     def __create_table_backups_migration_tasks(self, tables):
         return [
@@ -43,7 +44,9 @@ class BackupEntityMigrationHandler(webapp2.RequestHandler):
                 method='GET',
                 url='/backup_entity/migrate_backup_for_table',
                 params={'table_key': table.key.urlsafe()},
-                name='migrate_backup_for_table_' + table.key.urlsafe())
+                name='migrate_backup_for_table_' + str(
+                    table.key.urlsafe()).replace(
+                    '=', '_').replace('+', '__').replace('/', '___'))
             for table in tables
         ]
 
