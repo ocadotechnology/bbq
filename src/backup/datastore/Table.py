@@ -15,6 +15,17 @@ class Table(ndb.Model):
     last_checked = ndb.DateTimeProperty(indexed=True)
     partition_id = ndb.StringProperty(indexed=True)
 
+
+    # TODO remove after migration
+    @classmethod
+    def get_all_with_cursor(cls, cursor):
+        ctx = ndb.get_context()
+        ctx.set_cache_policy(False)
+        query = cls.query()
+        tables, cursor, more = query.fetch_page(1000, start_cursor=cursor)
+        return tables, cursor, more
+
+
     @classmethod
     def get_table_from_backup(cls, backup):
         parent = backup.key.parent()
