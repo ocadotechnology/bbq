@@ -65,15 +65,13 @@ resource "google_bigquery_table" "last_backup_view" {
               deleted,
               last_modified,
               numBytes,
-              COALESCE(table_id.text, table_id.string, table_id) AS table_id,
-              COALESCE(dataset_id.text, dataset_id.string, dataset_id) AS dataset_id,
+              table_id,
+              dataset_id,
               NTH(2, SPLIT(__key__.path, ',')) AS parent_id,
               TO_BASE64(BYTES(__key__.path)) AS key
             FROM
               TABLE_QUERY( [${local.datastore_export_project}:${var.datastore_export_dataset}],
-                'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")' ) AS last_table,
-              (SELECT '' AS table_id.text, '' AS table_id.string, '' AS dataset_id.text, '' AS dataset_id.string) AS faketable
-               WHERE created IS NOT NULL
+                'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")' ) AS last_table
             )
         EOF
     use_legacy_sql = true
