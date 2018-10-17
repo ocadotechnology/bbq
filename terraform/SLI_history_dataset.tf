@@ -92,7 +92,7 @@ resource "google_bigquery_table" "SLI_backup_quality_view" {
           #legacySQL
           SELECT snapshotTime, projectId, datasetId, tableId, partitionId, backupDatasetId, backupTableId, lastModifiedTime, backupLastModifiedTime, backupEntityLastModifiedTime, numBytes, backupNumBytes, backupEntityNumBytes, numRows, backupNumRows
           FROM (
-            SELECT snapshotTime, projectId, datasetId, tableId, partitionId, backupDatasetId, backupTableId, lastModifiedTime, backupLastModifiedTime, backupEntityLastModifiedTime, numBytes, backupNumBytes, backupEntityNumBytes, numRows, backupNumRows
+            SELECT snapshotTime, projectId, datasetId, tableId, partitionId, backupDatasetId, backupTableId, lastModifiedTime, backupLastModifiedTime, backupEntityLastModifiedTime, numBytes, backupNumBytes, backupEntityNumBytes, numRows, backupNumRows,
             DENSE_RANK() OVER (ORDER BY snapshotTime DESC ) AS newestSnapshotRank
             FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_quality]
             WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
