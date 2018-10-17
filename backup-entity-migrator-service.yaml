@@ -1,7 +1,7 @@
 runtime: python27
 api_version: 1
 threadsafe: true
-service: slo-service
+service: backup-entity-migration
 
 instance_class: F2
 
@@ -19,7 +19,6 @@ skip_files:
 - gitlab-bbq
 - docs
 - tests
-- src/backup
 - src/datastore_export
 - src/restore
 - src/retention
@@ -29,16 +28,12 @@ handlers:
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
   application_readable: true
-- url: /cron/sli/calculate
-  script: src.slo.sli_handlers.app
+- url: /backup_entity/migrate
+  script: src.backup_entity_migration.backup_entity_migration_handlers.app
   secure: always
   login: admin
-- url: /sli/latency_for_x_days
-  script: src.slo.backup_creation_latency.latency_sli_handler.app
-  secure: always
-  login: admin
-- url: /.*
-  script: src.slo.slo_ui_handlers.app
+- url: /backup_entity/migrate_backup_for_table
+  script: src.backup_entity_migration.backup_entity_migration_handlers.app
   secure: always
   login: admin
 
