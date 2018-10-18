@@ -11,7 +11,7 @@ class SLITableNewerModificationPredicate(object):
     def __init__(self, big_query):
         self.big_query = big_query
 
-    def is_modified_till_last_census_snapshot(self, sli_table_entry):
+    def is_modified_since_last_census_snapshot(self, sli_table_entry):
         table_reference = QualityQuerySpecification.quality_sli_entry_to_table_reference(sli_table_entry)
         table = self.big_query.get_table(
             project_id=table_reference.project_id,

@@ -25,12 +25,12 @@ class TestQualitySliService(unittest.TestCase):
                                    "tableId": "t1",
                                    "partitionId": "part1"}
                                 ], 21342134324))
-    @patch.object(SLITableNewerModificationPredicate, 'is_modified_till_last_census_snapshot')
+    @patch.object(SLITableNewerModificationPredicate, 'is_modified_since_last_census_snapshot')
     @patch.object(SLIResultsStreamer, 'stream')
-    def test_table_that_is_modfied_till_last_census_snapshot_should_be_filtered_out(self,
-        stream, is_modified_till_last_census_snapshot, _):
+    def test_table_that_is_modfied_since_last_census_snapshot_should_be_filtered_out(self,
+        stream, is_modified_since_last_census_snapshot, _):
         # given
-        is_modified_till_last_census_snapshot.return_value = True
+        is_modified_since_last_census_snapshot.return_value = True
         # when
         QualitySliService().recalculate_sli()
         # then
@@ -42,12 +42,12 @@ class TestQualitySliService(unittest.TestCase):
                                    "tableId": "t1",
                                    "partitionId": "part1"}
                                 ], 21342134324))
-    @patch.object(SLITableNewerModificationPredicate, 'is_modified_till_last_census_snapshot')
+    @patch.object(SLITableNewerModificationPredicate, 'is_modified_since_last_census_snapshot')
     @patch.object(SLIResultsStreamer, 'stream')
-    def test_table_that_is_not_modfied_till_last_census_snapshot_should_not_be_filtered_out(self,
-        stream, is_modified_till_last_census_snapshot, _):
+    def test_table_that_is_not_modfied_since_last_census_snapshot_should_not_be_filtered_out(self,
+        stream, is_modified_since_last_census_snapshot, _):
         # given
-        is_modified_till_last_census_snapshot.return_value = False
+        is_modified_since_last_census_snapshot.return_value = False
         # when
         QualitySliService().recalculate_sli()
         # then
@@ -61,13 +61,13 @@ class TestQualitySliService(unittest.TestCase):
                                    "tableId": "t1",
                                    "partitionId": "part1"}
                                 ], 21342134324))
-    @patch.object(SLITableNewerModificationPredicate, 'is_modified_till_last_census_snapshot')
+    @patch.object(SLITableNewerModificationPredicate, 'is_modified_since_last_census_snapshot')
     @patch.object(SLIResultsStreamer, 'stream')
     def test_table_that_caused_exception_in_modification_predicate_should_not_be_filtered_out(
-        self, stream, is_modified_till_last_census_snapshot, _):
+        self, stream, is_modified_since_last_census_snapshot, _):
 
         # given
-        is_modified_till_last_census_snapshot.side_effect = Exception("An error")
+        is_modified_since_last_census_snapshot.side_effect = Exception("An error")
 
         # when
         QualitySliService().recalculate_sli()
