@@ -16,11 +16,3 @@ class SLIViewQuerier(object):
         logging.info("Executing query: %s", query)
         query_results = self.big_query.execute_query(query)
         return self.query_specification.format_query_results(query_results, self.snapshot_time), self.snapshot_time
-
-    @staticmethod
-    def sli_entry_to_table_reference(table):
-        return TableReference(project_id=table['projectId'],
-                              dataset_id=table['datasetId'],
-                              table_id=table['tableId'],
-                              partition_id=table['partitionId'])
-    
