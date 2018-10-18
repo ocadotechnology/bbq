@@ -11,7 +11,7 @@ class SLITableExistsPredicate(object):
         self.big_query = big_query
 
     def exists(self, sli_table):
-        table_reference = LatencyQuerySpecification.latency_sli_entry_to_table_reference(sli_table)
+        table_reference = LatencyQuerySpecification.entry_to_table_reference(sli_table)
         table = self.big_query.get_table(
             project_id=table_reference.project_id,
             dataset_id=table_reference.dataset_id,
