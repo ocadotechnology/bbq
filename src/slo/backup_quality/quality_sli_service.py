@@ -36,7 +36,7 @@ class QualitySliService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
-            return not self.table_newer_modification_predicate.is_modified_since_last_census_snapshot()
+            return not self.table_newer_modification_predicate.is_modified_since_last_census_snapshot(table)
         except Exception:
             logging.exception("An error occurred while filtering table %s, "
                               "still it will be streamed", table)
