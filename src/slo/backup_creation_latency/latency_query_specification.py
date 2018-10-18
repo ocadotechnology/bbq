@@ -26,7 +26,7 @@ class LatencyQuerySpecification(object):
         return formatted_results
 
     @staticmethod
-    def latency_sli_entry_to_table_reference(table):
+    def entry_to_table_reference(table):
         return TableReference(project_id=table['projectId'],
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],

@@ -12,7 +12,7 @@ class SLITableRecreationPredicate(object):
         self.big_query = big_query
 
     def is_recreated(self, sli_table_entry):
-        table_reference = LatencyQuerySpecification.latency_sli_entry_to_table_reference(sli_table_entry)
+        table_reference = LatencyQuerySpecification.entry_to_table_reference(sli_table_entry)
         table = self.big_query.get_table(
             project_id=table_reference.project_id,
             dataset_id=table_reference.dataset_id,
