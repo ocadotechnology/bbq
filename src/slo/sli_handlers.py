@@ -14,13 +14,19 @@ class SLIMainHandler(webapp2.RequestHandler):
 
     @staticmethod
     def create_slo_recalculation_tasks():
-        return [
+        tasks = [
+          Tasks.create(method='POST',
+                       url='/sli/latency_for_x_days',
+                       params={'x_days': x_days})
+          for x_days in [0, 3, 4, 5, 7]
+        ]
+        tasks.append(
             Tasks.create(
                 method='POST',
-                url='/sli/latency_for_x_days',
-                params={'x_days': x_days})
-            for x_days in [0, 3, 4, 5, 7]
-        ]
+                url='/sli/quality',
+                params={}))
+
+        return tasks
 
 
 app = webapp2.WSGIApplication([
