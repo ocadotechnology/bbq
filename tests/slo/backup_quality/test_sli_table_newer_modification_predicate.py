@@ -30,7 +30,7 @@ class TestSLITableNewerModificationPredicate(unittest.TestCase):
         }
 
         # when
-        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_till_last_census_snapshot(sli_table)
+        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_since_last_census_snapshot(sli_table)
 
         # then
         self.assertTrue(is_modified)
@@ -56,7 +56,7 @@ class TestSLITableNewerModificationPredicate(unittest.TestCase):
         }
 
         # when
-        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_till_last_census_snapshot(sli_table)
+        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_since_last_census_snapshot(sli_table)
 
         # then
         self.assertFalse(is_modified)
@@ -82,7 +82,7 @@ class TestSLITableNewerModificationPredicate(unittest.TestCase):
         }
 
         # when
-        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_till_last_census_snapshot(sli_table)
+        is_modified = SLITableNewerModificationPredicate(BigQuery()).is_modified_since_last_census_snapshot(sli_table)
 
         # then
         self.assertFalse(is_modified)
