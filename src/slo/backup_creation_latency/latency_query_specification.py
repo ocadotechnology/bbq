@@ -1,4 +1,5 @@
 from src.commons.config.configuration import configuration
+from src.commons.table_reference import TableReference
 
 
 class LatencyQuerySpecification(object):
@@ -23,3 +24,10 @@ class LatencyQuerySpecification(object):
                               "backupLastModified": float(result['f'][7]['v']),
                               "xDays": self.x_days} for result in results]
         return formatted_results
+
+    @staticmethod
+    def latency_sli_entry_to_table_reference(table):
+        return TableReference(project_id=table['projectId'],
+                              dataset_id=table['datasetId'],
+                              table_id=table['tableId'],
+                              partition_id=table['partitionId'])

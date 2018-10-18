@@ -37,6 +37,10 @@ handlers:
   script: src.slo.backup_creation_latency.latency_sli_handler.app
   secure: always
   login: admin
+- url: /sli/quality
+  script: src.slo.backup_quality.quality_sli_handler.app
+  secure: always
+  login: admin
 - url: /.*
   script: src.slo.slo_ui_handlers.app
   secure: always
