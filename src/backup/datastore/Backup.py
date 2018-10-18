@@ -64,13 +64,6 @@ class Backup(ndb.Model):
             .order(-Backup.created) \
             .fetch()
 
-    # nopep8 pylint: disable=C0121
-    # TODO remove after migration
-    @classmethod
-    @retry(Exception, tries=5, delay=1, backoff=2)
-    def get_all_backups_entities(cls, ancestor_key):
-        return Backup.query(ancestor=ancestor_key).fetch()
-
     @classmethod
     def sort_backups_by_create_time_desc(cls, backups):
         copy = list(backups)
