@@ -29,7 +29,7 @@ class QualityQuerySpecification(object):
         return formatted_results
 
     @staticmethod
-    def entry_to_table_reference(table):
+    def to_table_reference(table):
         return TableReference(project_id=table['projectId'],
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
