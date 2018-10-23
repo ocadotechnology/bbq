@@ -1,17 +1,15 @@
 import logging
 
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
-from src.slo.backup_creation_latency.latency_query_specification import \
-    LatencyQuerySpecification
-
 
 class SLITableExistsPredicate(object):
 
-    def __init__(self, big_query):
+    def __init__(self, big_query, query_specification):
         self.big_query = big_query
+        self.query_specification = query_specification
 
     def exists(self, sli_table):
-        table_reference = LatencyQuerySpecification.entry_to_table_reference(sli_table)
+        table_reference = self.query_specification.to_table_reference(sli_table)
         table = self.big_query.get_table(
             project_id=table_reference.project_id,
             dataset_id=table_reference.dataset_id,

@@ -2,7 +2,9 @@ import unittest
 
 from mock import Mock, patch
 
-from src.slo.backup_creation_latency.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.backup_creation_latency.latency_query_specification import \
+    LatencyQuerySpecification
+from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
 from src.commons.big_query.big_query import BigQuery
 
 
@@ -17,7 +19,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_non_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertFalse(exists)
@@ -31,7 +33,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_non_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertTrue(exists)
@@ -48,7 +50,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertFalse(exists)
@@ -64,7 +66,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertTrue(exists)
@@ -78,7 +80,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_non_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertFalse(exists)
@@ -93,7 +95,7 @@ class TestSLITableExistsPredicate(unittest.TestCase):
         sli_table = self.__create_non_partitioned_sli_table()
 
         # when
-        exists = SLITableExistsPredicate(BigQuery()).exists(sli_table)
+        exists = SLITableExistsPredicate(BigQuery(), LatencyQuerySpecification).exists(sli_table)
 
         # then
         self.assertTrue(exists)

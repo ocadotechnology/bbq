@@ -3,8 +3,8 @@ import unittest
 from mock import patch
 
 from src.slo.sli_results_streamer import SLIResultsStreamer
-from src.slo.backup_creation_latency.sli_table_exists_predicate import SLITableExistsPredicate
-from src.slo.backup_creation_latency.sli_table_recreation_predicate import \
+from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.backup_creation_latency.predicate.sli_table_recreation_predicate import \
     SLITableRecreationPredicate
 from src.slo.sli_view_querier import SLIViewQuerier
 from src.slo.backup_creation_latency.latency_sli_service import LatencySliService

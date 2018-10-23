@@ -1,9 +1,11 @@
 import logging
 
 from src.commons.big_query.big_query import BigQuery
+from src.slo.predicate.sli_table_exists_predicate import \
+  SLITableExistsPredicate
 from src.slo.backup_quality.quality_query_specification import \
   QualityQuerySpecification
-from src.slo.backup_quality.sli_table_newer_modification_predicate import \
+from src.slo.backup_quality.predicate.sli_table_newer_modification_predicate import \
   SLITableNewerModificationPredicate
 from src.slo.sli_results_streamer import SLIResultsStreamer
 from src.slo.sli_view_querier import SLIViewQuerier
@@ -20,6 +22,7 @@ class QualitySliService(object):
             table_id="SLI_backup_quality"
         )
         self.table_newer_modification_predicate = SLITableNewerModificationPredicate(big_query)
+        self.table_existence_predicate = SLITableExistsPredicate(big_query, QualityQuerySpecification)
 
     def recalculate_sli(self):
         logging.info("Recalculating quality SLI has been started.")
@@ -36,6 +39,8 @@ class QualitySliService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
+            if not self.table_existence_predicate.exists(table):
+              return False
             return not self.table_newer_modification_predicate.is_modified_since_last_census_snapshot(table)
         except Exception:
             logging.exception("An error occurred while filtering table %s, "
