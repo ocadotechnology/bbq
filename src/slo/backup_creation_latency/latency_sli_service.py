@@ -3,9 +3,9 @@ import logging
 from src.commons.big_query.big_query import BigQuery
 from src.slo.backup_creation_latency.latency_query_specification import \
     LatencyQuerySpecification
-from src.slo.backup_creation_latency.sli_table_exists_predicate import SLITableExistsPredicate
+from src.slo.predicate.sli_table_exists_predicate import SLITableExistsPredicate
 from src.slo.sli_results_streamer import SLIResultsStreamer
-from src.slo.backup_creation_latency.sli_table_recreation_predicate import \
+from src.slo.backup_creation_latency.predicate.sli_table_recreation_predicate import \
   SLITableRecreationPredicate
 from src.slo.sli_view_querier import SLIViewQuerier
 
@@ -22,7 +22,7 @@ class LatencySliService(object):
         self.streamer = SLIResultsStreamer(
             table_id="SLI_backup_creation_latency"
         )
-        self.table_existence_predicate = SLITableExistsPredicate(big_query)
+        self.table_existence_predicate = SLITableExistsPredicate(big_query, LatencyQuerySpecification)
         self.table_recreation_predicate = SLITableRecreationPredicate(big_query)
 
     def recalculate_sli(self):
