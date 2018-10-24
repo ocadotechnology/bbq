@@ -69,7 +69,7 @@ class TestQualitySliService(unittest.TestCase):
                                 ], 21342134324))
     @patch.object(SLITableExistsPredicate, 'exists')
     @patch.object(SLIResultsStreamer, 'stream')
-    def test_table_that_is_not_exist_should_be_be_filtered_out(self,
+    def test_table_that_not_exists_should_be_be_filtered_out(self,
         stream, exists, _):
         # given
         exists.return_value = False
