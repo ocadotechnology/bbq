@@ -178,7 +178,7 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=configuration.backup_project_id,
             body=query_data).execute(num_retries=3)
 
-    @google_http_error_retry(tries=1, delay=1, backoff=2)
+    @google_http_error_retry(tries=6, delay=2, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
         logging.info("getting table %s", BigQueryTable(project_id, dataset_id, table_id))
         try:
