@@ -96,6 +96,7 @@ class TestTaskCreator(unittest.TestCase):
                     copy_job_type_id='backups',
                     project_id='test_project',
                     job_id='job123',
+                    location="EU",
                     retry_count=-1
                 )
             )
@@ -105,7 +106,9 @@ class TestTaskCreator(unittest.TestCase):
         result_check_request = ResultCheckRequest(
             task_name_suffix='task-name-suffix',
             copy_job_type_id='backups',
-            project_id='test_project', job_id='job123',
+            project_id='test_project',
+            job_id='job123',
+            location='EU',
             retry_count=2,
             post_copy_action_request=PostCopyActionRequest(
                 url="/my/url",
@@ -136,6 +139,7 @@ class TestTaskCreator(unittest.TestCase):
                 copy_job_type_id="unknown-copying",
                 project_id="project_abc",
                 job_id="job123",
+                location='EU',
                 retry_count=0,
                 post_copy_action_request=PostCopyActionRequest(
                     '/my/post/copy/url', {'mypayload': 'mypayload_value'}))

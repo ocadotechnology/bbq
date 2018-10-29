@@ -37,7 +37,7 @@ class TestCopyJobService(unittest.TestCase):
         patch.stopall()
         self.testbed.deactivate()
 
-    @patch.object(BigQuery, 'insert_job', return_value="job_id_123")
+    @patch.object(BigQuery, 'insert_job', return_value=("job_id_123", "EU"))
     @patch.object(TaskCreator, 'create_copy_job_result_check')
     def test_that_post_copy_action_request_is_passed(
             self, create_copy_job_result_check, _):
@@ -64,6 +64,7 @@ class TestCopyJobService(unittest.TestCase):
                 copy_job_type_id="test-process",
                 project_id="target_project_id_1",
                 job_id="job_id_123",
+                location="EU",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )
@@ -195,6 +196,7 @@ class TestCopyJobService(unittest.TestCase):
                 copy_job_type_id="test-process",
                 project_id="target_project_id_1",
                 job_id="random_job_123",
+                location=None,
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )

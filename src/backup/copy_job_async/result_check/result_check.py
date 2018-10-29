@@ -18,7 +18,8 @@ class ResultCheck(object):
         self.__post_copy_action_request = result_check_request.post_copy_action_request
         job_json = self.BQ.get_job(
             project_id=result_check_request.project_id,
-            job_id=result_check_request.job_id
+            job_id=result_check_request.job_id,
+            location=result_check_request.location
         )
         logging.info('Checking result (retryCount=%s) of job: %s',
                      result_check_request.retry_count, json.dumps(job_json))

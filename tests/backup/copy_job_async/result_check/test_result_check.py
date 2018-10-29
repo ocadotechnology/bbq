@@ -42,6 +42,7 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             project_id="target_project_id",
             job_id="job_id", retry_count=retry_count,
+            location="EU",
             post_copy_action_request=post_copy_action_request)
         return result_check_request
 
@@ -74,6 +75,7 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             project_id="target_project_id",
             job_id="job_id",
+            location="EU",
             retry_count=0,
             post_copy_action_request=post_copy_action_request)
         )
@@ -131,6 +133,7 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             project_id="target_project_id",
             job_id="job_id",
+            location="EU",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request))
 
@@ -161,6 +164,7 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             project_id="target_project_id",
             job_id="job_id",
+            location="EU",
             retry_count=retry_count,
             post_copy_action_request=None
         ))
@@ -172,6 +176,7 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             project_id="target_project_id",
             job_id="job_id",
+            location="EU",
             retry_count=retry_count,
             post_copy_action_request=None
         ))

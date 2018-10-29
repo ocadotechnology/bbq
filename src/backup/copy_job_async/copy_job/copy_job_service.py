@@ -16,7 +16,7 @@ class CopyJobService(object):
         target_big_query_table = copy_job_request.target_big_query_table
         retry_count = copy_job_request.retry_count
 
-        job_id = CopyJobService.__schedule(source_big_query_table,
+        job_id, job_location = CopyJobService.__schedule(source_big_query_table,
                                            target_big_query_table,
                                            job_id=CopyJobService._create_random_job_id())
         if job_id:
@@ -26,6 +26,7 @@ class CopyJobService(object):
                     copy_job_type_id=copy_job_request.copy_job_type_id,
                     project_id=target_big_query_table.get_project_id(),
                     job_id=job_id,
+                    location=job_location,
                     retry_count=retry_count,
                     post_copy_action_request=copy_job_request.post_copy_action_request
                 )
@@ -66,17 +67,17 @@ class CopyJobService(object):
             }
         }
         try:
-            response_job_id = BigQuery().insert_job(
+            response_job_id, response_job_location = BigQuery().insert_job(
                 target_big_query_table.get_project_id(), job_data)
-            logging.info("Response job ID: " + response_job_id)
-            return response_job_id
+            logging.info("Response job ID: %s, location: %s", response_job_id, response_job_location)
+            return response_job_id, response_job_location
         except HttpError as bq_error:
             if bq_error.resp.status == 404:
                 logging.exception('404 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
-                return None
+                return None, None
             elif bq_error.resp.status == 409:
                 logging.warning('409 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
-                return job_id
+                return job_id, None
             else:
                 raise
         except Exception as error:
