@@ -233,11 +233,11 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=project_id, body=body
         ).execute()
         logging.info('Insert job response: ' + json.dumps(response))
-        return response['jobReference']['jobId']
+        return response['jobReference']['jobId'], response['jobReference']['location']
 
-    def get_job(self, project_id, job_id):
+    def get_job(self, project_id, job_id, location):
         return self.service.jobs().get(
-            projectId=project_id, jobId=job_id
+            projectId=project_id, jobId=job_id, location=location
         ).execute(num_retries=3)
 
     @retry(Error, tries=3, delay=2, backoff=2)

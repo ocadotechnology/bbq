@@ -36,12 +36,13 @@ class TestResultCheckHandler(unittest.TestCase):
         # given
         project_id = "target_project_id"
         job_id = "job_id"
+        location = "EU"
         retry_count = "1"
         post_copy_action_request = \
             PostCopyActionRequest(url="/my/url", data={"key1": "value1"})
 
         result_check_request = self.create_example_result_check_request(
-            project_id, job_id, retry_count, post_copy_action_request)
+            project_id, job_id,location, retry_count, post_copy_action_request)
 
         # when
         self.under_test.post(url='/tasks/copy_job_async/result_check', params={"resultCheckRequest": jsonpickle.encode(result_check_request)})
@@ -49,10 +50,10 @@ class TestResultCheckHandler(unittest.TestCase):
         # then
         result_check_mock.assert_called_with(
             self.create_example_result_check_request(
-                project_id, job_id, retry_count, post_copy_action_request)
+                project_id, job_id,location, retry_count, post_copy_action_request)
         )
 
-    def create_example_result_check_request(self, project_id, job_id,
+    def create_example_result_check_request(self, project_id, job_id, location,
                                             retry_count,
                                             post_copy_action_request):
         return ResultCheckRequest(
@@ -60,6 +61,7 @@ class TestResultCheckHandler(unittest.TestCase):
             copy_job_type_id=None,
             project_id=project_id,
             job_id=job_id,
+            location=location,
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request
         )
