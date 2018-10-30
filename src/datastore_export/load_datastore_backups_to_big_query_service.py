@@ -17,6 +17,12 @@ class LoadDatastoreBackupsToBigQueryException(Exception):
     pass
 
 
+class LoadJob(object):
+    def __init__(self,job_id, location):
+        self.job_id = job_id
+        self.location = location
+
+
 class LoadDatastoreBackupsToBigQueryService(object):
 
     def __init__(self, date):
@@ -30,15 +36,15 @@ class LoadDatastoreBackupsToBigQueryService(object):
             DATASET_ID, self.location
         )
 
-        load_jobs_tuples = []
+        load_jobs = []
         for kind in kinds:
             job_id, job_location = self.big_query.insert_job(
                 project_id=configuration.backup_project_id,
                 body=self.__create_job_body(source_uri, kind)
             )
-            load_jobs_tuples.append((job_id, job_location))
+            load_jobs.append(LoadJob(job_id, job_location))
 
-        return self.__all_finished_with_success(load_jobs_tuples)
+        return self.__all_finished_with_success(load_jobs)
 
     def __create_job_body(self, source_uri, kind):
         return {
@@ -61,16 +67,16 @@ class LoadDatastoreBackupsToBigQueryService(object):
             }
         }
 
-    def __all_finished_with_success(self, load_jobs_tuples):
+    def __all_finished_with_success(self, load_jobs):
         result = True
-        for load_job_tuple in load_jobs_tuples:
-            if not self.__is_finished_with_success(load_job_tuple):
+        for load_job in load_jobs:
+            if not self.__is_finished_with_success(load_job):
                 result = False
         return result
 
-    def __is_finished_with_success(self, load_job_tuple):
+    def __is_finished_with_success(self, load_job):
         finish_time = time.time() + TIMEOUT
-        self.__wait_till_done(load_job_tuple)
+        self.__wait_till_done(load_job)
 
         if time.time() > finish_time:
             ErrorReporting().report(
@@ -80,24 +86,24 @@ class LoadDatastoreBackupsToBigQueryService(object):
         logging.info("Export from GCS to BQ finished successfully.")
         return True
 
-    def __wait_till_done(self, load_job_tuple):
+    def __wait_till_done(self, load_job):
         while True:
             result = self.big_query.get_job(
                 project_id=configuration.backup_project_id,
-                job_id=load_job_tuple[0],
-                location=load_job_tuple[1]
+                job_id=load_job.job_id,
+                location=load_job.location
             )
             if 'errors' in result['status']:
                 raise LoadDatastoreBackupsToBigQueryException(
-                    "Export from GCS to BQ failed, job id: {}".format(
-                        load_job_tuple)
+                    "Export from GCS to BQ failed, job id: {}, location: {}"
+                    .format(load_job.job_id, load_job.location)
                 )
             if result['status']['state'] == 'DONE':
                 return
 
             logging.info(
                 "Export from GCS to BQ still in progress... JobId: %s. "
-                "Waiting %d seconds to check the results again.",
-                load_job_tuple, PERIOD
+                "Location: %s. Waiting %d seconds to check the results again.",
+                load_job.job_id, load_job.location, PERIOD
             )
             time.sleep(PERIOD)
