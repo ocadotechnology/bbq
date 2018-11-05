@@ -2,7 +2,7 @@ import unittest
 
 from src.commons.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.table_reference import TableReference
-from tests.backup.copy_job_async.result_check.job_result_example import \
+from tests.commons.copy_job_async.result_check.job_result_example import \
     JobResultExample
 
 
