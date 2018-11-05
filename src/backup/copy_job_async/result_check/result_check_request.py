@@ -1,6 +1,6 @@
 class ResultCheckRequest(object):
     def __init__(self, task_name_suffix, copy_job_type_id, job_reference,
-        retry_count=0, post_copy_action_request=None):
+                 retry_count=0, post_copy_action_request=None):
         self.__task_name_suffix = task_name_suffix
         self.__copy_job_type_id = copy_job_type_id
         self.__job_reference = job_reference
@@ -30,9 +30,9 @@ class ResultCheckRequest(object):
     def __str__(self):
         return 'task_name_suffix: {}, copy_job_type_id: {}, jobReference: {},' \
                ' retryCount: {}, postCopyActionRequest: {}'.format(
-            self.__task_name_suffix, self.__copy_job_type_id,
-            self.__job_reference, self.__retry_count,
-            self.__post_copy_action_request)
+                self.__task_name_suffix, self.__copy_job_type_id,
+                self.__job_reference, self.__retry_count,
+                self.__post_copy_action_request)
 
     def __repr__(self):
         return self.__str__()
