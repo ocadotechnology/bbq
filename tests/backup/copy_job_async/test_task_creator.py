@@ -6,16 +6,17 @@ from google.appengine.api.taskqueue import UnknownQueueError
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.commons.test_utils import utils
 from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
 from src.backup.copy_job_async.copy_job.copy_job_task_name import \
-    CopyJobTaskName
+  CopyJobTaskName
 from src.backup.copy_job_async.post_copy_action_request import \
-    PostCopyActionRequest
+  PostCopyActionRequest
 from src.backup.copy_job_async.result_check.result_check_request import \
-    ResultCheckRequest
+  ResultCheckRequest
 from src.backup.copy_job_async.task_creator import TaskCreator
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.test_utils import utils
 
 
 class TestTaskCreator(unittest.TestCase):
@@ -94,9 +95,9 @@ class TestTaskCreator(unittest.TestCase):
                 ResultCheckRequest(
                     task_name_suffix=None,
                     copy_job_type_id='backups',
-                    project_id='test_project',
-                    job_id='job123',
-                    location="EU",
+                    job_reference=BigQueryJobReference(project_id="project_abc",
+                                                       job_id="job123",
+                                                       location='EU'),
                     retry_count=-1
                 )
             )
@@ -106,9 +107,9 @@ class TestTaskCreator(unittest.TestCase):
         result_check_request = ResultCheckRequest(
             task_name_suffix='task-name-suffix',
             copy_job_type_id='backups',
-            project_id='test_project',
-            job_id='job123',
-            location='EU',
+            job_reference=BigQueryJobReference(project_id="project_abc",
+                                               job_id="job123",
+                                               location='EU'),
             retry_count=2,
             post_copy_action_request=PostCopyActionRequest(
                 url="/my/url",
@@ -137,9 +138,9 @@ class TestTaskCreator(unittest.TestCase):
             TaskCreator.create_copy_job_result_check(ResultCheckRequest(
                 task_name_suffix=None,
                 copy_job_type_id="unknown-copying",
-                project_id="project_abc",
-                job_id="job123",
-                location='EU',
+                job_reference=BigQueryJobReference(project_id="project_abc",
+                                                   job_id="job123",
+                                                   location='EU'),
                 retry_count=0,
                 post_copy_action_request=PostCopyActionRequest(
                     '/my/post/copy/url', {'mypayload': 'mypayload_value'}))
