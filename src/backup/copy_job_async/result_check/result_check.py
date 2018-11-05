@@ -16,25 +16,23 @@ class ResultCheck(object):
     def check(self, result_check_request):
         self.__copy_job_type_id = result_check_request.copy_job_type_id
         self.__post_copy_action_request = result_check_request.post_copy_action_request
-        job_json = self.BQ.get_job(
-            project_id=result_check_request.project_id,
-            job_id=result_check_request.job_id,
-            location=result_check_request.location
-        )
+        job_json = self.BQ.get_job(result_check_request.job_reference)
+
         logging.info('Checking result (retryCount=%s) of job: %s',
                      result_check_request.retry_count, json.dumps(job_json))
 
         copy_job_result = CopyJobResult(job_json)
 
         if copy_job_result.is_done():
-            logging.info('Copy job %s complete', result_check_request.job_id)
+            logging.info('Copy job %s complete',
+                         result_check_request.job_reference)
             self.__process_copy_job_result(copy_job_result,
                                            result_check_request.retry_count)
         else:
             logging.info(
                 "Copy job '%s' not completed yet. Another result check "
                 "is put on the queue.",
-                result_check_request.job_id)
+                result_check_request.job_reference)
             TaskCreator.create_copy_job_result_check(result_check_request)
 
     def __process_copy_job_result(self, job_result, retry_count):
@@ -43,7 +41,7 @@ class ResultCheck(object):
             logging.info("retry_count: %s", retry_count)
             logging.error(job_result.error_message)
             if self.__should_retry(job_result.error_result) \
-                    and retry_count < self.__MAX_RETRY_COUNT:
+                and retry_count < self.__MAX_RETRY_COUNT:
                 logging.error('We may need to re-trigger this task.')
                 retry_count += 1
                 TaskCreator.create_copy_job(

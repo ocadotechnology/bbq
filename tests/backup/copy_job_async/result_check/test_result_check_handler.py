@@ -7,7 +7,9 @@ from src.backup.copy_job_async.post_copy_action_request import \
 from src.backup.copy_job_async.result_check import result_check_handler
 from src.backup.copy_job_async.result_check.result_check import \
     ResultCheck
-from src.backup.copy_job_async.result_check.result_check_request import ResultCheckRequest
+from src.backup.copy_job_async.result_check.result_check_request import \
+    ResultCheckRequest
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 import unittest
@@ -59,9 +61,9 @@ class TestResultCheckHandler(unittest.TestCase):
         return ResultCheckRequest(
             task_name_suffix=None,
             copy_job_type_id=None,
-            project_id=project_id,
-            job_id=job_id,
-            location=location,
+            job_reference=BigQueryJobReference(project_id=project_id,
+                                               job_id=job_id,
+                                               location=location),
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request
         )

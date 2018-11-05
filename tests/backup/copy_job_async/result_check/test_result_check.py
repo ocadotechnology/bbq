@@ -12,6 +12,7 @@ from src.backup.copy_job_async.post_copy_action_request import \
 from src.backup.copy_job_async.result_check.result_check_request import \
     ResultCheckRequest
 from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from tests.backup.copy_job_async.result_check.job_result_example import \
     JobResultExample
 
@@ -40,9 +41,10 @@ class TestResultCheck(unittest.TestCase):
         result_check_request = ResultCheckRequest(
             task_name_suffix="task_name_suffix",
             copy_job_type_id="backups",
-            project_id="target_project_id",
-            job_id="job_id", retry_count=retry_count,
-            location="EU",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
+            retry_count=retry_count,
             post_copy_action_request=post_copy_action_request)
         return result_check_request
 
@@ -73,9 +75,9 @@ class TestResultCheck(unittest.TestCase):
         ResultCheck().check(ResultCheckRequest(
             task_name_suffix='task_name_suffix',
             copy_job_type_id="backups",
-            project_id="target_project_id",
-            job_id="job_id",
-            location="EU",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
             retry_count=0,
             post_copy_action_request=post_copy_action_request)
         )
@@ -131,9 +133,9 @@ class TestResultCheck(unittest.TestCase):
         ResultCheck().check(ResultCheckRequest(
             task_name_suffix="task_name_suffix",
             copy_job_type_id="backups",
-            project_id="target_project_id",
-            job_id="job_id",
-            location="EU",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request))
 
@@ -162,9 +164,9 @@ class TestResultCheck(unittest.TestCase):
         ResultCheck().check(ResultCheckRequest(
             task_name_suffix="task_name_suffix",
             copy_job_type_id="backups",
-            project_id="target_project_id",
-            job_id="job_id",
-            location="EU",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
             retry_count=retry_count,
             post_copy_action_request=None
         ))
@@ -174,9 +176,9 @@ class TestResultCheck(unittest.TestCase):
         ResultCheck().check(ResultCheckRequest(
             task_name_suffix="task_name_suffix",
             copy_job_type_id="backups",
-            project_id="target_project_id",
-            job_id="job_id",
-            location="EU",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
             retry_count=retry_count,
             post_copy_action_request=None
         ))
