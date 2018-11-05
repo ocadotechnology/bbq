@@ -8,7 +8,7 @@ from src.commons.decorators.retry import retry
 from src.commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
 from src.commons.handlers.json_handler import JsonHandler
-from src.backup.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.copy_job_async.copy_job_result import CopyJobResult
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.commons.big_query.big_query import BigQuery
