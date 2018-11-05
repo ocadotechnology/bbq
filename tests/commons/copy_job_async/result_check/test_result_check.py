@@ -13,7 +13,7 @@ from src.commons.copy_job_async.result_check.result_check_request import \
     ResultCheckRequest
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
-from tests.backup.copy_job_async.result_check.job_result_example import \
+from tests.commons.copy_job_async.result_check.job_result_example import \
     JobResultExample
 
 
