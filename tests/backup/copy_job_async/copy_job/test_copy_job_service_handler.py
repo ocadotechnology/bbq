@@ -2,9 +2,10 @@ import os
 
 import jsonpickle
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job.copy_job_service import CopyJobService
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.copy_job import copy_job_service_handler
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job.copy_job_service import CopyJobService
+from src.commons.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
@@ -12,7 +13,6 @@ import unittest
 
 import webtest
 
-from src.backup.copy_job_async.copy_job import copy_job_service_handler
 from src.commons.big_query.big_query_table import BigQueryTable
 from google.appengine.ext import testbed
 from mock import patch

@@ -1,9 +1,9 @@
 import json
 import logging
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job_result import CopyJobResult
-from src.backup.copy_job_async.task_creator import TaskCreator
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query import BigQuery
 
 

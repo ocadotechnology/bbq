@@ -4,7 +4,7 @@ from unittest import TestCase
 from google.appengine.ext import testbed, ndb
 from mock import patch, call, mock
 
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restoration_job import RestorationJob

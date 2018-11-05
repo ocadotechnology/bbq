@@ -4,7 +4,7 @@ import jsonpickle
 from google.appengine.api.taskqueue import Task
 
 from src.commons.tasks import Tasks
-from src.backup.copy_job_async.copy_job.copy_job_task_name import \
+from src.commons.copy_job_async.copy_job.copy_job_task_name import \
     CopyJobTaskName
 from src.commons.config.configuration import configuration
 

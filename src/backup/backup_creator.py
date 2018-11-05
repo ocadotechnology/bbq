@@ -2,8 +2,8 @@ import logging
 
 from src.commons import request_correlation_id
 from src.backup.backup_id_creator import BackupIdCreator
-from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.copy_job_service_async import CopyJobServiceAsync
+from src.commons.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
 from src.backup.dataset_id_creator import DatasetIdCreator
 from src.commons.big_query.big_query_table import BigQueryTable

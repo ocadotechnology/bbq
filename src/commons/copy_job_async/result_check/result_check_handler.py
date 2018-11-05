@@ -3,8 +3,8 @@ import logging
 import jsonpickle
 import webapp2
 
-from src.backup.copy_job_async.result_check.result_check import ResultCheck
 from src.commons.config.configuration import configuration
+from src.commons.copy_job_async.result_check.result_check import ResultCheck
 
 
 class ResultCheckHandler(webapp2.RequestHandler):

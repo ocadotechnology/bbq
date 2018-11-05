@@ -3,11 +3,11 @@ import unittest
 from google.appengine.ext import testbed, ndb
 from mock import patch
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job_service_async import CopyJobServiceAsync
+from src.commons.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
-from src.backup.copy_job_async.task_creator import TaskCreator
+from src.commons.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table import BigQueryTable
 
