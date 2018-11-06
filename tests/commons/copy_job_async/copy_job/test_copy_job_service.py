@@ -57,6 +57,8 @@ class TestCopyJobService(unittest.TestCase):
                 copy_job_type_id='test-process',
                 source_big_query_table=self.example_source_bq_table,
                 target_big_query_table=self.example_target_bq_table,
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )
@@ -71,10 +73,54 @@ class TestCopyJobService(unittest.TestCase):
                     project_id='test_project',
                     job_id='job123',
                     location='EU'),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )
         )
+        @patch.object(BigQuery, 'insert_job',
+                      return_value=BigQueryJobReference(
+                          project_id='test_project',
+                          job_id='job123',
+                          location='EU'))
+        @patch.object(TaskCreator, 'create_copy_job_result_check')
+        def test_that_create_and_write_disposition_are_passed_to_result_check(
+            self, create_copy_job_result_check, _):
+            # given
+            create_disposition = "SOME_CREATE_DISPOSITION"
+            write_disposition = "SOME_WRITE_DISPOSITION"
+
+            # when
+            CopyJobService().run_copy_job_request(
+                CopyJobRequest(
+                    task_name_suffix='task_name_suffix',
+                    copy_job_type_id='test-process',
+                    source_big_query_table=self.example_source_bq_table,
+                    target_big_query_table=self.example_target_bq_table,
+                    create_disposition=create_disposition,
+                    write_disposition=write_disposition,
+                    retry_count=0,
+                    post_copy_action_request=None
+                )
+            )
+
+            # then
+            create_copy_job_result_check.assert_called_once_with(
+                ResultCheckRequest(
+                    task_name_suffix='task_name_suffix',
+                    copy_job_type_id='test-process',
+                    job_reference=BigQueryJobReference(
+                        project_id='test_project',
+                        job_id='job123',
+                        location='EU'),
+                    create_disposition=create_disposition,
+                    write_disposition=write_disposition,
+                    retry_count=0,
+                    post_copy_action_request=None
+                )
+            )
+
 
     @patch.object(BigQuery, 'insert_job')
     @patch('time.sleep', side_effect=lambda _: None)
@@ -87,7 +133,9 @@ class TestCopyJobService(unittest.TestCase):
             task_name_suffix=None,
             copy_job_type_id=None,
             source_big_query_table=self.example_source_bq_table,
-            target_big_query_table=self.example_target_bq_table
+            target_big_query_table=self.example_target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY"
         )
 
         # when
@@ -108,7 +156,9 @@ class TestCopyJobService(unittest.TestCase):
             task_name_suffix=None,
             copy_job_type_id=None,
             source_big_query_table=self.example_source_bq_table,
-            target_big_query_table=self.example_target_bq_table
+            target_big_query_table=self.example_target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY"
         )
 
         # when
@@ -130,6 +180,8 @@ class TestCopyJobService(unittest.TestCase):
             copy_job_type_id='test-process',
             source_big_query_table=self.example_source_bq_table,
             target_big_query_table=self.example_target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0,
             post_copy_action_request=post_copy_action_request
         )
@@ -176,9 +228,10 @@ class TestCopyJobService(unittest.TestCase):
                   side_effect=[HttpError(Mock(status=503), 'internal error'),
                                HttpError(Mock(status=409), 'job exists')])
     @patch('time.sleep', side_effect=lambda _: None)
-    def test_bug_regression_job_already_exists_after_internal_error(self, _, insert_job,
-        _create_random_job_id,
-        create_copy_job_result_check, table_metadata):
+    def test_bug_regression_job_already_exists_after_internal_error(
+        self, _, insert_job, _create_random_job_id,
+        create_copy_job_result_check, table_metadata
+    ):
         # given
         post_copy_action_request = \
             PostCopyActionRequest(url='/my/url', data={'key1': 'value1'})
@@ -191,6 +244,8 @@ class TestCopyJobService(unittest.TestCase):
                 copy_job_type_id='test-process',
                 source_big_query_table=self.example_source_bq_table,
                 target_big_query_table=self.example_target_bq_table,
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )
@@ -206,6 +261,8 @@ class TestCopyJobService(unittest.TestCase):
                     project_id='target_project_id_1',
                     job_id='random_job_123',
                     location='EU'),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )

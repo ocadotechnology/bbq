@@ -23,7 +23,9 @@ class CopyJobService(object):
         job_reference = CopyJobService.__schedule(
             source_big_query_table=source_big_query_table,
             target_big_query_table=target_big_query_table,
-            job_id=CopyJobService._create_random_job_id())
+            job_id=CopyJobService._create_random_job_id(),
+            create_disposition=copy_job_request.create_disposition,
+            write_disposition=copy_job_request.write_disposition)
 
         if job_reference:
             TaskCreator.create_copy_job_result_check(
@@ -31,6 +33,8 @@ class CopyJobService(object):
                     task_name_suffix=copy_job_request.task_name_suffix,
                     copy_job_type_id=copy_job_request.copy_job_type_id,
                     job_reference=job_reference,
+                    create_disposition=copy_job_request.create_disposition,
+                    write_disposition=copy_job_request.write_disposition,
                     retry_count=retry_count,
                     post_copy_action_request=copy_job_request.post_copy_action_request
                 )
@@ -46,7 +50,8 @@ class CopyJobService(object):
 
     @staticmethod
     @retry(Exception, tries=6, delay=2, backoff=2)
-    def __schedule(source_big_query_table, target_big_query_table, job_id):
+    def __schedule(source_big_query_table, target_big_query_table, job_id,
+                   create_disposition, write_disposition):
         logging.info("Scheduling job ID: " + job_id)
         job_data = {
             "jobReference": {
@@ -65,8 +70,8 @@ class CopyJobService(object):
                         "datasetId": target_big_query_table.get_dataset_id(),
                         "tableId": target_big_query_table.get_table_id(),
                     },
-                    "createDisposition": "CREATE_IF_NEEDED",
-                    "writeDisposition": "WRITE_EMPTY"
+                    "createDisposition": create_disposition,
+                    "writeDisposition": write_disposition
                 }
             }
         }

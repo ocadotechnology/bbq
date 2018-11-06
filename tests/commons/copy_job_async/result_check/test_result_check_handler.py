@@ -63,6 +63,8 @@ class TestResultCheckHandler(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id=project_id,
                                                job_id=job_id,
                                                location=location),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request
         )

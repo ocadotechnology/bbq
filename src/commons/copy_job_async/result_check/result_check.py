@@ -1,10 +1,10 @@
 import json
 import logging
 
+from src.commons.big_query.big_query import BigQuery
 from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
 from src.commons.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.copy_job_async.task_creator import TaskCreator
-from src.commons.big_query.big_query import BigQuery
 
 
 class ResultCheck(object):
@@ -26,8 +26,12 @@ class ResultCheck(object):
         if copy_job_result.is_done():
             logging.info('Copy job %s complete',
                          result_check_request.job_reference)
-            self.__process_copy_job_result(copy_job_result,
-                                           result_check_request.retry_count)
+            self.__process_copy_job_result(
+                copy_job_result,
+                result_check_request.retry_count,
+                result_check_request.create_disposition,
+                result_check_request.write_disposition
+            )
         else:
             logging.info(
                 "Copy job '%s' not completed yet. Another result check "
@@ -35,13 +39,14 @@ class ResultCheck(object):
                 result_check_request.job_reference)
             TaskCreator.create_copy_job_result_check(result_check_request)
 
-    def __process_copy_job_result(self, job_result, retry_count):
-
+    def __process_copy_job_result(self, job_result, retry_count,
+                                  create_disposition, write_disposition):
         if job_result.has_errors():
             logging.info("retry_count: %s", retry_count)
             logging.error(job_result.error_message)
             if self.__should_retry(job_result.error_result) \
-                and retry_count < self.__MAX_RETRY_COUNT:
+                    and retry_count < self.__MAX_RETRY_COUNT:
+
                 logging.error('We may need to re-trigger this task.')
                 retry_count += 1
                 TaskCreator.create_copy_job(
@@ -50,6 +55,8 @@ class ResultCheck(object):
                         copy_job_type_id=self.__copy_job_type_id,
                         source_big_query_table=job_result.source_bq_table,
                         target_big_query_table=job_result.target_bq_table,
+                        create_disposition=create_disposition,
+                        write_disposition=write_disposition,
                         retry_count=retry_count,
                         post_copy_action_request=self.__post_copy_action_request
                     )

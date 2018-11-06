@@ -21,6 +21,8 @@ class TestCopyJobNameCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0
         )
 
@@ -44,6 +46,8 @@ class TestCopyJobNameCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0
         )
 
