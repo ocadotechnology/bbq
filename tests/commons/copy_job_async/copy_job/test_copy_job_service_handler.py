@@ -53,6 +53,8 @@ class TestCopyJobServiceHandler(unittest.TestCase):
                     copy_job_type_id=None,
                     source_big_query_table=source_big_query_table,
                     target_big_query_table=target_big_query_table,
+                    create_disposition="CREATE_IF_NEEDED",
+                    write_disposition="WRITE_EMPTY",
                     retry_count=0,
                     post_copy_action_request=post_copy_action_request
                 )
@@ -66,6 +68,8 @@ class TestCopyJobServiceHandler(unittest.TestCase):
                 copy_job_type_id=None,
                 source_big_query_table=source_big_query_table,
                 target_big_query_table=target_big_query_table,
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )

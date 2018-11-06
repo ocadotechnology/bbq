@@ -58,6 +58,8 @@ class TestCopyJobServiceAsync(unittest.TestCase):
                 copy_job_type_id="test-process",
                 source_big_query_table=(self.create_example_source_bq_table()),
                 target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=expected_retry_count
             )
         )
@@ -88,8 +90,42 @@ class TestCopyJobServiceAsync(unittest.TestCase):
                 copy_job_type_id="test-process",
                 source_big_query_table=(self.create_example_source_bq_table()),
                 target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
+            )
+        )
+
+    @patch.object(TaskCreator, 'create_copy_job')
+    def test_that_create_and_write_disposition_are_passed_if_specified(
+        self, create_copy_job):
+        # given
+        create_dispositon = "SOME_CREATE_DISPOSITON"
+        write_dispostion = "SOME_WRITE_DISPOSTION"
+
+        # when
+        CopyJobServiceAsync(
+            copy_job_type_id="test-process",
+            task_name_suffix="example_sufix"
+        ).copy_table(
+            self.create_example_source_bq_table(),
+            self.create_example_target_bq_table(),
+            create_disposition=create_dispositon,
+            write_disposition=write_dispostion
+        )
+
+        # then
+        create_copy_job.assert_called_once_with(
+            CopyJobRequest(
+                task_name_suffix="example_sufix",
+                copy_job_type_id="test-process",
+                source_big_query_table=(self.create_example_source_bq_table()),
+                target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition=create_dispositon,
+                write_disposition=write_dispostion,
+                retry_count=0,
+                post_copy_action_request=None
             )
         )
 

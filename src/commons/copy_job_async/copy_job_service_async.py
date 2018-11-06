@@ -15,13 +15,17 @@ class CopyJobServiceAsync(object):
         self.__post_copy_action_request = post_copy_action_request
         return self
 
-    def copy_table(self, source_big_query_table, target_big_query_table):
+    def copy_table(self, source_big_query_table, target_big_query_table,
+                   create_disposition="CREATE_IF_NEEDED",
+                   write_disposition="WRITE_EMPTY"):
         copy_job_request = CopyJobRequest(
             task_name_suffix=self.__task_name_suffix,
             copy_job_type_id=self.__copy_job_type_id,
             source_big_query_table=source_big_query_table,
             target_big_query_table=target_big_query_table,
             retry_count=0,
-            post_copy_action_request=self.__post_copy_action_request
+            post_copy_action_request=self.__post_copy_action_request,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition
         )
         TaskCreator.create_copy_job(copy_job_request)

@@ -43,6 +43,8 @@ class TestTaskCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             post_copy_action_request=PostCopyActionRequest(url="/my/url", data={
                 "key1": "value1"})
         )
@@ -79,7 +81,9 @@ class TestTaskCreator(unittest.TestCase):
                                                          'source_table'),
                     target_big_query_table=BigQueryTable('target_project',
                                                          'target_dataset',
-                                                         'target_table')
+                                                         'target_table'),
+                    create_disposition="CREATE_IF_NEEDED",
+                    write_disposition="WRITE_EMPTY"
                 )
             )
 
@@ -98,6 +102,8 @@ class TestTaskCreator(unittest.TestCase):
                     job_reference=BigQueryJobReference(project_id="project_abc",
                                                        job_id="job123",
                                                        location='EU'),
+                    create_disposition="CREATE_IF_NEEDED",
+                    write_disposition="WRITE_EMPTY",
                     retry_count=-1
                 )
             )
@@ -110,6 +116,8 @@ class TestTaskCreator(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="project_abc",
                                                job_id="job123",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=2,
             post_copy_action_request=PostCopyActionRequest(
                 url="/my/url",
@@ -141,6 +149,8 @@ class TestTaskCreator(unittest.TestCase):
                 job_reference=BigQueryJobReference(project_id="project_abc",
                                                    job_id="job123",
                                                    location='EU'),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=PostCopyActionRequest(
                     '/my/post/copy/url', {'mypayload': 'mypayload_value'}))

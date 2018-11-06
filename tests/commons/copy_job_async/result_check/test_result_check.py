@@ -44,6 +44,8 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request)
         return result_check_request
@@ -78,6 +80,8 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0,
             post_copy_action_request=post_copy_action_request)
         )
@@ -136,6 +140,8 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request))
 
@@ -147,6 +153,47 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             source_big_query_table=copy_job_result.source_bq_table,
             target_big_query_table=copy_job_result.target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
+            retry_count=retry_count + 1,
+            post_copy_action_request=post_copy_action_request
+        )
+        create_copy_job.assert_called_once_with(copy_job_request)
+
+    @patch.object(BigQuery, 'get_job',
+                  return_value=JobResultExample.DONE_WITH_RETRY_ERRORS)
+    @patch.object(TaskCreator, 'create_copy_job')
+    def test_that_should_re_trigger_copy_job_task_with_proper_create_and_write_dispositions_if_retry_error_occurs(
+            self, create_copy_job, _):
+        # given
+        retry_count = 0
+        post_copy_action_request = \
+            PostCopyActionRequest(url="/my/url", data={"key1": "value1"})
+        create_disposition = "SOME_CREATE_DISPOSITION"
+        write_disposition = "SOME_WRITE_DISPOSITION"
+
+        # when
+        ResultCheck().check(ResultCheckRequest(
+            task_name_suffix="task_name_suffix",
+            copy_job_type_id="backups",
+            job_reference=BigQueryJobReference(project_id="target_project_id",
+                                               job_id="job_id",
+                                               location='EU'),
+            create_disposition=create_disposition,
+            write_disposition=write_disposition,
+            retry_count=retry_count,
+            post_copy_action_request=post_copy_action_request))
+
+        # then
+        copy_job_result = CopyJobResult(JobResultExample.DONE_WITH_RETRY_ERRORS)
+
+        copy_job_request = CopyJobRequest(
+            task_name_suffix=None,
+            copy_job_type_id="backups",
+            source_big_query_table=copy_job_result.source_bq_table,
+            target_big_query_table=copy_job_result.target_bq_table,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition,
             retry_count=retry_count + 1,
             post_copy_action_request=post_copy_action_request
         )
@@ -167,6 +214,8 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=None
         ))
@@ -179,6 +228,8 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=None
         ))
