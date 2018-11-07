@@ -128,6 +128,11 @@ All backups that was invoked on local application will end up in this project.
       ln -s config/index.yaml index.yaml
       ```
 
+1. Acquire new user credentials to use for application default credentials:
+    ```bash
+    gcloud auth application-default login
+    ```
+
 1. Run command 
       ```bash
       dev_appserver.py app.yaml
@@ -154,5 +159,5 @@ All backups that was invoked on local application will end up in this project.
 
 1. Run following Python command (you might need to update Google Cloud SDK path)
       ```bash
-      python test_runner.py --test-path tests/ -v --test-pattern "test*.py" ./google-cloud-sdk
+      python test_runner.py --test-path tests/ -v --test-pattern "test*.py" /PATH-TO/google-cloud-sdk
       ```
