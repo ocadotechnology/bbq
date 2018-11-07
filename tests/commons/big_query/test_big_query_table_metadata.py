@@ -507,3 +507,4 @@ class TestBigQueryTableMetadata_TableReference(unittest.TestCase):
         result = big_query_table_metadata.table_reference()
         # then
         self.assertEqual(TableReference("p1", "d1", "t1"), result)
+

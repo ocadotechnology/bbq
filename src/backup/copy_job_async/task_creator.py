@@ -33,11 +33,8 @@ class TaskCreator(object):
         assert result_check_request.retry_count >= 0
         queue_name = result_check_request.copy_job_type_id + '-result-check'
         logging.info(
-            "Schedule copy_job_result_check task for %s (project: '%s') "
-            "jobId: '%s' (retry count:'%s') in queue '%s'",
-            result_check_request, result_check_request.project_id,
-            result_check_request.job_id, result_check_request.retry_count,
-            queue_name)
+            "Schedule copy_job_result_check task for %s in queue '%s'",
+            result_check_request, queue_name)
 
         task = Task(
             method='POST',

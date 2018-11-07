@@ -6,13 +6,14 @@ import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
+from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.config.configuration import configuration
 from src.commons.decorators.cached import cached
 from src.commons.decorators.google_http_error_retry import \
     google_http_error_retry
 from src.commons.decorators.log_time import log_time, measure_time_and_log
 from src.commons.decorators.retry import retry
-from src.commons.big_query.big_query_table import BigQueryTable
-from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 
 
@@ -24,7 +25,7 @@ class DatasetNotFoundException(Exception):
     pass
 
 
-class BigQuery(object):  # pylint: disable=R0904
+class BigQuery(object):
     def __init__(self):
         self.http = self._create_http()
         self.service = googleapiclient.discovery.build(
@@ -99,7 +100,7 @@ class BigQuery(object):  # pylint: disable=R0904
 
     @retry(Error, tries=3, delay=2, backoff=2)
     def list_tables(self, project_id, dataset_id, page_token=None,
-                    max_results=1000):
+        max_results=1000):
         return self.service.tables().list(
             projectId=project_id, datasetId=dataset_id,
             maxResults=max_results, pageToken=page_token
@@ -150,7 +151,7 @@ class BigQuery(object):  # pylint: disable=R0904
             use_legacy_sql=True)
 
         if query_results and 'totalRows' in query_results \
-                and int(query_results['totalRows']) > 0:
+            and int(query_results['totalRows']) > 0:
             results = []
             results.extend(query_results.get('rows', []))
             first_row = results[0]
@@ -165,7 +166,7 @@ class BigQuery(object):  # pylint: disable=R0904
 
     @staticmethod
     def random_table_from_project_query():
-        return "SELECT tableId, datasetId, projectId FROM [{}]"\
+        return "SELECT tableId, datasetId, projectId FROM [{}]" \
             .format(configuration.restoration_daily_test_random_table_view)
 
     def __sync_query(self, query, timeout=30000, use_legacy_sql=False):
@@ -233,11 +234,16 @@ class BigQuery(object):  # pylint: disable=R0904
             projectId=project_id, body=body
         ).execute()
         logging.info('Insert job response: ' + json.dumps(response))
-        return response['jobReference']['jobId']
+        return BigQueryJobReference(
+            project_id=response['jobReference']['projectId'],
+            job_id=response['jobReference']['jobId'],
+            location=response['jobReference']['location'])
 
-    def get_job(self, project_id, job_id):
+    def get_job(self, job_reference):
         return self.service.jobs().get(
-            projectId=project_id, jobId=job_id
+            projectId=job_reference.project_id,
+            jobId=job_reference.job_id,
+            location=job_reference.location
         ).execute(num_retries=3)
 
     @retry(Error, tries=3, delay=2, backoff=2)
@@ -262,7 +268,7 @@ class BigQuery(object):  # pylint: disable=R0904
     # @refactor - boolean argument
     @retry(Error, tries=6, delay=2, backoff=2)
     def create_dataset(
-            self, project_id, dataset_id, location, table_expiration_in_ms=False
+        self, project_id, dataset_id, location, table_expiration_in_ms=False
     ):
         logging.info(
             "Creating dataset %s / %s (location: %s)",
@@ -277,8 +283,8 @@ class BigQuery(object):  # pylint: disable=R0904
         }
 
         if table_expiration_in_ms and \
-                isinstance(table_expiration_in_ms,
-                           (int, long)):  # pylint: disable=E0602
+            isinstance(table_expiration_in_ms,
+                       (int, long)):  # pylint: disable=E0602
             body['defaultTableExpirationMs'] = table_expiration_in_ms
 
         try:

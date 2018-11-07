@@ -2,10 +2,14 @@ import logging
 import uuid
 
 from apiclient.errors import HttpError
-from src.commons.decorators.retry import retry
+
+from src.backup.copy_job_async.result_check.result_check_request import \
+    ResultCheckRequest
 from src.backup.copy_job_async.task_creator import TaskCreator
-from src.backup.copy_job_async.result_check.result_check_request import ResultCheckRequest
 from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.decorators.retry import retry
 
 
 class CopyJobService(object):
@@ -16,16 +20,17 @@ class CopyJobService(object):
         target_big_query_table = copy_job_request.target_big_query_table
         retry_count = copy_job_request.retry_count
 
-        job_id = CopyJobService.__schedule(source_big_query_table,
-                                           target_big_query_table,
-                                           job_id=CopyJobService._create_random_job_id())
-        if job_id:
+        job_reference = CopyJobService.__schedule(
+            source_big_query_table=source_big_query_table,
+            target_big_query_table=target_big_query_table,
+            job_id=CopyJobService._create_random_job_id())
+
+        if job_reference:
             TaskCreator.create_copy_job_result_check(
                 ResultCheckRequest(
                     task_name_suffix=copy_job_request.task_name_suffix,
                     copy_job_type_id=copy_job_request.copy_job_type_id,
-                    project_id=target_big_query_table.get_project_id(),
-                    job_id=job_id,
+                    job_reference=job_reference,
                     retry_count=retry_count,
                     post_copy_action_request=copy_job_request.post_copy_action_request
                 )
@@ -66,17 +71,20 @@ class CopyJobService(object):
             }
         }
         try:
-            response_job_id = BigQuery().insert_job(
+            job_reference = BigQuery().insert_job(
                 target_big_query_table.get_project_id(), job_data)
-            logging.info("Response job ID: " + response_job_id)
-            return response_job_id
+            logging.info("%s", job_reference)
+            return job_reference
         except HttpError as bq_error:
             if bq_error.resp.status == 404:
                 logging.exception('404 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
                 return None
             elif bq_error.resp.status == 409:
                 logging.warning('409 while creating Copy Job from %s to %s' % (source_big_query_table, target_big_query_table))
-                return job_id
+                return BigQueryJobReference(
+                    project_id=target_big_query_table.get_project_id(),
+                    job_id=job_id,
+                    location=BigQueryTableMetadata.get_table_by_big_query_table(source_big_query_table).get_location())
             else:
                 raise
         except Exception as error:
