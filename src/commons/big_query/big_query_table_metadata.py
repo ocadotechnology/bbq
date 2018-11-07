@@ -32,10 +32,19 @@ class BigQueryTableMetadata(object):
 
     @staticmethod
     def get_table_by_reference(reference):
-        return BigQueryTableMetadata.__get_table_or_partition(project_id=reference.project_id,
-                                                              dataset_id=reference.dataset_id,
-                                                              table_id=reference.table_id,
-                                                              partition_id=reference.partition_id)
+        return BigQueryTableMetadata.__get_table_or_partition(
+            project_id=reference.project_id,
+            dataset_id=reference.dataset_id,
+            table_id=reference.table_id,
+            partition_id=reference.partition_id)
+
+    @staticmethod
+    def get_table_by_big_query_table(big_query_table):
+        return BigQueryTableMetadata.__get_table_or_partition(
+            project_id=big_query_table.project_id,
+            dataset_id=big_query_table.dataset_id,
+            table_id=big_query_table.table_id,
+            partition_id=None)
 
     @staticmethod
     @cached(time=300)

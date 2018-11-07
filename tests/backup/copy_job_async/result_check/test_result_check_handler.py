@@ -7,7 +7,9 @@ from src.backup.copy_job_async.post_copy_action_request import \
 from src.backup.copy_job_async.result_check import result_check_handler
 from src.backup.copy_job_async.result_check.result_check import \
     ResultCheck
-from src.backup.copy_job_async.result_check.result_check_request import ResultCheckRequest
+from src.backup.copy_job_async.result_check.result_check_request import \
+    ResultCheckRequest
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 import unittest
@@ -36,12 +38,13 @@ class TestResultCheckHandler(unittest.TestCase):
         # given
         project_id = "target_project_id"
         job_id = "job_id"
+        location = "EU"
         retry_count = "1"
         post_copy_action_request = \
             PostCopyActionRequest(url="/my/url", data={"key1": "value1"})
 
         result_check_request = self.create_example_result_check_request(
-            project_id, job_id, retry_count, post_copy_action_request)
+            project_id, job_id,location, retry_count, post_copy_action_request)
 
         # when
         self.under_test.post(url='/tasks/copy_job_async/result_check', params={"resultCheckRequest": jsonpickle.encode(result_check_request)})
@@ -49,17 +52,18 @@ class TestResultCheckHandler(unittest.TestCase):
         # then
         result_check_mock.assert_called_with(
             self.create_example_result_check_request(
-                project_id, job_id, retry_count, post_copy_action_request)
+                project_id, job_id,location, retry_count, post_copy_action_request)
         )
 
-    def create_example_result_check_request(self, project_id, job_id,
+    def create_example_result_check_request(self, project_id, job_id, location,
                                             retry_count,
                                             post_copy_action_request):
         return ResultCheckRequest(
             task_name_suffix=None,
             copy_job_type_id=None,
-            project_id=project_id,
-            job_id=job_id,
+            job_reference=BigQueryJobReference(project_id=project_id,
+                                               job_id=job_id,
+                                               location=location),
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request
         )
