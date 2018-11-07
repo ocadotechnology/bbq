@@ -108,11 +108,12 @@ class TestCopyJobServiceAsync(unittest.TestCase):
         CopyJobServiceAsync(
             copy_job_type_id="test-process",
             task_name_suffix="example_sufix"
-        ).copy_table(
+        )\
+        .with_create_disposition(create_dispositon)\
+        .with_write_disposition(write_dispostion)\
+        .copy_table(
             self.create_example_source_bq_table(),
-            self.create_example_target_bq_table(),
-            create_disposition=create_dispositon,
-            write_disposition=write_dispostion
+            self.create_example_target_bq_table()
         )
 
         # then
