@@ -73,7 +73,7 @@ class CopyJobService(object):
         try:
             job_reference = BigQuery().insert_job(
                 target_big_query_table.get_project_id(), job_data)
-            logging.info("%s", job_reference)
+            logging.info("Successfully insert: %s", job_reference)
             return job_reference
         except HttpError as bq_error:
             if bq_error.resp.status == 404:
