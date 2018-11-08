@@ -33,8 +33,6 @@ class CopyJobService(object):
                     task_name_suffix=copy_job_request.task_name_suffix,
                     copy_job_type_id=copy_job_request.copy_job_type_id,
                     job_reference=job_reference,
-                    create_disposition=copy_job_request.create_disposition,
-                    write_disposition=copy_job_request.write_disposition,
                     retry_count=retry_count,
                     post_copy_action_request=copy_job_request.post_copy_action_request
                 )

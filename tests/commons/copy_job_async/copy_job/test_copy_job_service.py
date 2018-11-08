@@ -73,8 +73,6 @@ class TestCopyJobService(unittest.TestCase):
                     project_id='test_project',
                     job_id='job123',
                     location='EU'),
-                create_disposition="CREATE_IF_NEEDED",
-                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )
@@ -114,8 +112,6 @@ class TestCopyJobService(unittest.TestCase):
                         project_id='test_project',
                         job_id='job123',
                         location='EU'),
-                    create_disposition=create_disposition,
-                    write_disposition=write_disposition,
                     retry_count=0,
                     post_copy_action_request=None
                 )
@@ -261,8 +257,6 @@ class TestCopyJobService(unittest.TestCase):
                     project_id='target_project_id_1',
                     job_id='random_job_123',
                     location='EU'),
-                create_disposition="CREATE_IF_NEEDED",
-                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
             )

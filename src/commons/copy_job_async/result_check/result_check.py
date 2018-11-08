@@ -28,9 +28,7 @@ class ResultCheck(object):
                          result_check_request.job_reference)
             self.__process_copy_job_result(
                 copy_job_result,
-                result_check_request.retry_count,
-                result_check_request.create_disposition,
-                result_check_request.write_disposition
+                result_check_request.retry_count
             )
         else:
             logging.info(
@@ -39,8 +37,7 @@ class ResultCheck(object):
                 result_check_request.job_reference)
             TaskCreator.create_copy_job_result_check(result_check_request)
 
-    def __process_copy_job_result(self, job_result, retry_count,
-                                  create_disposition, write_disposition):
+    def __process_copy_job_result(self, job_result, retry_count):
         if job_result.has_errors():
             logging.info("retry_count: %s", retry_count)
             logging.error(job_result.error_message)
@@ -55,8 +52,8 @@ class ResultCheck(object):
                         copy_job_type_id=self.__copy_job_type_id,
                         source_big_query_table=job_result.source_bq_table,
                         target_big_query_table=job_result.target_bq_table,
-                        create_disposition=create_disposition,
-                        write_disposition=write_disposition,
+                        create_disposition=job_result.create_disposition,
+                        write_disposition=job_result.write_disposition,
                         retry_count=retry_count,
                         post_copy_action_request=self.__post_copy_action_request
                     )
