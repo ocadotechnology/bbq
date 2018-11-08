@@ -4,7 +4,7 @@ import unittest
 from freezegun import freeze_time
 from mock import patch, PropertyMock
 
-from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
+from src.commons.copy_job_async.copy_job_service_async import CopyJobServiceAsync
 from src.backup.datastore.Table import Table
 # pylint: disable=W0613,R0201
 from src.backup.backup_creator import BackupCreator

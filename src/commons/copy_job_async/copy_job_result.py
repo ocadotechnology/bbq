@@ -32,6 +32,14 @@ class CopyJobResult(object):
         return self.__configuration['sourceTable']['tableId']
 
     @property
+    def create_disposition(self):
+        return self.__configuration['createDisposition']
+
+    @property
+    def write_disposition(self):
+        return self.__configuration['writeDisposition']
+
+    @property
     def source_bq_table(self):
         return BigQueryTable(self.source_project_id, self.source_dataset_id,
                              self.source_table_id)

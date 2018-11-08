@@ -14,7 +14,9 @@ class JobResultExample(object):
                     "projectId": "target_project_id",
                     "tableId": "target_table_id",
                     "datasetId": "target_dataset_id"
-                }
+                },
+                "createDisposition": "CREATE_IF_NEEDED",
+                "writeDisposition": "WRITE_TRUNCATE"
             }
         }
     }
@@ -37,7 +39,9 @@ class JobResultExample(object):
                     "projectId": "target_project_id",
                     "tableId": "target_table_id",
                     "datasetId": "target_dataset_id"
-                }
+                },
+                "createDisposition": "CREATE_IF_NEEDED",
+                "writeDisposition": "WRITE_TRUNCATE"
             }
         }
     }
@@ -74,7 +78,9 @@ class JobResultExample(object):
                     "projectId": "target_project_id",
                     "tableId": "target_table_id",
                     "datasetId": "target_dataset_id"
-                }
+                },
+                "createDisposition": "CREATE_NEVER",
+                "writeDisposition": "WRITE_TRUNCATE"
             }
         }
     }
@@ -111,7 +117,9 @@ class JobResultExample(object):
                     "projectId": "target_project_id",
                     "tableId": "target_table_id",
                     "datasetId": "target_dataset_id"
-                }
+                },
+                "createDisposition": "CREATE_IF_NEEDED",
+                "writeDisposition": "WRITE_TRUNCATE"
             }
         }
     }

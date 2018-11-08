@@ -96,11 +96,11 @@ handlers:
   secure: always
   login: admin
 - url: /tasks/copy_job_async/copy_job
-  script: src.backup.copy_job_async.copy_job.copy_job_service_handler.app
+  script: src.commons.copy_job_async.copy_job.copy_job_service_handler.app
   secure: always
   login: admin
 - url: /tasks/copy_job_async/result_check
-  script: src.backup.copy_job_async.result_check.result_check_handler.app
+  script: src.commons.copy_job_async.result_check.result_check_handler.app
   secure: always
   login: admin
 - url: /cron/backup

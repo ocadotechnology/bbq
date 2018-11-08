@@ -5,14 +5,14 @@ from datetime import datetime
 from jsonpickle import json
 from mock.mock import Mock
 
-from src.backup.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 
 from src.backup.datastore.Table import Table
 from src.commons.big_query.big_query import BigQuery
 from src.commons.table_reference import TableReference
-from tests.backup.copy_job_async.result_check.job_result_example import \
+from tests.commons.copy_job_async.result_check.job_result_example import \
   JobResultExample
 from tests.test_utils import content
 
