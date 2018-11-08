@@ -5,7 +5,7 @@ from datetime import datetime
 from jsonpickle import json
 from mock.mock import Mock
 
-from src.commons.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from tests import test_utils
 

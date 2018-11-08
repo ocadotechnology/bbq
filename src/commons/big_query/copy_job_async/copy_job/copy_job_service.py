@@ -3,9 +3,9 @@ import uuid
 
 from apiclient.errors import HttpError
 
-from src.commons.copy_job_async.result_check.result_check_request import \
+from src.commons.big_query.copy_job_async.result_check.result_check_request import \
     ResultCheckRequest
-from src.commons.copy_job_async.task_creator import TaskCreator
+from src.commons.big_query.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata

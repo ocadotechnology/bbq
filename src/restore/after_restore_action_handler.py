@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from src.commons.exceptions import JsonNotParseableException, \
     WrongJsonFormatException
 from src.commons.handlers.json_handler import JsonHandler
-from src.commons.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.config.configuration import configuration
 from src.restore.datastore.restore_item import RestoreItem
 

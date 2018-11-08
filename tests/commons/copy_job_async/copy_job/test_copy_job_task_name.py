@@ -2,8 +2,10 @@ import unittest
 
 from freezegun import freeze_time
 
-from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.commons.copy_job_async.copy_job.copy_job_task_name import CopyJobTaskName
+from src.commons.big_query.copy_job_async.copy_job.copy_job_request \
+    import CopyJobRequest
+from src.commons.big_query.copy_job_async.copy_job.copy_job_task_name \
+    import CopyJobTaskName
 from src.commons.big_query.big_query_table import BigQueryTable
 
 
