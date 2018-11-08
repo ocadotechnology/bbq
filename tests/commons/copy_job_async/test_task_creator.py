@@ -102,8 +102,6 @@ class TestTaskCreator(unittest.TestCase):
                     job_reference=BigQueryJobReference(project_id="project_abc",
                                                        job_id="job123",
                                                        location='EU'),
-                    create_disposition="CREATE_IF_NEEDED",
-                    write_disposition="WRITE_EMPTY",
                     retry_count=-1
                 )
             )
@@ -116,8 +114,6 @@ class TestTaskCreator(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="project_abc",
                                                job_id="job123",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=2,
             post_copy_action_request=PostCopyActionRequest(
                 url="/my/url",
@@ -149,8 +145,6 @@ class TestTaskCreator(unittest.TestCase):
                 job_reference=BigQueryJobReference(project_id="project_abc",
                                                    job_id="job123",
                                                    location='EU'),
-                create_disposition="CREATE_IF_NEEDED",
-                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=PostCopyActionRequest(
                     '/my/post/copy/url', {'mypayload': 'mypayload_value'}))

@@ -44,8 +44,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request)
         return result_check_request
@@ -80,8 +78,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=0,
             post_copy_action_request=post_copy_action_request)
         )
@@ -140,8 +136,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request))
 
@@ -153,8 +147,8 @@ class TestResultCheck(unittest.TestCase):
             copy_job_type_id="backups",
             source_big_query_table=copy_job_result.source_bq_table,
             target_big_query_table=copy_job_result.target_bq_table,
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
+            create_disposition="CREATE_NEVER",
+            write_disposition="WRITE_TRUNCATE",
             retry_count=retry_count + 1,
             post_copy_action_request=post_copy_action_request
         )
@@ -169,8 +163,8 @@ class TestResultCheck(unittest.TestCase):
         retry_count = 0
         post_copy_action_request = \
             PostCopyActionRequest(url="/my/url", data={"key1": "value1"})
-        create_disposition = "SOME_CREATE_DISPOSITION"
-        write_disposition = "SOME_WRITE_DISPOSITION"
+        create_disposition = "CREATE_NEVER"
+        write_disposition = "WRITE_TRUNCATE"
 
         # when
         ResultCheck().check(ResultCheckRequest(
@@ -179,8 +173,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition=create_disposition,
-            write_disposition=write_disposition,
             retry_count=retry_count,
             post_copy_action_request=post_copy_action_request))
 
@@ -214,8 +206,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=None
         ))
@@ -228,8 +218,6 @@ class TestResultCheck(unittest.TestCase):
             job_reference=BigQueryJobReference(project_id="target_project_id",
                                                job_id="job_id",
                                                location='EU'),
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY",
             retry_count=retry_count,
             post_copy_action_request=None
         ))
