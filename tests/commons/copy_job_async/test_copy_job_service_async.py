@@ -3,11 +3,11 @@ import unittest
 from google.appengine.ext import testbed, ndb
 from mock import patch
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job_service_async import CopyJobServiceAsync
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job_service_async import CopyJobServiceAsync
+from src.commons.copy_job_async.post_copy_action_request import \
     PostCopyActionRequest
-from src.backup.copy_job_async.task_creator import TaskCreator
+from src.commons.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table import BigQueryTable
 
@@ -58,6 +58,8 @@ class TestCopyJobServiceAsync(unittest.TestCase):
                 copy_job_type_id="test-process",
                 source_big_query_table=(self.create_example_source_bq_table()),
                 target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=expected_retry_count
             )
         )
@@ -88,8 +90,43 @@ class TestCopyJobServiceAsync(unittest.TestCase):
                 copy_job_type_id="test-process",
                 source_big_query_table=(self.create_example_source_bq_table()),
                 target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY",
                 retry_count=0,
                 post_copy_action_request=post_copy_action_request
+            )
+        )
+
+    @patch.object(TaskCreator, 'create_copy_job')
+    def test_that_create_and_write_disposition_are_passed_if_specified(
+        self, create_copy_job):
+        # given
+        create_dispositon = "SOME_CREATE_DISPOSITON"
+        write_dispostion = "SOME_WRITE_DISPOSTION"
+
+        # when
+        CopyJobServiceAsync(
+            copy_job_type_id="test-process",
+            task_name_suffix="example_sufix"
+        )\
+        .with_create_disposition(create_dispositon)\
+        .with_write_disposition(write_dispostion)\
+        .copy_table(
+            self.create_example_source_bq_table(),
+            self.create_example_target_bq_table()
+        )
+
+        # then
+        create_copy_job.assert_called_once_with(
+            CopyJobRequest(
+                task_name_suffix="example_sufix",
+                copy_job_type_id="test-process",
+                source_big_query_table=(self.create_example_source_bq_table()),
+                target_big_query_table=(self.create_example_target_bq_table()),
+                create_disposition=create_dispositon,
+                write_disposition=write_dispostion,
+                retry_count=0,
+                post_copy_action_request=None
             )
         )
 

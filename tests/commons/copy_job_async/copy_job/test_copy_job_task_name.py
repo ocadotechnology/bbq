@@ -2,8 +2,8 @@ import unittest
 
 from freezegun import freeze_time
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job.copy_job_task_name import CopyJobTaskName
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job.copy_job_task_name import CopyJobTaskName
 from src.commons.big_query.big_query_table import BigQueryTable
 
 
@@ -21,6 +21,8 @@ class TestCopyJobNameCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0
         )
 
@@ -44,6 +46,8 @@ class TestCopyJobNameCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             retry_count=0
         )
 

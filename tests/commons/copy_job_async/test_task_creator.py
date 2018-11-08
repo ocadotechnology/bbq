@@ -6,14 +6,14 @@ from google.appengine.api.taskqueue import UnknownQueueError
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.backup.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.backup.copy_job_async.copy_job.copy_job_task_name import \
+from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.copy_job_async.copy_job.copy_job_task_name import \
   CopyJobTaskName
-from src.backup.copy_job_async.post_copy_action_request import \
+from src.commons.copy_job_async.post_copy_action_request import \
   PostCopyActionRequest
-from src.backup.copy_job_async.result_check.result_check_request import \
+from src.commons.copy_job_async.result_check.result_check_request import \
   ResultCheckRequest
-from src.backup.copy_job_async.task_creator import TaskCreator
+from src.commons.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.test_utils import utils
@@ -43,6 +43,8 @@ class TestTaskCreator(unittest.TestCase):
             target_big_query_table=BigQueryTable('target_project',
                                                  'target_dataset',
                                                  'target_table'),
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
             post_copy_action_request=PostCopyActionRequest(url="/my/url", data={
                 "key1": "value1"})
         )
@@ -79,7 +81,9 @@ class TestTaskCreator(unittest.TestCase):
                                                          'source_table'),
                     target_big_query_table=BigQueryTable('target_project',
                                                          'target_dataset',
-                                                         'target_table')
+                                                         'target_table'),
+                    create_disposition="CREATE_IF_NEEDED",
+                    write_disposition="WRITE_EMPTY"
                 )
             )
 
