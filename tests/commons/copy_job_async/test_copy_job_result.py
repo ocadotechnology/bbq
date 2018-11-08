@@ -1,6 +1,6 @@
 import unittest
 
-from src.commons.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.table_reference import TableReference
 from tests.commons.copy_job_async.result_check.job_result_example import \
     JobResultExample

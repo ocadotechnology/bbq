@@ -3,7 +3,7 @@ import logging
 import jsonpickle
 import webapp2
 
-from src.commons.copy_job_async.copy_job.copy_job_service import CopyJobService
+from src.commons.big_query.copy_job_async.copy_job.copy_job_service import CopyJobService
 from src.commons.config.configuration import configuration
 
 

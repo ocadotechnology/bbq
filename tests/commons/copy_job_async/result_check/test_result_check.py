@@ -3,14 +3,18 @@ import unittest
 from google.appengine.ext import testbed, ndb
 from mock import patch
 
-from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.commons.copy_job_async.copy_job_result import CopyJobResult
-from src.commons.copy_job_async.result_check.result_check import ResultCheck
-from src.commons.copy_job_async.task_creator import TaskCreator
-from src.commons.copy_job_async.post_copy_action_request import \
-    PostCopyActionRequest
-from src.commons.copy_job_async.result_check.result_check_request import \
-    ResultCheckRequest
+from src.commons.big_query.copy_job_async.copy_job.copy_job_request \
+    import CopyJobRequest
+from src.commons.big_query.copy_job_async.copy_job_result \
+    import CopyJobResult
+from src.commons.big_query.copy_job_async.result_check.result_check \
+    import ResultCheck
+from src.commons.big_query.copy_job_async.task_creator \
+    import TaskCreator
+from src.commons.big_query.copy_job_async.post_copy_action_request \
+    import PostCopyActionRequest
+from src.commons.big_query.copy_job_async.result_check.result_check_request \
+    import ResultCheckRequest
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from tests.commons.copy_job_async.result_check.job_result_example import \

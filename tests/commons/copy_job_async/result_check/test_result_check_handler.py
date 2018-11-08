@@ -2,12 +2,14 @@ import os
 
 import jsonpickle
 
-from src.commons.copy_job_async.post_copy_action_request import \
-    PostCopyActionRequest
-from src.commons.copy_job_async.result_check import result_check_handler
-from src.commons.copy_job_async.result_check.result_check import ResultCheck
-from src.commons.copy_job_async.result_check.result_check_request import \
-    ResultCheckRequest
+from src.commons.big_query.copy_job_async.post_copy_action_request \
+    import PostCopyActionRequest
+from src.commons.big_query.copy_job_async.result_check import \
+    result_check_handler
+from src.commons.big_query.copy_job_async.result_check.result_check \
+    import ResultCheck
+from src.commons.big_query.copy_job_async.result_check.result_check_request \
+    import ResultCheckRequest
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'

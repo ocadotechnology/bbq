@@ -2,9 +2,9 @@ import json
 import logging
 
 from src.commons.big_query.big_query import BigQuery
-from src.commons.copy_job_async.copy_job.copy_job_request import CopyJobRequest
-from src.commons.copy_job_async.copy_job_result import CopyJobResult
-from src.commons.copy_job_async.task_creator import TaskCreator
+from src.commons.big_query.copy_job_async.copy_job.copy_job_request import CopyJobRequest
+from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.big_query.copy_job_async.task_creator import TaskCreator
 
 
 class ResultCheck(object):
