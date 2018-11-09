@@ -80,7 +80,7 @@ class AfterBackupActionHandler(JsonHandler):
     def __create_backup(backup_table_metadata, copy_job_results):
 
         table_entity = Table.get_table_by_reference(
-            copy_job_results.source_table_reference
+            TableReference.from_bq_table(copy_job_results.source_bq_table)
         )
 
         if table_entity is None:
