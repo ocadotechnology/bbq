@@ -61,12 +61,12 @@ class AfterBackupActionHandler(JsonHandler):
                                  copy_job_results)
             if backup_table_metadata.has_partition_expiration():
                 self.__disable_partition_expiration(
-                    copy_job_results.target_table_reference)
+                    TableReference.from_bq_table(copy_job_results.target_bq_table))
         else:
             pass
             ErrorReporting().report(
                 "Backup table {0} not exist. Backup entity is not created".format(
-                    copy_job_results.target_table_reference))
+                    copy_job_results.target_bq_table))
 
     def __disable_partition_expiration(self, backup_table_reference):
         self.BQ.disable_partition_expiration(
