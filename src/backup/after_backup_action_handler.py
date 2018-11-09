@@ -52,8 +52,9 @@ class AfterBackupActionHandler(JsonHandler):
             ErrorReporting().report(error_message)
             return
 
-        backup_table_metadata = BigQueryTableMetadata.get_table_by_reference(
-            copy_job_results.target_table_reference)
+        backup_table_metadata = BigQueryTableMetadata.get_table_by_big_query_table(
+            copy_job_results.target_bq_table
+        )
 
         if backup_table_metadata.table_exists():
             self.__create_backup(backup_table_metadata,
