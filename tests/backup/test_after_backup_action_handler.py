@@ -174,7 +174,7 @@ class TestAfterBackupActionHandler(unittest.TestCase):
 
 
     @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
-    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_big_query_table', return_value=BigQueryTableMetadata(None))
     @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())
     @patch.object(BigQueryTableMetadata, 'table_size_in_bytes', return_value=123)
