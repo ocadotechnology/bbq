@@ -10,7 +10,9 @@ from src.commons.exceptions import ParameterValidationException, \
 from src.commons.handlers.json_handler import JsonHandler
 from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.commons.big_query import validators
-from src.commons.big_query.validators import WrongDatasetNameException
+from src.commons.big_query.validators import WrongDatasetNameException, \
+    WrongProjectNameException, WrongWriteDispositionException, \
+    WrongCreateDispositionException
 from src.commons.config.configuration import configuration
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \
@@ -22,15 +24,24 @@ from src.restore.status.restoration_job_status_service import \
 class BackupListRestoreHandler(JsonHandler):
     def post(self):
         target_dataset_id = self.request.get('targetDatasetId', None)
-        self.__validate_params(target_dataset_id)
+        target_project_id = self.request.get('targetProjectId', None)
+        write_disposition = self.request.get('writeDisposition', 'WRITE_EMPTY')
+        create_disposition = self.request.get('createDisposition',
+                                              'CREATE_IF_NEEDED')
+        self.__validate_params(target_dataset_id, target_project_id,
+                               write_disposition, create_disposition)
+
         body_json = self.__parse_body_json()
         self.__validate_body_json(body_json)
 
         backup_items = self.__create_backup_items(body_json)
         self.__validate_backup_items(backup_items)
-        restore_request = BackupListRestoreRequest(
-            backup_items, target_dataset_id
-        )
+
+        restore_request = BackupListRestoreRequest(backup_items,
+                                                   target_dataset_id,
+                                                   target_project_id,
+                                                   write_disposition,
+                                                   create_disposition)
 
         restoration_job_id = str(uuid.uuid4())
         logging.info("Created restoration_job_id: %s", restoration_job_id)
@@ -39,10 +50,8 @@ class BackupListRestoreHandler(JsonHandler):
 
         restore_data = {
             'restorationJobId': restoration_job_id,
-            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(
-                restoration_job_id),
-            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(
-                restoration_job_id)
+            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(restoration_job_id),
+            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(restoration_job_id)
         }
         self._finish_with_success(restore_data)
 
@@ -99,11 +108,19 @@ class BackupListRestoreHandler(JsonHandler):
                 )
 
     @staticmethod
-    def __validate_params(target_dataset_id):
+    def __validate_params(target_dataset_id, target_project_id,
+                          write_disposition, create_disposition):
         try:
             if target_dataset_id:
                 validators.validate_dataset_id(target_dataset_id)
-        except WrongDatasetNameException, e:
+            if target_project_id:
+                validators.validate_project_id(target_project_id)
+            validators.validate_write_disposition(write_disposition)
+            validators.validate_create_disposition(create_disposition)
+        except (WrongDatasetNameException,
+                WrongProjectNameException,
+                WrongWriteDispositionException,
+                WrongCreateDispositionException), e:
             raise ParameterValidationException(e.message)
 
 

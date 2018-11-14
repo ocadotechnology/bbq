@@ -32,7 +32,8 @@ class BackupItem(object):
 
 
 class BackupListRestoreRequest(object):
-    def __init__(self, backup_items, target_dataset_id=None):
+    def __init__(self, backup_items, target_dataset_id, target_project_id,
+                 write_disposition, create_disposition):
         self.backup_items = backup_items
         self.target_dataset_id = target_dataset_id
 
