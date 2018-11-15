@@ -28,6 +28,8 @@ class RestorationJobStatusService(object):
                 "status": status,
                 "itemResults": item_results,
                 "itemsCount": restoration_job.items_count,
+                "createDisposition": restoration_job.create_disposition,
+                "writeDisposition": restoration_job.write_disposition,
                 "restorationItems": restoration_items}
 
     @staticmethod

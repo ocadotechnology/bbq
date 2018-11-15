@@ -136,8 +136,11 @@ class TestRestoreItem(unittest.TestCase):
         self.assertEqual(updated_restore_item.status_message, error_message)
 
     @staticmethod
-    def __create_restoration_job_with_one_item(restoration_job):
-        restoration_job_key = RestorationJob.create(restoration_job)
+    def __create_restoration_job_with_one_item(restoration_job_id):
+        restoration_job_key = RestorationJob.create(
+            restoration_job_id=restoration_job_id,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY")
         restoration_job_key.get().increment_count_by(1)
 
         restore_item = TestRestoreItem.__create_restore_item_example(
