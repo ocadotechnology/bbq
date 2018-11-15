@@ -1,12 +1,11 @@
-from unittest import TestCase
-
 from freezegun import freeze_time
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock, ANY
+from unittest import TestCase
 
 from src.commons.config.configuration import Configuration
 from src.restore.dataset.dataset_restore_service import _DatasetRestoreService, \
-    DatasetRestoreService
+  DatasetRestoreService
 
 RESTORATION_JOB_ID = 'restoration_job_id'
 
@@ -106,8 +105,9 @@ class TestDatasetRestoreService(TestCase):
                                      dataset_id=DATASET_TO_RESTORE,
                                      target_dataset_id=None,
                                      max_partition_days=None)
-        self.restore_service.restore.assert_called_once_with(RESTORATION_JOB_ID,
-                                                             "<GENERATED ITEMS>")
+        self.restore_service.restore.assert_called_once_with(
+            ndb.Key('RestorationJob', RESTORATION_JOB_ID),
+            "<GENERATED ITEMS>")
 
     def test_should_not_call_async_service_twice_if_restoration_job_exist(
             self):
@@ -123,5 +123,6 @@ class TestDatasetRestoreService(TestCase):
                                          target_dataset_id=None,
                                          max_partition_days=None)
         # then
-        self.restore_service.restore.assert_called_once_with(RESTORATION_JOB_ID,
-                                                             ANY)
+        self.restore_service.restore.assert_called_once_with(
+            ndb.Key('RestorationJob', RESTORATION_JOB_ID),
+            ANY)
