@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock
@@ -11,7 +12,7 @@ from src.commons.table_reference import TableReference
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.list.backup_list_restore_service import \
-  BackupItem, BackupListRestoreRequest, BackupListRestoreService
+    BackupItem, BackupListRestoreRequest, BackupListRestoreService
 
 
 class TestBackupListRestoreService(unittest.TestCase):
@@ -29,9 +30,10 @@ class TestBackupListRestoreService(unittest.TestCase):
         patch.stopall()
         self.testbed.deactivate()
 
+    @patch.object(uuid, 'uuid4', return_value=123)
     @patch.object(AsyncBatchRestoreService, 'restore')
     def test_that_restore_service_will_receive_suitable_request(
-            self, mocked_restore_service):
+            self, mocked_restore_service, _):
         # given
         source_entity = self.__create_table_entity("source_project_id",
                                                    "source_dataset_id",
@@ -46,7 +48,14 @@ class TestBackupListRestoreService(unittest.TestCase):
 
         output_parameters = "{\"test_param_key\": \"test_value\"}"
         backup_item = BackupItem(backup_key, output_parameters)
-        request = BackupListRestoreRequest([backup_item], "td123")
+
+        request = BackupListRestoreRequest(
+            backup_items=[backup_item],
+            target_project_id="target_project_id",
+            target_dataset_id="target_dataset_id",
+            write_disposition="write_disposition",
+            create_disposition="create_disposition"
+        )
 
         expected_source_table_reference = TableReference(
             Configuration.backup_project_id,
@@ -55,8 +64,8 @@ class TestBackupListRestoreService(unittest.TestCase):
             "source_partition_id"
         )
         expected_target_table_reference = TableReference(
-            Configuration.restoration_project_id,
-            "td123",
+            "target_project_id",
+            "target_dataset_id",
             "source_table_id",
             "source_partition_id"
         )
@@ -67,19 +76,19 @@ class TestBackupListRestoreService(unittest.TestCase):
         )
 
         # when
-        BackupListRestoreService().restore("restorationId", request)
+        restoration_job_id = BackupListRestoreService().restore(request)
 
         # then
-        mocked_restore_service.assert_called_once()
-        mocked_restore_service.assert_called_with(
-            ndb.Key('RestorationJob', 'restorationId'),
+        mocked_restore_service.assert_called_once_with(
+            ndb.Key('RestorationJob', restoration_job_id),
             [[expected_restore_item]]
         )
 
+    @patch.object(uuid, 'uuid4', return_value=1234)
     @patch.object(AsyncBatchRestoreService, 'restore',
                   return_value="restorationId")
-    def test_that_restore_service_will_generate_default_dataset_id_if_missing(
-            self, mocked_restore_service):
+    def test_that_restore_service_will_generate_default_values_if_missing(
+            self, mocked_restore_service, _):
         source_entity = self.__create_table_entity("source_project_id",
                                                    "source_dataset_id",
                                                    "source_table_id",
@@ -90,7 +99,13 @@ class TestBackupListRestoreService(unittest.TestCase):
                                                     "backup_dataset_id",
                                                     "backup_table_id")
         backup_key = backup_entity.put()
-        request = BackupListRestoreRequest(iter([BackupItem(backup_key)]))
+        request = BackupListRestoreRequest(
+            backup_items=iter([BackupItem(backup_key)]),
+            target_project_id=None,
+            target_dataset_id=None,
+            write_disposition=None,
+            create_disposition=None
+        )
 
         expected_source_table_reference = TableReference(
             Configuration.backup_project_id,
@@ -109,14 +124,14 @@ class TestBackupListRestoreService(unittest.TestCase):
         )
 
         # when
-        result = BackupListRestoreService().restore("restorationId", request)
+        restoration_job_id = BackupListRestoreService().restore(request)
 
         # then
+        expected_key = ndb.Key('RestorationJob', restoration_job_id)
+
         mocked_restore_service.assert_called_once()
-        mocked_restore_service.assert_called_with(
-            ndb.Key('RestorationJob', 'restorationId'),
-            [[expected_restore_item]]
-        )
+        mocked_restore_service.assert_called_with(expected_key,
+                                                  [[expected_restore_item]])
 
     def test_that_restore_will_fail_if_backup_not_exists_in_ds(self):
         # given
@@ -124,13 +139,19 @@ class TestBackupListRestoreService(unittest.TestCase):
                        "UYgICAgJTOzAgMCxIGQmFja3VwGICAgICAgIAKDA"
         backup_key = ndb.Key(urlsafe=url_safe_key)
 
-        request = BackupListRestoreRequest(iter([BackupItem(backup_key)]))
+        request = BackupListRestoreRequest(
+            backup_items=iter([BackupItem(backup_key)]),
+            target_project_id=None,
+            target_dataset_id=None,
+            write_disposition=None,
+            create_disposition=None
+        )
 
         error_message = "Couldn\'t obtain backup entity in datastore. Error:"
 
         # when
         with self.assertRaises(ParameterValidationException) as context:
-            BackupListRestoreService().restore("restoreId", request)
+            BackupListRestoreService().restore(request)
 
         # then
         self.assertTrue(error_message in str(context.exception))
@@ -148,14 +169,21 @@ class TestBackupListRestoreService(unittest.TestCase):
                                                     "backup_table_id")
         backup_key = backup_entity.put()
         source_entity.key.delete()
-        request = BackupListRestoreRequest(iter([BackupItem(backup_key)]))
+
+        request = BackupListRestoreRequest(
+            backup_items=iter([BackupItem(backup_key)]),
+            target_project_id=None,
+            target_dataset_id=None,
+            write_disposition=None,
+            create_disposition=None
+        )
 
         error_message = "Backup ancestor doesn't exists: '{}:{}'. " \
             .format(backup_entity.dataset_id, backup_entity.table_id)
 
         # when
         with self.assertRaises(ParameterValidationException) as context:
-            BackupListRestoreService().restore("restoreId",request)
+            BackupListRestoreService().restore(request)
 
         # then
         self.assertEquals(error_message, str(context.exception))
