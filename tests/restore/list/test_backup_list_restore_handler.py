@@ -141,7 +141,7 @@ class TestBackupListRestoreHandler(unittest.TestCase):
                                                             mocked_restore_service):
         # given
         expected_error = '{"status": "failed", "message": "Invalid create ' \
-                         'disposition: \'WRONG_WRITE\'. The following values ' \
+                         'disposition: \'WRONG_CREATE\'. The following values ' \
                          'are supported: CREATE_IF_NEEDED, CREATE_NEVER.", ' \
                          '"httpStatus": 400}'
         mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
@@ -151,7 +151,7 @@ class TestBackupListRestoreHandler(unittest.TestCase):
                        "\"test_param_key\":\"test_value\"}," \
                        "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
         response = self.under_test.post(
-            url='/restore/list?createDisposition=WRONG_WRITE',
+            url='/restore/list?createDisposition=WRONG_CREATE',
             params=request_body,
             content_type='application/json',
             expect_errors=True
