@@ -104,26 +104,26 @@ resource "google_bigquery_table" "SLI_backup_quality_view" {
   depends_on = ["google_bigquery_table.SLI_backup_quality"]
 }
 
-resource "google_bigquery_table" "SLI_backup_latency_last_snapshot_value_view" {
+resource "google_bigquery_table" "SLI_backup_latency_last_snapshot_time_view" {
   project = "${local.SLI_views_destination_project}"
   dataset_id = "${var.SLI_history_dataset}"
-  table_id = "SLI_backup_latency_last_snapshot_value"
+  table_id = "SLI_backup_latency_last_snapshot_time"
 
   view {
-    query = "SELECT MAX(snapshotTime) FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
+    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
     use_legacy_sql = true
   }
 
   depends_on = ["google_bigquery_table.SLI_backup_creation_latency"]
 }
 
-resource "google_bigquery_table" "SLI_backup_quality_last_snapshot_value_view" {
+resource "google_bigquery_table" "SLI_backup_quality_last_snapshot_time_view" {
   project = "${local.SLI_views_destination_project}"
   dataset_id = "${var.SLI_history_dataset}"
-  table_id = "SLI_backup_quality_last_snapshot_value"
+  table_id = "SLI_backup_quality_last_snapshot_time"
 
   view {
-    query = "SELECT MAX(snapshotTime) FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_quality] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
+    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_quality] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
     use_legacy_sql = true
   }
 
