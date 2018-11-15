@@ -1,11 +1,15 @@
+import uuid
+
 from google.appengine.api.datastore_errors import BadRequestError, Error
 from google.appengine.ext import ndb
 
 from src.commons.collections import paginated
+from src.commons.config.configuration import configuration
 from src.commons.decorators.log_time import log_time
 from src.commons.decorators.retry import retry
 from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Table import Table
+from src.commons.table_reference import TableReference
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.datastore.restore_item import RestoreItem
@@ -32,31 +36,40 @@ class BackupItem(object):
 
 
 class BackupListRestoreRequest(object):
-    def __init__(self, backup_items, target_dataset_id, target_project_id,
+    def __init__(self, backup_items, target_project_id, target_dataset_id,
                  write_disposition, create_disposition):
         self.backup_items = backup_items
         self.target_dataset_id = target_dataset_id
+        self.target_project_id = target_project_id
+        self.write_disposition = write_disposition
+        self.create_disposition = create_disposition
+        self.restoration_job_id = str(uuid.uuid4())
 
     def __eq__(self, o):
         return type(o) is BackupListRestoreRequest \
                and self.backup_items == o.backup_items \
-               and self.target_dataset_id == o.target_dataset_id
+               and self.target_dataset_id == o.target_dataset_id \
+               and self.target_project_id == o.target_project_id \
+               and self.write_disposition == o.write_disposition \
+               and self.create_disposition == o.create_disposition \
+               and self.restoration_job_id == o.restoration_job_id
 
     def __ne__(self, other):
         return not (self == other)
 
 
 class BackupListRestoreService(object):
-    def restore(self, restoration_job_id, backup_list_restore_request):
+    def restore(self, backup_list_restore_request):
         restoration_job_key = RestorationJob.create(
-            restoration_job_id,
-            create_disposition="CREATE_IF_NEEDED",
-            write_disposition="WRITE_EMPTY"
+            restoration_job_id=backup_list_restore_request.restoration_job_id,
+            create_disposition=backup_list_restore_request.create_disposition,
+            write_disposition=backup_list_restore_request.write_disposition
         )
         restore_items = self \
             .__generate_restore_items(backup_list_restore_request)
 
         AsyncBatchRestoreService().restore(restoration_job_key, [restore_items])
+        return backup_list_restore_request.restoration_job_id
 
     @log_time
     def __generate_restore_items(self, backup_list_restore_request):
@@ -70,31 +83,47 @@ class BackupListRestoreService(object):
 
             for backup_item, backup_entity in \
                     zip(backup_items_sublist, backup_entities):
-                source_table_entity = self.__get_source_table_entity(
-                    backup_entity)
-
-                source_table_reference = RestoreTableReference \
-                    .backup_table_reference(source_table_entity, backup_entity)
-
-                target_dataset_id = backup_list_restore_request.target_dataset_id
-                if target_dataset_id is None:
-                    target_dataset_id = RestoreWorkspaceCreator.create_default_target_dataset_id(
-                        source_table_entity.project_id,
-                        source_table_entity.dataset_id)
-
-                target_table_reference = \
-                    RestoreTableReference.target_table_reference(
-                        source_table_entity,
-                        target_dataset_id
-                    )
-
-                restore_item = RestoreItem.create(source_table_reference,
-                                                  target_table_reference,
-                                                  backup_item.output_parameters)
+                restore_item = self.__create_restore_item(
+                    backup_entity,
+                    backup_item,
+                    backup_list_restore_request
+                )
                 restore_items.append(restore_item)
 
             ctx.clear_cache()
         return restore_items
+
+    def __create_restore_item(self, backup_entity, backup_item,
+                              backup_list_restore_request):
+        source_table_entity = self.__get_source_table_entity(
+            backup_entity)
+
+        source_table_reference = RestoreTableReference \
+            .backup_table_reference(source_table_entity, backup_entity)
+        target_table_reference = self.__create_target_table_reference(
+            backup_list_restore_request, source_table_entity)
+
+        return RestoreItem.create(source_table_reference,
+                                  target_table_reference,
+                                  backup_item.output_parameters)
+
+    @staticmethod
+    def __create_target_table_reference(restore_request, source_table_entity):
+        target_project_id = restore_request.target_project_id
+        target_dataset_id = restore_request.target_dataset_id
+
+        if target_project_id is None:
+            target_project_id = configuration.restoration_project_id
+        if target_dataset_id is None:
+            target_dataset_id = \
+                RestoreWorkspaceCreator.create_default_target_dataset_id(
+                    source_table_entity.project_id,
+                    source_table_entity.dataset_id
+                )
+        return TableReference(target_project_id,
+                              target_dataset_id,
+                              source_table_entity.table_id,
+                              source_table_entity.partition_id)
 
     @staticmethod
     @retry(Error, tries=3, delay=1, backoff=2)

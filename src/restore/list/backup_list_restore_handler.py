@@ -43,10 +43,8 @@ class BackupListRestoreHandler(JsonHandler):
                                                    write_disposition,
                                                    create_disposition)
 
-        restoration_job_id = str(uuid.uuid4())
+        restoration_job_id = BackupListRestoreService().restore(restore_request)
         logging.info("Created restoration_job_id: %s", restoration_job_id)
-
-        BackupListRestoreService().restore(restoration_job_id, restore_request)
 
         restore_data = {
             'restorationJobId': restoration_job_id,
