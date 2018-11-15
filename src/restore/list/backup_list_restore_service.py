@@ -39,8 +39,8 @@ class BackupListRestoreRequest(object):
     def __init__(self, backup_items, target_project_id, target_dataset_id,
                  write_disposition, create_disposition):
         self.backup_items = backup_items
-        self.target_dataset_id = target_dataset_id
         self.target_project_id = target_project_id
+        self.target_dataset_id = target_dataset_id
         self.write_disposition = write_disposition
         self.create_disposition = create_disposition
         self.restoration_job_id = str(uuid.uuid4())
@@ -59,71 +59,35 @@ class BackupListRestoreRequest(object):
 
 
 class BackupListRestoreService(object):
-    def restore(self, backup_list_restore_request):
+    def restore(self, restore_request):
         restoration_job_key = RestorationJob.create(
-            restoration_job_id=backup_list_restore_request.restoration_job_id,
-            create_disposition=backup_list_restore_request.create_disposition,
-            write_disposition=backup_list_restore_request.write_disposition
+            restoration_job_id=restore_request.restoration_job_id,
+            create_disposition=restore_request.create_disposition,
+            write_disposition=restore_request.write_disposition
         )
-        restore_items = self \
-            .__generate_restore_items(backup_list_restore_request)
+        restore_items = self.__generate_restore_items(restore_request)
 
         AsyncBatchRestoreService().restore(restoration_job_key, [restore_items])
-        return backup_list_restore_request.restoration_job_id
+        return restore_request.restoration_job_id
 
     @log_time
-    def __generate_restore_items(self, backup_list_restore_request):
+    def __generate_restore_items(self, restore_request):
         restore_items = []
         ctx = ndb.get_context()
 
-        for backup_items_sublist \
-                in paginated(1000, backup_list_restore_request.backup_items):
-            backup_entities = self. \
-                __get_backup_entities(backup_items_sublist)
+        for backup_items_sublist in paginated(1000, restore_request.backup_items):
+            backup_entities = self.__get_backup_entities(backup_items_sublist)
 
-            for backup_item, backup_entity in \
-                    zip(backup_items_sublist, backup_entities):
+            for backup_item, backup_entity in zip(backup_items_sublist, backup_entities):
                 restore_item = self.__create_restore_item(
+                    restore_request,
                     backup_entity,
-                    backup_item,
-                    backup_list_restore_request
+                    backup_item
                 )
                 restore_items.append(restore_item)
 
             ctx.clear_cache()
         return restore_items
-
-    def __create_restore_item(self, backup_entity, backup_item,
-                              backup_list_restore_request):
-        source_table_entity = self.__get_source_table_entity(
-            backup_entity)
-
-        source_table_reference = RestoreTableReference \
-            .backup_table_reference(source_table_entity, backup_entity)
-        target_table_reference = self.__create_target_table_reference(
-            backup_list_restore_request, source_table_entity)
-
-        return RestoreItem.create(source_table_reference,
-                                  target_table_reference,
-                                  backup_item.output_parameters)
-
-    @staticmethod
-    def __create_target_table_reference(restore_request, source_table_entity):
-        target_project_id = restore_request.target_project_id
-        target_dataset_id = restore_request.target_dataset_id
-
-        if target_project_id is None:
-            target_project_id = configuration.restoration_project_id
-        if target_dataset_id is None:
-            target_dataset_id = \
-                RestoreWorkspaceCreator.create_default_target_dataset_id(
-                    source_table_entity.project_id,
-                    source_table_entity.dataset_id
-                )
-        return TableReference(target_project_id,
-                              target_dataset_id,
-                              source_table_entity.table_id,
-                              source_table_entity.partition_id)
 
     @staticmethod
     @retry(Error, tries=3, delay=1, backoff=2)
@@ -144,6 +108,18 @@ class BackupListRestoreService(object):
                             "Error: \n{}".format(e.message)
             raise ParameterValidationException(error_message)
 
+    def __create_restore_item(self, restore_request, backup_entity, backup_item):
+        source_entity = self.__get_source_table_entity(backup_entity)
+
+        source_table_reference = RestoreTableReference\
+            .backup_table_reference(source_entity, backup_entity)
+        target_table_reference = self.__create_target_table_reference(
+            restore_request, source_entity)
+
+        return RestoreItem.create(source_table_reference,
+                                  target_table_reference,
+                                  backup_item.output_parameters)
+
     @staticmethod
     @retry(Error, tries=3, delay=1, backoff=2)
     def __get_source_table_entity(backup_entity):
@@ -154,3 +130,21 @@ class BackupListRestoreService(object):
                         backup_entity.table_id)
             raise ParameterValidationException(error_message)
         return source_table_entity
+
+    @staticmethod
+    def __create_target_table_reference(restore_request, source_entity):
+        target_project_id = restore_request.target_project_id
+        target_dataset_id = restore_request.target_dataset_id
+
+        if target_project_id is None:
+            target_project_id = configuration.restoration_project_id
+        if target_dataset_id is None:
+            target_dataset_id = \
+                RestoreWorkspaceCreator.create_default_target_dataset_id(
+                    source_entity.project_id,
+                    source_entity.dataset_id
+                )
+        return TableReference(target_project_id,
+                              target_dataset_id,
+                              source_entity.table_id,
+                              source_entity.partition_id)

@@ -1,19 +1,19 @@
 import json
 import logging
 import urllib
-import uuid
 
 import webapp2
 
-from src.commons.exceptions import ParameterValidationException, \
-    JsonNotParseableException
-from src.commons.handlers.json_handler import JsonHandler
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.commons.big_query import validators
 from src.commons.big_query.validators import WrongDatasetNameException, \
     WrongProjectNameException, WrongWriteDispositionException, \
     WrongCreateDispositionException
 from src.commons.config.configuration import configuration
+from src.commons.exceptions import ParameterValidationException, \
+    JsonNotParseableException
+from src.commons.handlers.bbq_authenticated_handler import \
+    BbqAuthenticatedHandler
+from src.commons.handlers.json_handler import JsonHandler
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \
     BackupListRestoreService, BackupItem, BackupListRestoreRequest
@@ -38,18 +38,18 @@ class BackupListRestoreHandler(JsonHandler):
         self.__validate_backup_items(backup_items)
 
         restore_request = BackupListRestoreRequest(backup_items,
-                                                   target_dataset_id,
                                                    target_project_id,
+                                                   target_dataset_id,
                                                    write_disposition,
                                                    create_disposition)
 
-        restoration_job_id = BackupListRestoreService().restore(restore_request)
-        logging.info("Created restoration_job_id: %s", restoration_job_id)
+        job_id = BackupListRestoreService().restore(restore_request)
+        logging.info("Scheduled restoration job: %s", job_id)
 
         restore_data = {
-            'restorationJobId': restoration_job_id,
-            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(restoration_job_id),
-            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(restoration_job_id)
+            'restorationJobId': job_id,
+            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(job_id),
+            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(job_id)
         }
         self._finish_with_success(restore_data)
 
