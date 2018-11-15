@@ -43,7 +43,7 @@ def validate_write_disposition(write_disposition):
     if write_disposition not in available_write_dispositions:
         error_message = "Invalid write disposition: '{}'. " \
                         "The following values are supported: {}."\
-            .format(write_disposition, ','.join(available_write_dispositions))
+            .format(write_disposition, ', '.join(available_write_dispositions))
         raise WrongWriteDispositionException(error_message)
 
 
@@ -51,5 +51,5 @@ def validate_create_disposition(create_disposition):
     if create_disposition not in available_create_dispositions:
         error_message = "Invalid create disposition: '{}'. " \
                         "The following values are supported: {}." \
-            .format(create_disposition, ','.join(available_create_dispositions))
+            .format(create_disposition, ', '.join(available_create_dispositions))
         raise WrongCreateDispositionException(error_message)
