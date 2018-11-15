@@ -24,7 +24,10 @@ class _DatasetRestoreService(object):
             max_partition_days)
 
         try:
-            RestorationJob.create(restoration_job_id)
+            restoration_job_key = RestorationJob.create(
+                restoration_job_id,
+                create_disposition="CREATE_IF_NEEDED",
+                write_disposition="WRITE_EMPTY")
         except DuplicatedRestorationJobIdException:
             logging.warning(
                 "Trying to create RestorationJob with already existed restoration job id")
@@ -36,7 +39,7 @@ class _DatasetRestoreService(object):
             target_dataset_id=target_dataset_id,
             max_partition_days=max_partition_days)
 
-        AsyncBatchRestoreService().restore(restoration_job_id, restore_items)
+        AsyncBatchRestoreService().restore(restoration_job_key, restore_items)
 
 
 class DatasetRestoreService(_DatasetRestoreService):

@@ -47,11 +47,15 @@ class BackupListRestoreRequest(object):
 
 class BackupListRestoreService(object):
     def restore(self, restoration_job_id, backup_list_restore_request):
-        RestorationJob.create(restoration_job_id)
+        restoration_job_key = RestorationJob.create(
+            restoration_job_id,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY"
+        )
         restore_items = self \
             .__generate_restore_items(backup_list_restore_request)
 
-        AsyncBatchRestoreService().restore(restoration_job_id, [restore_items])
+        AsyncBatchRestoreService().restore(restoration_job_key, [restore_items])
 
     @log_time
     def __generate_restore_items(self, backup_list_restore_request):

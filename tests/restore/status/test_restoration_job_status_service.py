@@ -198,7 +198,9 @@ class TestRestorationJobStatusService(unittest.TestCase):
         self.assertEqual(3, len(result['restorationItems']))
 
     def create_restoration_job_with_count(self, item_count):
-        job_key = RestorationJob.create(TEST_RESTORATION_JOB_ID)
+        job_key = RestorationJob.create(TEST_RESTORATION_JOB_ID,
+                                        create_disposition="CREATE_IF_NEEDED",
+                                        write_disposition="WRITE_EMPTY")
         job_key.get().increment_count_by(item_count)
         return job_key
 
