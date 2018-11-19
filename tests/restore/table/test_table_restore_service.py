@@ -31,5 +31,5 @@ class TestTableRestoreService(unittest.TestCase):
                                     restoration_datetime)
         # then
         expected_restore_request = BackupListRestoreRequest(
-            [BackupItem(backup.key)], target_dataset_id)
-        restore.assert_called_once_with("123", expected_restore_request)
+            [BackupItem(backup.key)], None, target_dataset_id, None, None)
+        restore.assert_called_once_with(expected_restore_request)
