@@ -56,6 +56,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
                                    DatasetRestoreItemsGenerator.generate_restore_items(
                                        project_id=PROJECT_TO_RESTORE,
                                        dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id=RESTORATION_PROJECT_ID,
                                        target_dataset_id=self.__create_target_dataset(
                                            None),
                                        max_partition_days=None)]
@@ -73,6 +74,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
                                    DatasetRestoreItemsGenerator.generate_restore_items(
                                        project_id=PROJECT_TO_RESTORE,
                                        dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id=RESTORATION_PROJECT_ID,
                                        target_dataset_id=custom_target_dataset_id,
                                        max_partition_days=None)]
         # then
@@ -88,6 +90,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
                                    DatasetRestoreItemsGenerator.generate_restore_items(
                                        project_id=PROJECT_TO_RESTORE,
                                        dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id=RESTORATION_PROJECT_ID,
                                        target_dataset_id=self.__create_target_dataset(
                                            None),
                                        max_partition_days=None)]
@@ -105,6 +108,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
                                    DatasetRestoreItemsGenerator.generate_restore_items(
                                        project_id=PROJECT_TO_RESTORE,
                                        dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id=RESTORATION_PROJECT_ID,
                                        target_dataset_id=self.__create_target_dataset(
                                            None),
                                        max_partition_days=None)]
@@ -125,6 +129,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
                                    DatasetRestoreItemsGenerator.generate_restore_items(
                                        project_id=PROJECT_TO_RESTORE,
                                        dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id=RESTORATION_PROJECT_ID,
                                        target_dataset_id=self.__create_target_dataset(
                                            None),
                                        max_partition_days=2)]
@@ -246,5 +251,4 @@ class TestDatasetRestoreItemsGenerator(TestCase):
     def __create_target_dataset(custom_target_dataset):
         if custom_target_dataset is not None:
             return custom_target_dataset
-        return '{}___{}'.format(PROJECT_TO_RESTORE, DATASET_TO_RESTORE).replace(
-            '-', '_')
+        return DATASET_TO_RESTORE
