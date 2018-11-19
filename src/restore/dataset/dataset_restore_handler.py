@@ -3,12 +3,11 @@ import uuid
 
 import webapp2
 
-from src.commons.exceptions import ParameterValidationException
-from src.commons.handlers.json_handler import JsonHandler
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.commons.big_query import validators
-from src.commons.big_query.validators import WrongDatasetNameException
 from src.commons.config.configuration import configuration
+from src.commons.handlers.bbq_authenticated_handler import \
+    BbqAuthenticatedHandler
+from src.commons.handlers.json_handler import JsonHandler
 from src.restore.dataset.dataset_restore_service import \
     DatasetRestoreService
 from src.restore.status.restoration_job_status_service import \
@@ -18,19 +17,20 @@ from src.restore.status.restoration_job_status_service import \
 class DatasetRestoreHandler(JsonHandler):
 
     def post(self, project_id, dataset_id):
-
         target_project_id = self.request.get('targetProjectId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         create_disposition = self.request.get('createDisposition', None)
         write_disposition = self.request.get('writeDisposition', None)
         max_partition_days = self.__get_max_partition_days()
 
-        validators.validate_dataset_restore_params(source_project_id=project_id,
-                                                   source_dataset_id=dataset_id,
-                                                   target_project_id=target_project_id,
-                                                   target_dataset_id=target_dataset_id,
-                                                   create_disposition=create_disposition,
-                                                   write_disposition=write_disposition)
+        validators.validate_dataset_restore_params(
+            source_project_id=project_id,
+            source_dataset_id=dataset_id,
+            target_project_id=target_project_id,
+            target_dataset_id=target_dataset_id,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition
+        )
 
         restoration_job_id = str(uuid.uuid4())
         logging.info("Created restoration_job_id: %s", restoration_job_id)
@@ -50,10 +50,8 @@ class DatasetRestoreHandler(JsonHandler):
             'restorationJobId': restoration_job_id,
             'projectId': project_id,
             'datasetId': dataset_id,
-            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(
-                restoration_job_id),
-            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(
-                restoration_job_id)
+            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(restoration_job_id),
+            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(restoration_job_id)
         }
         self._finish_with_success(restore_data)
 
@@ -71,8 +69,10 @@ class DatasetRestoreAuthenticatedHandler(DatasetRestoreHandler,
 
 
 app = webapp2.WSGIApplication([
-    webapp2.Route('/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
-     DatasetRestoreHandler),
-    webapp2.Route('/schedule/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
-     DatasetRestoreAuthenticatedHandler)
+    webapp2.Route(
+        '/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
+        DatasetRestoreHandler),
+    webapp2.Route(
+        '/schedule/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
+        DatasetRestoreAuthenticatedHandler)
 ], debug=configuration.debug_mode)

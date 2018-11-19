@@ -34,11 +34,12 @@ class DatasetRestoreItemsGenerator(object):
                         target_project_id,
                         target_dataset_id,
                         table_entity.table_id,
-                        table_entity.partition_id)
+                        table_entity.partition_id
+                    )
 
-                    restore_items.append(
-                        RestoreItem.create(source_table_reference,
-                                           target_table_reference))
+                    restore_item = RestoreItem.create(source_table_reference,
+                                                      target_table_reference)
+                    restore_items.append(restore_item)
 
             logging.info("Restore items generator yields %s restore items",
                          len(restore_items))

@@ -3,12 +3,12 @@ import uuid
 from google.appengine.api.datastore_errors import BadRequestError, Error
 from google.appengine.ext import ndb
 
+from src.backup.datastore.Table import Table
 from src.commons.collections import paginated
 from src.commons.config.configuration import configuration
 from src.commons.decorators.log_time import log_time
 from src.commons.decorators.retry import retry
 from src.commons.exceptions import ParameterValidationException
-from src.backup.datastore.Table import Table
 from src.commons.table_reference import TableReference
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restoration_job import RestorationJob
@@ -36,12 +36,12 @@ class BackupItem(object):
 
 class BackupListRestoreRequest(object):
     def __init__(self, backup_items, target_project_id, target_dataset_id,
-                 write_disposition, create_disposition):
+                 create_disposition, write_disposition):
         self.backup_items = backup_items
         self.target_project_id = target_project_id
         self.target_dataset_id = target_dataset_id
-        self.write_disposition = write_disposition
         self.create_disposition = create_disposition
+        self.write_disposition = write_disposition
         self.restoration_job_id = str(uuid.uuid4())
 
     def __eq__(self, o):
