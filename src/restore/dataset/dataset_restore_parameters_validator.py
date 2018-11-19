@@ -1,9 +1,9 @@
 import logging
 
-from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Table import Table
 from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
+from src.commons.exceptions import ParameterValidationException
 
 
 class DatasetRestoreParametersValidator(object):
@@ -11,8 +11,11 @@ class DatasetRestoreParametersValidator(object):
     def __init__(self):
         self.BQ = BigQuery()
 
-    def validate_parameters(self, project_id, dataset_id, target_dataset_id,
-                            max_partition_days):
+    def validate_parameters(
+            self, project_id, dataset_id, target_project_id,
+            target_dataset_id, create_disposition, write_disposition,
+            max_partition_days
+    ):
 
         any_backup = self.__get_backup(project_id, dataset_id,
                                        max_partition_days)
