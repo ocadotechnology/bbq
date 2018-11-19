@@ -12,22 +12,22 @@ class MainPage(BaseHandler):
 class RestoreDatasetUIHandler(BaseHandler):
     def get(self):
         self.render_response('restoreDataset.html',
-                             restoration_project_id=
-                             configuration.restoration_project_id)
+                             default_restoration_project_id=
+                             configuration.default_restoration_project_id)
 
 
 class RestoreListUIHandler(BaseHandler):
     def get(self):
         self.render_response('restoreList.html',
-                             restoration_project_id=
-                             configuration.restoration_project_id)
+                             default_restoration_project_id=
+                             configuration.default_restoration_project_id)
 
 
 class RestoreTableUIHandler(BaseHandler):
     def get(self):
         self.render_response('restoreTable.html',
-                             restoration_project_id=
-                             configuration.restoration_project_id)
+                             default_restoration_project_id=
+                             configuration.default_restoration_project_id)
 
 
 class OnDemandTableBackupUIHandler(BaseHandler):
