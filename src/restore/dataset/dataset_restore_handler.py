@@ -25,7 +25,12 @@ class DatasetRestoreHandler(JsonHandler):
         write_disposition = self.request.get('writeDisposition', None)
         max_partition_days = self.__get_max_partition_days()
 
-        self.__validate_params(dataset_id, target_dataset_id)
+        validators.validate_dataset_restore_params(source_project_id=project_id,
+                                                   source_dataset_id=dataset_id,
+                                                   target_project_id=target_project_id,
+                                                   target_dataset_id=target_dataset_id,
+                                                   create_disposition=create_disposition,
+                                                   write_disposition=write_disposition)
 
         restoration_job_id = str(uuid.uuid4())
         logging.info("Created restoration_job_id: %s", restoration_job_id)
@@ -55,15 +60,6 @@ class DatasetRestoreHandler(JsonHandler):
     def __get_max_partition_days(self):
         max_partition_days = self.request.get('maxPartitionDays', None)
         return int(max_partition_days) if max_partition_days else None
-
-    @staticmethod
-    def __validate_params(dataset_id, target_dataset_id):
-        try:
-            validators.validate_dataset_id(dataset_id)
-            if target_dataset_id:
-                validators.validate_dataset_id(target_dataset_id)
-        except WrongDatasetNameException, e:
-            raise ParameterValidationException(e.message)
 
 
 class DatasetRestoreAuthenticatedHandler(DatasetRestoreHandler,

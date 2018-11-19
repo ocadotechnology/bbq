@@ -23,13 +23,14 @@ from src.restore.status.restoration_job_status_service import \
 
 class BackupListRestoreHandler(JsonHandler):
     def post(self):
-        target_dataset_id = self.request.get('targetDatasetId', None)
         target_project_id = self.request.get('targetProjectId', None)
+        target_dataset_id = self.request.get('targetDatasetId', None)
         write_disposition = self.request.get('writeDisposition', 'WRITE_EMPTY')
         create_disposition = self.request.get('createDisposition',
                                               'CREATE_IF_NEEDED')
-        self.__validate_params(target_dataset_id, target_project_id,
-                               write_disposition, create_disposition)
+
+        validators.validate_list_restore_params(target_project_id, target_dataset_id,
+                                                create_disposition,write_disposition)
 
         body_json = self.__parse_body_json()
         self.__validate_body_json(body_json)
@@ -104,22 +105,6 @@ class BackupListRestoreHandler(JsonHandler):
                     "Please specify either 'backupUrlSafeKey' or 'backupBqKey' "
                     "element in single item."
                 )
-
-    @staticmethod
-    def __validate_params(target_dataset_id, target_project_id,
-                          write_disposition, create_disposition):
-        try:
-            if target_dataset_id:
-                validators.validate_dataset_id(target_dataset_id)
-            if target_project_id:
-                validators.validate_project_id(target_project_id)
-            validators.validate_write_disposition(write_disposition)
-            validators.validate_create_disposition(create_disposition)
-        except (WrongDatasetNameException,
-                WrongProjectNameException,
-                WrongWriteDispositionException,
-                WrongCreateDispositionException), e:
-            raise ParameterValidationException(e.message)
 
 
 class BackupListRestoreAuthenticatedHandler(BackupListRestoreHandler,

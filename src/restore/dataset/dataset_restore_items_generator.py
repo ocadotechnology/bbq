@@ -3,6 +3,7 @@ import logging
 from src.backup.datastore.Table import Table
 from src.commons.collections import paginated
 from src.commons.decorators.log_time import log_time
+from src.commons.table_reference import TableReference
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restoration_table_reference import RestoreTableReference
 
@@ -29,11 +30,11 @@ class DatasetRestoreItemsGenerator(object):
                         RestoreTableReference.backup_table_reference(
                             table_entity, backup_entity)
 
-                    target_table_reference = \
-                        RestoreTableReference.target_table_reference(
-                            table_entity,
-                            target_project_id,
-                            target_dataset_id)
+                    target_table_reference = TableReference(
+                        target_project_id,
+                        target_dataset_id,
+                        table_entity.table_id,
+                        table_entity.partition_id)
 
                     restore_items.append(
                         RestoreItem.create(source_table_reference,
