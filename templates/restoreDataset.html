@@ -5,10 +5,10 @@
 <script type="text/javascript">
   function OnSubmitForm() {
     var params = {
-      'targetProjectId': document.restoreDatasetForm.isRestoreToSource
+      'targetProjectId': document.restoreDatasetForm.isRestoreToSource.checked
           ? document.restoreDatasetForm.projectId.value
           : document.restoreDatasetForm.targetProjectId.value,
-      'targetDatasetId': document.restoreDatasetForm.isRestoreToSource
+      'targetDatasetId': document.restoreDatasetForm.isRestoreToSource.checked
           ? document.restoreDatasetForm.datasetId.value
           : document.restoreDatasetForm.targetDatasetId.value,
       'createDisposition': document.restoreDatasetForm.createDisposition.value,
@@ -16,23 +16,25 @@
       'maxPartitionDays': document.restoreDatasetForm.maxPartitionDays.value
     };
 
+    console.log(params)
+
     var url = '/restore/project/' + document.restoreDatasetForm.projectId.value + '/dataset/'
         + document.restoreDatasetForm.datasetId.value + '?' + encodeQueryData(params);
 
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", url, true);
-    xhttp.timeout = 1000 * 3600;
-
-    xhttp.onload = function () {
-      document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
-          undefined, 2);
-      makeUrlsClickable();
-    };
-    xhttp.ontimeout = function (e) {
-      document.getElementById("response").innerHTML = "Request timeout: " + e;
-    };
-
-    xhttp.send();
+    // var xhttp = new XMLHttpRequest();
+    // xhttp.open("POST", url, true);
+    // xhttp.timeout = 1000 * 3600;
+    //
+    // xhttp.onload = function () {
+    //   document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
+    //       undefined, 2);
+    //   makeUrlsClickable();
+    // };
+    // xhttp.ontimeout = function (e) {
+    //   document.getElementById("response").innerHTML = "Request timeout: " + e;
+    // };
+    //
+    // xhttp.send();
     return false;
   }
 </script>
