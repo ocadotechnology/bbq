@@ -19,7 +19,10 @@ class DatasetRestoreHandler(JsonHandler):
 
     def post(self, project_id, dataset_id):
 
+        target_project_id = self.request.get('targetProjectId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
+        create_disposition = self.request.get('createDisposition', None)
+        write_disposition = self.request.get('writeDisposition', None)
         max_partition_days = self.__get_max_partition_days()
 
         self.__validate_params(dataset_id, target_dataset_id)
@@ -31,7 +34,10 @@ class DatasetRestoreHandler(JsonHandler):
             restoration_job_id=restoration_job_id,
             project_id=project_id,
             dataset_id=dataset_id,
+            target_project_id=target_project_id,
             target_dataset_id=target_dataset_id,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition,
             max_partition_days=max_partition_days
         )
 

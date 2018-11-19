@@ -5,8 +5,15 @@
 <script type="text/javascript">
   function OnSubmitForm() {
     var params = {
-      'targetDatasetId': document.restoreDatasetForm.targetDatasetId.value,
-      'maxPartitionDays': document.restoreDatasetForm.max_partition_days.value
+      'targetProjectId': document.restoreDatasetForm.isRestoreToSource
+          ? document.restoreDatasetForm.projectId.value
+          : document.restoreDatasetForm.targetProjectId.value,
+      'targetDatasetId': document.restoreDatasetForm.isRestoreToSource
+          ? document.restoreDatasetForm.datasetId.value
+          : document.restoreDatasetForm.targetDatasetId.value,
+      'createDisposition': document.restoreDatasetForm.createDisposition.value,
+      'writeDisposition': document.restoreDatasetForm.writeDisposition.value,
+      'maxPartitionDays': document.restoreDatasetForm.maxPartitionDays.value
     };
 
     var url = '/restore/project/' + document.restoreDatasetForm.projectId.value + '/dataset/'
@@ -34,9 +41,11 @@
 <form name="restoreDatasetForm" onsubmit="return OnSubmitForm();">
   <div class="form-group row">
     <label for="sourceProjectId" class="col-sm-2 col-form-label">Source project id</label>
+
     <div class="col-sm-8">
       <input type="text" class="form-control" id="sourceProjectId" name="projectId"
              placeholder="project id" required/>
+
       <small id="sourceProjectIdHelp" class="form-text text-muted">Project id where dataset is
         placed originally
       </small>
@@ -52,28 +61,95 @@
       </small>
     </div>
   </div>
+
   <div class="form-group row">
-    <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
-    <div class="input-group col-sm-8">
-      <div class="input-group-prepend">
-        <span class="input-group-text" id="projectAddOn">{{ restoration_project_id }}.</span>
+    <label for="isRestoreToSourceProjectCheckbox" class="col-sm-2 col-form-label">Is restore to
+      source</label>
+    <div class="col-sm-8">
+      <label data-toggle="collapse" data-target="#collapse3rdParty"></label>
+      <input type="checkbox" class="form-control" id="isRestoreToSourceProjectCheckbox"
+             name="isRestoreToSource" data-toggle="collapse" data-target="#collapse3rdParty">
+
+      <small id="isRestoreToSourceProjectHelper" class="form-text text-muted">Will dataset be
+        restored straightforward into source project?
+      </small>
+    </div>
+  </div>
+
+  <div class="collapse show" id="collapse3rdParty">
+
+    <div class="form-group row">
+      <label for="targetProjectId" class="col-sm-2 col-form-label">Target project id</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="targetProjectId" name="targetProjectId"
+               value="{{ restoration_project_id }}">
+        <small id="targetProjectIdHelp" class="form-text text-muted">
+          Optional. Target project id. If not passed, default restoration project id will be used.
+        </small>
       </div>
-      <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
-             name="targetDatasetId" placeholder="source_project_id___source_dataset_id">
-      <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
-        that will be used (and created if does not exist) as container for restored table. Remember
-        that this will be a temporary dataset with expiration time set to 7 days. Note that passed
-        dataset could already exists - it should be in the same location as backup. If target
-        dataset id is not passed, then source dataset id value will be used as a target dataset id
-        in restoration project. In case of restoring backups from different datasets multiple target
-        datasets will be created.
+    </div>
+
+    <div class="form-group row">
+      <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
+      <div class="input-group col-sm-8">
+        <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
+               name="targetDatasetId" placeholder="source_dataset_id">
+        <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
+          that will be used (and created if does not exist) as container for restored table.
+          Remember
+          that this will be a temporary dataset with expiration time set to 7 days. Note that passed
+          dataset could already exists - it should be in the same location as backup. If target
+          dataset id is not passed, then source dataset id value will be used as a target dataset id
+          in restoration project.
+        </small>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="form-group row">
+    <label for="createDisposition" class="col-sm-2 col-form-label">Create disposition</label>
+    <div class="col-sm-8">
+      <select class="form-control" id="createDisposition" name="createDisposition">
+        <option>CREATE_IF_NEEDED</option>
+        <option>CREATE_NEVER</option>
+      </select>
+      <small id="createDispositionHelp" class="form-text text-muted">
+        Specifies whether the job is allowed to create new tables.<br>
+
+        The following values are supported:<br>
+        <b>CREATE_IF_NEEDED</b>: If the table does not exist, BigQuery creates the table.<br>
+        <b>CREATE_NEVER</b>: The table must already exist. If it does not, a 'notFound' error is
+        returned in the job result.<br>
+        The default value is <b>CREATE_IF_NEEDED</b>.
+      </small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="writeDisposition" class="col-sm-2 col-form-label">Write disposition</label>
+    <div class="col-sm-8">
+      <select class="form-control" id="writeDisposition" name="writeDisposition">
+        <option>WRITE_EMPTY</option>
+        <option>WRITE_TRUNCATE</option>
+        <option>WRITE_APPEND</option>
+      </select>
+      <small id="writeDispositionHelp" class="form-text text-muted">
+        Specifies the action that occurs if the destination table already exists.<br>
+
+        The following values are supported:<br>
+        <b>WRITE_EMPTY</b>: If the table already exists and contains data, a 'duplicate' error is
+        returned in the job result.<br>
+        <b>WRITE_TRUNCATE</b>: If the table already exists, BigQuery overwrites the table data.<br>
+        <b>WRITE_APPEND</b>: If the table already exists, BigQuery appends the data to the
+        table.<br>
+        The default value is <b>WRITE_EMPTY</b>.
       </small>
     </div>
   </div>
   <div class="form-group row">
     <label for="maxPartitionsDays" class="col-sm-2 col-form-label">Max partition days</label>
     <div class="col-sm-4">
-      <input type="number" class="form-control" id="maxPartitionsDays" name="max_partition_days">
+      <input type="number" class="form-control" id="maxPartitionsDays" name="maxPartitionDays">
       <small id="maxPartitionsDaysHelp" class="form-text text-muted">Optional. Number of days from
         partitioned tables will be restored (eg. 30 means that partitions from last 30 days from now
         will be restored)
@@ -86,7 +162,6 @@
     </div>
   </div>
 </form>
-
 <br><strong>Response:</strong> <br>
 <pre id="response"></pre>
 

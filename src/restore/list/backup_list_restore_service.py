@@ -14,7 +14,6 @@ from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restoration_job import RestorationJob
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restoration_table_reference import RestoreTableReference
-from src.restore.restore_workspace_creator import RestoreWorkspaceCreator
 
 
 class BackupItem(object):
@@ -139,11 +138,7 @@ class BackupListRestoreService(object):
         if target_project_id is None:
             target_project_id = configuration.restoration_project_id
         if target_dataset_id is None:
-            target_dataset_id = \
-                RestoreWorkspaceCreator.create_default_target_dataset_id(
-                    source_entity.project_id,
-                    source_entity.dataset_id
-                )
+            target_dataset_id = source_entity.dataset_id
         return TableReference(target_project_id,
                               target_dataset_id,
                               source_entity.table_id,

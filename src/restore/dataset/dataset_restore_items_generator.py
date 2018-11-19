@@ -1,8 +1,8 @@
 import logging
 
+from src.backup.datastore.Table import Table
 from src.commons.collections import paginated
 from src.commons.decorators.log_time import log_time
-from src.backup.datastore.Table import Table
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.restoration_table_reference import RestoreTableReference
 
@@ -11,8 +11,8 @@ class DatasetRestoreItemsGenerator(object):
 
     @classmethod
     @log_time
-    def generate_restore_items(cls, project_id, dataset_id, target_dataset_id,
-                               max_partition_days):
+    def generate_restore_items(cls, project_id, dataset_id, target_project_id,
+                               target_dataset_id, max_partition_days):
         if max_partition_days:
             table_entities = Table \
                 .get_tables_with_max_partition_days(project_id, dataset_id,
@@ -31,7 +31,9 @@ class DatasetRestoreItemsGenerator(object):
 
                     target_table_reference = \
                         RestoreTableReference.target_table_reference(
-                            table_entity, target_dataset_id)
+                            table_entity,
+                            target_project_id,
+                            target_dataset_id)
 
                     restore_items.append(
                         RestoreItem.create(source_table_reference,
