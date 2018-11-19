@@ -12,6 +12,12 @@ from tests.utils import table_entities_creator
 PROJECT_TO_RESTORE = 'project-x'
 DATASET_TO_RESTORE = 'dataset_y'
 
+TARGET_PROJECT = 'restoration-project-x'
+TARGET_DATASET = 'restore_dataset_y'
+
+CREATE_DISPOSITION = "CREATE_IF_NEEDED"
+WRITE_DISPOSITION = "WRITE_EMPTY"
+
 DATASET_WITH_US = {'location': 'US'}
 DATASET_WITH_EU = {'location': 'EU'}
 
@@ -42,7 +48,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
 
         # when
         DatasetRestoreParametersValidator().validate_parameters(
-            PROJECT_TO_RESTORE, DATASET_TO_RESTORE, None, None)
+            project_id=PROJECT_TO_RESTORE,
+            dataset_id=DATASET_TO_RESTORE,
+            target_project_id=TARGET_PROJECT,
+            target_dataset_id=None,
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
+            max_partition_days=None)
 
     def test_should_not_throw_exception_when_custom_target_dataset_not_exist(
             self):
@@ -55,8 +67,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
 
         # when
         DatasetRestoreParametersValidator().validate_parameters(
-            PROJECT_TO_RESTORE, DATASET_TO_RESTORE, 'CUSTOM_TARGET_DATASET',
-            None)
+            project_id=PROJECT_TO_RESTORE,
+            dataset_id=DATASET_TO_RESTORE,
+            target_project_id=TARGET_PROJECT,
+            target_dataset_id='CUSTOM_TARGET_DATASET',
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
+            max_partition_days=None)
 
     def test_should_not_throw_exception_when_the_same_location(
             self):
@@ -70,8 +87,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
 
         # when
         DatasetRestoreParametersValidator().validate_parameters(
-            PROJECT_TO_RESTORE, DATASET_TO_RESTORE, 'CUSTOM_TARGET_DATASET',
-            None)
+            project_id=PROJECT_TO_RESTORE,
+            dataset_id=DATASET_TO_RESTORE,
+            target_project_id=TARGET_PROJECT,
+            target_dataset_id='CUSTOM_TARGET_DATASET',
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
+            max_partition_days=None)
 
     def test_should_throw_exception_when_default_dataset_has_different_location(
             self):
@@ -85,8 +107,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
         # when
         with self.assertRaises(ParameterValidationException) as ex:
             DatasetRestoreParametersValidator().validate_parameters(
-                PROJECT_TO_RESTORE, DATASET_TO_RESTORE, None,
-                None)
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=TARGET_PROJECT,
+                target_dataset_id=None,
+                create_disposition=CREATE_DISPOSITION,
+                write_disposition=WRITE_DISPOSITION,
+                max_partition_days=None)
 
         # then
         self.assertTrue(
@@ -105,8 +132,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
         # when
         with self.assertRaises(ParameterValidationException) as ex:
             DatasetRestoreParametersValidator().validate_parameters(
-                PROJECT_TO_RESTORE, DATASET_TO_RESTORE, 'CUSTOM_TARGET_DATASET',
-                None)
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=TARGET_PROJECT,
+                target_dataset_id='CUSTOM_TARGET_DATASET',
+                create_disposition=CREATE_DISPOSITION,
+                write_disposition=WRITE_DISPOSITION,
+                max_partition_days=None)
 
         # then
         self.assertTrue(
@@ -117,7 +149,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
         # when
         with self.assertRaises(ParameterValidationException) as ex:
             DatasetRestoreParametersValidator().validate_parameters(
-                PROJECT_TO_RESTORE, DATASET_TO_RESTORE, None, None)
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=TARGET_PROJECT,
+                target_dataset_id=None,
+                create_disposition=CREATE_DISPOSITION,
+                write_disposition=WRITE_DISPOSITION,
+                max_partition_days=None)
 
         # then
         self.assertTrue('No Tables was found in Datastore' in str(ex.exception))
@@ -134,7 +172,13 @@ class TestDatasetRestoreParametersValidator(TestCase):
         # when
         with self.assertRaises(ParameterValidationException) as ex:
             DatasetRestoreParametersValidator().validate_parameters(
-                PROJECT_TO_RESTORE, DATASET_TO_RESTORE, None, None)
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=TARGET_PROJECT,
+                target_dataset_id=None,
+                create_disposition=CREATE_DISPOSITION,
+                write_disposition=WRITE_DISPOSITION,
+                max_partition_days=None)
 
         # then
         self.assertTrue(

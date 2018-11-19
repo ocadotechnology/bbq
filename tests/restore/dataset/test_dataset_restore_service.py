@@ -7,6 +7,9 @@ from src.commons.config.configuration import Configuration
 from src.restore.dataset.dataset_restore_service import _DatasetRestoreService, \
   DatasetRestoreService
 
+CREATE_DISPOSITION = "CREATE_IF_NEEDED"
+WRITE_DISPOSITION = "WRITE_EMPTY"
+
 RESTORATION_JOB_ID = 'restoration_job_id'
 
 BACKUP_PROJECT_ID = 'backup_project_id'
@@ -62,14 +65,20 @@ class TestDatasetRestoreService(TestCase):
             restoration_job_id=RESTORATION_JOB_ID,
             project_id=PROJECT_TO_RESTORE,
             dataset_id=DATASET_TO_RESTORE,
+            target_project_id=RESTORATION_PROJECT_ID,
             target_dataset_id=None,
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
         # then
         self.location_validator.validate_parameters.assert_called_once_with(
             project_id=PROJECT_TO_RESTORE,
             dataset_id=DATASET_TO_RESTORE,
-            target_dataset_id='project_x___dataset_y',
+            target_project_id=RESTORATION_PROJECT_ID,
+            target_dataset_id='dataset_y',
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
     def test_dataset_restore_service_should_create_defered_task(self):
@@ -78,7 +87,10 @@ class TestDatasetRestoreService(TestCase):
             restoration_job_id=RESTORATION_JOB_ID,
             project_id=PROJECT_TO_RESTORE,
             dataset_id=DATASET_TO_RESTORE,
+            target_project_id=RESTORATION_PROJECT_ID,
             target_dataset_id=None,
+            create_disposition=CREATE_DISPOSITION,
+            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
         # then
@@ -95,16 +107,21 @@ class TestDatasetRestoreService(TestCase):
         _DatasetRestoreService().restore(restoration_job_id=RESTORATION_JOB_ID,
                                          project_id=PROJECT_TO_RESTORE,
                                          dataset_id=DATASET_TO_RESTORE,
+                                         target_project_id=RESTORATION_PROJECT_ID,
                                          target_dataset_id=None,
+                                         create_disposition=CREATE_DISPOSITION,
+                                         write_disposition=WRITE_DISPOSITION,
                                          max_partition_days=None)
 
         # then
         self.restore_items_generator \
             .generate_restore_items \
-            .assert_called_once_with(project_id=PROJECT_TO_RESTORE,
-                                     dataset_id=DATASET_TO_RESTORE,
-                                     target_dataset_id=None,
-                                     max_partition_days=None)
+            .assert_called_once_with(
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=RESTORATION_PROJECT_ID,
+                target_dataset_id=None,
+                max_partition_days=None)
         self.restore_service.restore.assert_called_once_with(
             ndb.Key('RestorationJob', RESTORATION_JOB_ID),
             "<GENERATED ITEMS>")
@@ -115,12 +132,18 @@ class TestDatasetRestoreService(TestCase):
         _DatasetRestoreService().restore(restoration_job_id=RESTORATION_JOB_ID,
                                          project_id=PROJECT_TO_RESTORE,
                                          dataset_id=DATASET_TO_RESTORE,
+                                         target_project_id=RESTORATION_PROJECT_ID,
                                          target_dataset_id=None,
+                                         create_disposition=CREATE_DISPOSITION,
+                                         write_disposition=WRITE_DISPOSITION,
                                          max_partition_days=None)
         _DatasetRestoreService().restore(restoration_job_id=RESTORATION_JOB_ID,
                                          project_id=PROJECT_TO_RESTORE,
                                          dataset_id=DATASET_TO_RESTORE,
+                                         target_project_id=RESTORATION_PROJECT_ID,
                                          target_dataset_id=None,
+                                         create_disposition=CREATE_DISPOSITION,
+                                         write_disposition=WRITE_DISPOSITION,
                                          max_partition_days=None)
         # then
         self.restore_service.restore.assert_called_once_with(

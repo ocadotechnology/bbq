@@ -45,7 +45,12 @@ class TestDatasetRestoreHandler(unittest.TestCase):
         # when
         response = self.under_test.post(
             '/restore/project/p123/dataset/d123',
-            params={'targetDatasetId': 'td123', 'maxPartitionDays': '100'})
+            params={
+                'targetProjectId': 'p123',
+                'targetDatasetId': 'td123',
+                'createDisposition': 'CREATE_IF_NEEDED',
+                'writeDisposition': 'WRITE_EMPTY',
+                'maxPartitionDays': '100'})
 
         # then
         get_status_endpoint.assert_called_once_with("123")
@@ -55,7 +60,10 @@ class TestDatasetRestoreHandler(unittest.TestCase):
             restoration_job_id="123",
             project_id='p123',
             dataset_id='d123',
+            target_project_id='p123',
             target_dataset_id='td123',
+            create_disposition='CREATE_IF_NEEDED',
+            write_disposition='WRITE_EMPTY',
             max_partition_days=100
         )
         self.assertEqual(response.body, json.dumps(expected_response_body))
