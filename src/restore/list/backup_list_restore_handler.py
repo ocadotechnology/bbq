@@ -5,9 +5,6 @@ import urllib
 import webapp2
 
 from src.commons.big_query import validators
-from src.commons.big_query.validators import WrongDatasetNameException, \
-    WrongProjectNameException, WrongWriteDispositionException, \
-    WrongCreateDispositionException
 from src.commons.config.configuration import configuration
 from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException
@@ -22,15 +19,18 @@ from src.restore.status.restoration_job_status_service import \
 
 
 class BackupListRestoreHandler(JsonHandler):
+
     def post(self):
+
         target_project_id = self.request.get('targetProjectId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
-        write_disposition = self.request.get('writeDisposition', 'WRITE_EMPTY')
-        create_disposition = self.request.get('createDisposition',
-                                              'CREATE_IF_NEEDED')
+        write_disposition = self.request.get('writeDisposition', None)
+        create_disposition = self.request.get('createDisposition', None)
 
-        validators.validate_list_restore_params(target_project_id, target_dataset_id,
-                                                create_disposition,write_disposition)
+        validators.validate_list_restore_params(
+            target_project_id, target_dataset_id,
+            create_disposition, write_disposition
+        )
 
         body_json = self.__parse_body_json()
         self.__validate_body_json(body_json)
@@ -41,8 +41,8 @@ class BackupListRestoreHandler(JsonHandler):
         restore_request = BackupListRestoreRequest(backup_items,
                                                    target_project_id,
                                                    target_dataset_id,
-                                                   write_disposition,
-                                                   create_disposition)
+                                                   create_disposition,
+                                                   write_disposition)
 
         job_id = BackupListRestoreService().restore(restore_request)
         logging.info("Scheduled restoration job: %s", job_id)
