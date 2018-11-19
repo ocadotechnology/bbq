@@ -17,7 +17,7 @@ class TableRestoreHandler(JsonHandler):
         partition_id = self.request.get('partitionId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         if target_dataset_id:
-            validators.validate_dataset_id(target_dataset_id)
+            validators.__validate_dataset_id(target_dataset_id)
 
         restoration_datetime = self.__get_restoration_datetime()
 
