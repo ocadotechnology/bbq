@@ -3,7 +3,7 @@ import uuid
 
 import webapp2
 
-from src.commons.big_query import validators
+from src.commons.handlers import validators
 from src.commons.config.configuration import configuration
 from src.commons.handlers.bbq_authenticated_handler import \
     BbqAuthenticatedHandler
