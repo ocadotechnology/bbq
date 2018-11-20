@@ -41,7 +41,10 @@ class TestTableRestoreHandler(unittest.TestCase):
         # then
         restore.assert_called_once_with(
             TableReference('project-id', 'dataset_id', 'table_id', '20170725'),
-            'target_dataset_id', datetime(2017, 07, 25, 23, 59, 59)
+            None,
+            'target_dataset_id',
+            None, None,
+            datetime(2017, 07, 25, 23, 59, 59)
         )
 
     @patch.object(TableRestoreService, 'restore', return_value={})
@@ -52,7 +55,8 @@ class TestTableRestoreHandler(unittest.TestCase):
         # then
         expected_table_reference = \
             TableReference('project-id', 'dataset_id', 'table_id')
-        restore.assert_called_once_with(expected_table_reference, None, None)
+        restore.assert_called_once_with(expected_table_reference,
+                                        None, None, None, None, None)
 
     @patch.object(TableRestoreService, 'restore', return_value={})
     def test_should_fail_on_wrong_date_format(self, _):
