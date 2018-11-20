@@ -23,7 +23,7 @@ class DatasetRestoreHandler(JsonHandler):
         write_disposition = self.request.get('writeDisposition', None)
         max_partition_days = self.__get_max_partition_days()
 
-        validators.validate_dataset_restore_params(
+        validators.validate_restore_request_params(
             source_project_id=project_id,
             source_dataset_id=dataset_id,
             target_project_id=target_project_id,

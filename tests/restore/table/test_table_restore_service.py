@@ -27,7 +27,9 @@ class TestTableRestoreService(unittest.TestCase):
 
         # when
         TableRestoreService.restore(table_reference,
+                                    None,
                                     target_dataset_id,
+                                    None, None,
                                     restoration_datetime)
         # then
         expected_restore_request = BackupListRestoreRequest(
