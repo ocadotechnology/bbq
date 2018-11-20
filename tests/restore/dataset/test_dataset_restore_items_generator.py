@@ -63,6 +63,23 @@ class TestDatasetRestoreItemsGenerator(TestCase):
         # then
         self.assertEqual(generated_restore_items, [[restore_item]])
 
+    def test_should_create_restore_items_when_target_project_id(self):
+        # given
+        restore_item = self.__prepare_entities_and_create_expected_restore_item(target_project_id="TARGET-PROJECT")
+
+
+        # when
+        generated_restore_items = [i for i in
+                                   DatasetRestoreItemsGenerator.generate_restore_items(
+                                       project_id=PROJECT_TO_RESTORE,
+                                       dataset_id=DATASET_TO_RESTORE,
+                                       target_project_id="TARGET-PROJECT",
+                                       target_dataset_id=self.__create_target_dataset(
+                                           None),
+                                       max_partition_days=None)]
+        # then
+        self.assertEqual(generated_restore_items, [[restore_item]])
+
     def test_should_create_restore_items_target_dataset_provided(
             self):
         custom_target_dataset_id = "custom_target_dataset_id"
@@ -140,6 +157,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
 
     @staticmethod
     def __prepare_entities_and_create_expected_restore_item(partition_id=None,
+                                                            target_project_id=RESTORATION_PROJECT_ID,
                                                             target_dataset=None):
         table = table_entities_creator.create_and_insert_table_with_one_backup(
             project_id=PROJECT_TO_RESTORE,
@@ -149,8 +167,9 @@ class TestDatasetRestoreItemsGenerator(TestCase):
             partition_id=partition_id)
 
         return TestDatasetRestoreItemsGenerator.__generate_expected_restore_item(
-            table,
-            target_dataset)
+            table=table,
+            target_project_id=target_project_id,
+            custom_target_dataset=target_dataset)
 
     @staticmethod
     def __prepare_entities_with_removed_backup():
@@ -231,7 +250,10 @@ class TestDatasetRestoreItemsGenerator(TestCase):
             partition_id='20171201')
 
     @staticmethod
-    def __generate_expected_restore_item(table, custom_target_dataset=None):
+    def __generate_expected_restore_item(
+            table,
+            target_project_id=RESTORATION_PROJECT_ID,
+            custom_target_dataset=None):
         expected_source = TableReference(project_id=BACKUP_PROJECT_ID,
                                          dataset_id=table.last_backup.dataset_id,
                                          table_id=table.last_backup.table_id,
@@ -239,7 +261,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
 
         target_dataset = TestDatasetRestoreItemsGenerator.__create_target_dataset(
             custom_target_dataset)
-        expected_target = TableReference(project_id=RESTORATION_PROJECT_ID,
+        expected_target = TableReference(project_id=target_project_id,
                                          dataset_id=target_dataset,
                                          table_id=table.table_id,
                                          partition_id=table.partition_id)

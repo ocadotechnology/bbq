@@ -77,8 +77,6 @@ class TestDatasetRestoreService(TestCase):
             dataset_id=DATASET_TO_RESTORE,
             target_project_id=RESTORATION_PROJECT_ID,
             target_dataset_id='dataset_y',
-            create_disposition=CREATE_DISPOSITION,
-            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
     def test_dataset_restore_service_should_create_defered_task(self):

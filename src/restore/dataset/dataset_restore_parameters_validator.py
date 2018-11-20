@@ -11,16 +11,13 @@ class DatasetRestoreParametersValidator(object):
     def __init__(self):
         self.BQ = BigQuery()
 
-    def validate_parameters(
-            self, project_id, dataset_id, target_project_id,
-            target_dataset_id, create_disposition, write_disposition,
-            max_partition_days
-    ):
+    def validate_parameters(self, project_id, dataset_id, target_project_id,
+            target_dataset_id, max_partition_days):
 
         any_backup = self.__get_backup(project_id, dataset_id,
                                        max_partition_days)
 
-        self.__validate_locations(any_backup, target_dataset_id)
+        self.__validate_locations(any_backup, target_project_id, target_dataset_id)
 
     def __get_backup(self, project_id, dataset_id, max_partition_days):
         logging.info(
@@ -56,10 +53,10 @@ class DatasetRestoreParametersValidator(object):
                                                             max_partition_days,
                                                             page_size=20)
 
-    def __get_target_dataset_location(self, target_dataset_id):
+    def __get_target_dataset_location(self, target_project_id, target_dataset_id):
         target_dataset = self.BQ.get_dataset(
-            configuration.restoration_project_id,
-            target_dataset_id)
+            project_id=target_project_id,
+            dataset_id=target_dataset_id)
         if target_dataset is None:
             return None
         return self.__extract_location(target_dataset)
@@ -71,8 +68,8 @@ class DatasetRestoreParametersValidator(object):
             return None
         return self.__extract_location(backup_dataset)
 
-    def __validate_locations(self, any_backup, target_dataset_id):
-        target_location = self.__get_target_dataset_location(target_dataset_id)
+    def __validate_locations(self, any_backup, target_project_id, target_dataset_id):
+        target_location = self.__get_target_dataset_location(target_project_id,target_dataset_id)
 
         if target_location is None:
             return
