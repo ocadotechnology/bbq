@@ -169,3 +169,20 @@ class TestDatasetRestoreParametersValidator(TestCase):
         # then
         self.assertTrue(
             'No Backups was found in Datastore' in str(ex.exception))
+
+    def test_should_throw_exception_when_no_target_project_id(
+        self):
+        # given
+        target_project = None
+        # when
+        with self.assertRaises(ParameterValidationException) as ex:
+            DatasetRestoreParametersValidator().validate_parameters(
+                project_id=PROJECT_TO_RESTORE,
+                dataset_id=DATASET_TO_RESTORE,
+                target_project_id=target_project,
+                target_dataset_id=None,
+                max_partition_days=None)
+
+        # then
+        self.assertTrue(
+            'Required target project id parameter is None' in str(ex.exception))
