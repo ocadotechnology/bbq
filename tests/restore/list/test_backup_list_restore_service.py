@@ -114,7 +114,7 @@ class TestBackupListRestoreService(unittest.TestCase):
             "source_partition_id"
         )
         expected_target_table_reference = TableReference(
-            Configuration.restoration_project_id,
+            "source_project_id",
             "source_dataset_id",
             "source_table_id",
             "source_partition_id"
