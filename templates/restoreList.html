@@ -8,10 +8,10 @@
         function OnSubmitForm() {
             let params = {
                 'targetProjectId': document.restoreListForm.isRestoreToSource.checked
-                    ? document.restoreListForm.projectId.value
+                    ? null
                     : document.restoreListForm.targetProjectId.value,
                 'targetDatasetId': document.restoreListForm.isRestoreToSource.checked
-                    ? document.restoreListForm.datasetId.value
+                    ? null
                     : document.restoreListForm.targetDatasetId.value,
                 'createDisposition': document.restoreListForm.createDisposition.value,
                 'writeDisposition': document.restoreListForm.writeDisposition.value

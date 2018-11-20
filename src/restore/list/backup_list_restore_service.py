@@ -136,7 +136,7 @@ class BackupListRestoreService(object):
         target_dataset_id = restore_request.target_dataset_id
 
         if target_project_id is None:
-            target_project_id = configuration.restoration_project_id
+            target_project_id = source_entity.project_id
         if target_dataset_id is None:
             target_dataset_id = source_entity.dataset_id
         return TableReference(target_project_id,
