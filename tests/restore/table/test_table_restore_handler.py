@@ -3,9 +3,9 @@ import os
 from datetime import datetime
 
 from src.commons.exceptions import NotFoundException
+from src.commons.table_reference import TableReference
 from src.restore.table import table_restore_handler
 from src.restore.table.table_restore_service import TableRestoreService
-from src.commons.table_reference import TableReference
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 
@@ -34,16 +34,20 @@ class TestTableRestoreHandler(unittest.TestCase):
         self.under_test.get(
             RESTORE_TABLE_URL,
             params={'partitionId': '20170725',
+                    'targetProjectId': "target-project-id",
                     'targetDatasetId': 'target_dataset_id',
+                    'createDisposition': 'CREATE_IF_NEEDED',
+                    'writeDisposition': 'WRITE_EMPTY',
                     'restorationDate': '2017-07-25'}
         )
 
         # then
         restore.assert_called_once_with(
             TableReference('project-id', 'dataset_id', 'table_id', '20170725'),
-            None,
-            'target_dataset_id',
-            None, None,
+            "target-project-id",
+            "target_dataset_id",
+            "CREATE_IF_NEEDED",
+            "WRITE_EMPTY",
             datetime(2017, 07, 25, 23, 59, 59)
         )
 
