@@ -52,8 +52,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
             dataset_id=DATASET_TO_RESTORE,
             target_project_id=TARGET_PROJECT,
             target_dataset_id=None,
-            create_disposition=CREATE_DISPOSITION,
-            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
     def test_should_not_throw_exception_when_custom_target_dataset_not_exist(
@@ -71,8 +69,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
             dataset_id=DATASET_TO_RESTORE,
             target_project_id=TARGET_PROJECT,
             target_dataset_id='CUSTOM_TARGET_DATASET',
-            create_disposition=CREATE_DISPOSITION,
-            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
     def test_should_not_throw_exception_when_the_same_location(
@@ -91,8 +87,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
             dataset_id=DATASET_TO_RESTORE,
             target_project_id=TARGET_PROJECT,
             target_dataset_id='CUSTOM_TARGET_DATASET',
-            create_disposition=CREATE_DISPOSITION,
-            write_disposition=WRITE_DISPOSITION,
             max_partition_days=None)
 
     def test_should_throw_exception_when_default_dataset_has_different_location(
@@ -111,8 +105,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
                 dataset_id=DATASET_TO_RESTORE,
                 target_project_id=TARGET_PROJECT,
                 target_dataset_id=None,
-                create_disposition=CREATE_DISPOSITION,
-                write_disposition=WRITE_DISPOSITION,
                 max_partition_days=None)
 
         # then
@@ -136,8 +128,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
                 dataset_id=DATASET_TO_RESTORE,
                 target_project_id=TARGET_PROJECT,
                 target_dataset_id='CUSTOM_TARGET_DATASET',
-                create_disposition=CREATE_DISPOSITION,
-                write_disposition=WRITE_DISPOSITION,
                 max_partition_days=None)
 
         # then
@@ -153,8 +143,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
                 dataset_id=DATASET_TO_RESTORE,
                 target_project_id=TARGET_PROJECT,
                 target_dataset_id=None,
-                create_disposition=CREATE_DISPOSITION,
-                write_disposition=WRITE_DISPOSITION,
                 max_partition_days=None)
 
         # then
@@ -176,8 +164,6 @@ class TestDatasetRestoreParametersValidator(TestCase):
                 dataset_id=DATASET_TO_RESTORE,
                 target_project_id=TARGET_PROJECT,
                 target_dataset_id=None,
-                create_disposition=CREATE_DISPOSITION,
-                write_disposition=WRITE_DISPOSITION,
                 max_partition_days=None)
 
         # then

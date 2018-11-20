@@ -68,8 +68,6 @@ class DatasetRestoreService(_DatasetRestoreService):
             dataset_id=dataset_id,
             target_project_id=target_project_id,
             target_dataset_id=target_dataset_id,
-            create_disposition=create_disposition,
-            write_disposition=write_disposition,
             max_partition_days=max_partition_days)
 
         logging.info("Executing deferred task DatasetRestoreService().restore")
