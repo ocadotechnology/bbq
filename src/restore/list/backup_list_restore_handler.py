@@ -4,7 +4,7 @@ import urllib
 
 import webapp2
 
-from src.commons.big_query import validators
+from src.commons.handlers import validators
 from src.commons.config.configuration import configuration
 from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException

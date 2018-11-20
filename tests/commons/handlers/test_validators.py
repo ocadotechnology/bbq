@@ -1,7 +1,7 @@
 import unittest
 
-from src.commons.big_query import validators
-from src.commons.big_query.validators import WrongDatasetNameException
+from src.commons.handlers import validators
+from src.commons.handlers.validators import WrongDatasetNameException
 
 
 class TestValidators(unittest.TestCase):
