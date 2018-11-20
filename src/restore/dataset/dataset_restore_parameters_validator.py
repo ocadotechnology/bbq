@@ -14,6 +14,9 @@ class DatasetRestoreParametersValidator(object):
     def validate_parameters(self, project_id, dataset_id, target_project_id,
             target_dataset_id, max_partition_days):
 
+        if target_project_id is None:
+            raise ParameterValidationException("Required target project id parameter is None")
+
         any_backup = self.__get_backup(project_id, dataset_id,
                                        max_partition_days)
 

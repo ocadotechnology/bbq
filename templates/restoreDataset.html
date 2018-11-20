@@ -86,7 +86,7 @@
         <input type="text" class="form-control" id="targetProjectId" name="targetProjectId"
                value="{{ default_restoration_project_id }}">
         <small id="targetProjectIdHelp" class="form-text text-muted">
-          Optional. Target project id. If not passed, default restoration project id will be used.
+          <b>Required</b>. Target project id. If not passed, default restoration project id will be used.
         </small>
       </div>
     </div>
@@ -98,9 +98,7 @@
                name="targetDatasetId" placeholder="source_dataset_id">
         <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
           that will be used (and created if does not exist) as container for restored table.
-          Remember
-          that this will be a temporary dataset with expiration time set to 7 days. Note that passed
-          dataset could already exists - it should be in the same location as backup. If target
+          Note that passed dataset could already exists - it should be in the same location as backup. If target
           dataset id is not passed, then source dataset id value will be used as a target dataset id
           in restoration project.
         </small>
