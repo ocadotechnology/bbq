@@ -35,9 +35,6 @@ class TestDatasetRestoreItemsGenerator(TestCase):
         patch.object(Configuration, 'backup_project_id',
                      return_value=BACKUP_PROJECT_ID,
                      new_callable=PropertyMock).start()
-        patch.object(Configuration, 'restoration_project_id',
-                     return_value=RESTORATION_PROJECT_ID,
-                     new_callable=PropertyMock).start()
 
         self.freezer = freeze_time("2017-12-06")
         self.freezer.start()

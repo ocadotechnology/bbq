@@ -34,9 +34,6 @@ class TestDatasetRestoreService(TestCase):
         patch.object(Configuration, 'backup_project_id',
                      return_value=BACKUP_PROJECT_ID,
                      new_callable=PropertyMock).start()
-        patch.object(Configuration, 'restoration_project_id',
-                     return_value=RESTORATION_PROJECT_ID,
-                     new_callable=PropertyMock).start()
 
         self.restore_service = patch(
             'src.restore.dataset'

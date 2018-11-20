@@ -23,7 +23,6 @@ class TestBackupListRestoreService(unittest.TestCase):
         self.testbed.init_memcache_stub()
         patch('src.restore.async_batch_restore_service.BigQuery').start()
         patch.object(Configuration, 'backup_project_id', return_value='source_project_id', new_callable=PropertyMock).start()
-        patch.object(Configuration, 'restoration_project_id', return_value='target_proj', new_callable=PropertyMock).start()
         ndb.get_context().clear_cache()
 
     def tearDown(self):

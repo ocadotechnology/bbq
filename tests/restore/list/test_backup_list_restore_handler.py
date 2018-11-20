@@ -1,13 +1,11 @@
 import json
 import os
-import uuid
 
 from google.appengine.ext import ndb, testbed
 
 from src.restore.list.backup_list_restore_service \
     import BackupListRestoreService, BackupItem
-from src.restore.status.restoration_job_status_service import \
-    RestorationJobStatusService
+
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 from src.restore.list import backup_list_restore_handler
