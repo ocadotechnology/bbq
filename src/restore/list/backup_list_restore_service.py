@@ -35,7 +35,8 @@ class BackupItem(object):
 
 class BackupListRestoreRequest(object):
     def __init__(self, backup_items, target_project_id, target_dataset_id,
-                 create_disposition, write_disposition):
+                 create_disposition='CREATE_IF_NEEDED',
+                 write_disposition='WRITE_EMPTY'):
         self.backup_items = backup_items
         self.target_project_id = target_project_id
         self.target_dataset_id = target_dataset_id
@@ -109,7 +110,7 @@ class BackupListRestoreService(object):
     def __create_restore_item(self, restore_request, backup_entity, backup_item):
         source_entity = self.__get_source_table_entity(backup_entity)
 
-        source_table_reference = RestoreTableReference\
+        source_table_reference = RestoreTableReference \
             .backup_table_reference(source_entity, backup_entity)
         target_table_reference = self.__create_target_table_reference(
             restore_request, source_entity)
