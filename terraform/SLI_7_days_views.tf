@@ -1,7 +1,7 @@
-resource "google_bigquery_table" "census_data_7_days_ago_view" {
+resource "google_bigquery_table" "census_data_up_to_7_days_ago_view" {
   project = "${local.SLI_views_destination_project}"
   dataset_id = "${var.SLI_backup_creation_latency_views_dataset}"
-  table_id = "census_data_7_days_ago"
+  table_id = "census_data_up_to_7_days_ago"
 
   view {
     query = <<EOF
@@ -16,7 +16,7 @@ resource "google_bigquery_table" "census_data_7_days_ago_view" {
               FROM
                 [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
               WHERE
-                _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -10, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -7, "DAY"))
+                _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -10, "DAY")) AND TIMESTAMP(CURRENT_DATE())
                 AND timePartitioning.type IS NULL AND type='TABLE'
             )
             WHERE rownum = 1
@@ -29,7 +29,7 @@ resource "google_bigquery_table" "census_data_7_days_ago_view" {
                 FROM
                   [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
                 WHERE
-                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -10, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -7, "DAY"))
+                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -10, "DAY")) AND TIMESTAMP(CURRENT_DATE())
             )
             WHERE rownum = 1
           )
@@ -59,7 +59,7 @@ resource "google_bigquery_table" "SLI_7_days_view" {
               IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
               IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
             FROM
-              [${local.SLI_views_destination_project}:${var.SLI_backup_creation_latency_views_dataset}.census_data_7_days_ago] AS census
+              [${local.SLI_views_destination_project}:${var.SLI_backup_creation_latency_views_dataset}.census_data_up_to_7_days_ago] AS census
             LEFT JOIN (
               SELECT
                 backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
@@ -81,5 +81,5 @@ resource "google_bigquery_table" "SLI_7_days_view" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_table.census_data_7_days_ago_view", "google_bigquery_table.last_available_backup_for_every_table_entity_view"]
+  depends_on = ["google_bigquery_table.census_data_up_to_7_days_ago_view", "google_bigquery_table.last_available_backup_for_every_table_entity_view"]
 }
