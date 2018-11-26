@@ -1,17 +1,16 @@
 import json
 import logging
 import urllib
-import uuid
 
 import webapp2
 
+from src.commons.handlers import validators
+from src.commons.config.configuration import configuration
 from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException
+from src.commons.handlers.bbq_authenticated_handler import \
+    BbqAuthenticatedHandler
 from src.commons.handlers.json_handler import JsonHandler
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
-from src.commons.big_query import validators
-from src.commons.big_query.validators import WrongDatasetNameException
-from src.commons.config.configuration import configuration
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \
     BackupListRestoreService, BackupItem, BackupListRestoreRequest
@@ -20,29 +19,40 @@ from src.restore.status.restoration_job_status_service import \
 
 
 class BackupListRestoreHandler(JsonHandler):
+
     def post(self):
+
+        target_project_id = self.request.get('targetProjectId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
-        self.__validate_params(target_dataset_id)
+        write_disposition = self.request.get('writeDisposition', None)
+        create_disposition = self.request.get('createDisposition', None)
+
+        validators.validate_restore_request_params(
+            target_project_id=target_project_id,
+            target_dataset_id=target_dataset_id,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition
+        )
+
         body_json = self.__parse_body_json()
         self.__validate_body_json(body_json)
 
         backup_items = self.__create_backup_items(body_json)
         self.__validate_backup_items(backup_items)
-        restore_request = BackupListRestoreRequest(
-            backup_items, target_dataset_id
-        )
 
-        restoration_job_id = str(uuid.uuid4())
-        logging.info("Created restoration_job_id: %s", restoration_job_id)
+        restore_request = BackupListRestoreRequest(backup_items,
+                                                   target_project_id,
+                                                   target_dataset_id,
+                                                   create_disposition,
+                                                   write_disposition)
 
-        BackupListRestoreService().restore(restoration_job_id, restore_request)
+        job_id = BackupListRestoreService().restore(restore_request)
+        logging.info("Scheduled restoration job: %s", job_id)
 
         restore_data = {
-            'restorationJobId': restoration_job_id,
-            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(
-                restoration_job_id),
-            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(
-                restoration_job_id)
+            'restorationJobId': job_id,
+            'restorationStatusEndpoint': RestorationJobStatusService.get_status_endpoint(job_id),
+            'restorationWarningsOnlyStatusEndpoint': RestorationJobStatusService.get_warnings_only_status_endpoint(job_id)
         }
         self._finish_with_success(restore_data)
 
@@ -97,14 +107,6 @@ class BackupListRestoreHandler(JsonHandler):
                     "Please specify either 'backupUrlSafeKey' or 'backupBqKey' "
                     "element in single item."
                 )
-
-    @staticmethod
-    def __validate_params(target_dataset_id):
-        try:
-            if target_dataset_id:
-                validators.validate_dataset_id(target_dataset_id)
-        except WrongDatasetNameException, e:
-            raise ParameterValidationException(e.message)
 
 
 class BackupListRestoreAuthenticatedHandler(BackupListRestoreHandler,
