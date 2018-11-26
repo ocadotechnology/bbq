@@ -45,15 +45,17 @@
 
     <form name="restoreTableForm" onsubmit="return OnSubmitForm();">
         <div class="form-group row">
+            <div class="col">
+                <h4>Source table information</h4>
+            </div>
+        </div>
+        <div class="form-group row">
             <label for="sourceProjectId" class="col-sm-2 col-form-label">
                 Source project id
             </label>
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="sourceProjectId"
                        name="projectId" placeholder="project id" required/>
-                <small id="sourceProjectIdHelp" class="form-text text-muted">
-                    Project id where dataset is placed originally
-                </small>
             </div>
         </div>
         <div class="form-group row">
@@ -63,9 +65,6 @@
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="sourceDatasetId"
                        name="datasetId" placeholder="dataset id">
-                <small id="sourceDatasetIdHelp" class="form-text text-muted">
-                    Dataset id where tables were placed originally
-                </small>
             </div>
         </div>
         <div class="form-group row">
@@ -75,9 +74,6 @@
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="sourceTableId"
                        name="tableId" placeholder="table id">
-                <small id="sourceTableIdHelp" class="form-text text-muted">
-                    Table id of original table
-                </small>
             </div>
         </div>
         <div class="form-group row">
@@ -92,6 +88,11 @@
                     id of original table. If specified, only this single
                     partition will be restored
                 </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col">
+                <h4>Target table information (optional)</h4>
             </div>
         </div>
         <div class="form-group row">
@@ -123,6 +124,11 @@
                     value will be used as a target dataset id in restoration
                     project.
                 </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col">
+                <h4>Options</h4>
             </div>
         </div>
         <div class="form-group row">
