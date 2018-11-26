@@ -5,7 +5,6 @@ from google.appengine.ext import ndb
 
 from src.backup.datastore.Table import Table
 from src.commons.collections import paginated
-from src.commons.config.configuration import configuration
 from src.commons.decorators.log_time import log_time
 from src.commons.decorators.retry import retry
 from src.commons.exceptions import ParameterValidationException
@@ -36,7 +35,8 @@ class BackupItem(object):
 
 class BackupListRestoreRequest(object):
     def __init__(self, backup_items, target_project_id, target_dataset_id,
-                 create_disposition, write_disposition):
+                 create_disposition='CREATE_IF_NEEDED',
+                 write_disposition='WRITE_EMPTY'):
         self.backup_items = backup_items
         self.target_project_id = target_project_id
         self.target_dataset_id = target_dataset_id
@@ -110,7 +110,7 @@ class BackupListRestoreService(object):
     def __create_restore_item(self, restore_request, backup_entity, backup_item):
         source_entity = self.__get_source_table_entity(backup_entity)
 
-        source_table_reference = RestoreTableReference\
+        source_table_reference = RestoreTableReference \
             .backup_table_reference(source_entity, backup_entity)
         target_table_reference = self.__create_target_table_reference(
             restore_request, source_entity)

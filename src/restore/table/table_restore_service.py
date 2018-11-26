@@ -8,12 +8,18 @@ from src.restore.status.restoration_job_status_service import \
 
 
 class TableRestoreService(object):
+
     @classmethod
-    def restore(cls, table_reference, target_dataset_id, restoration_datetime):
+    def restore(cls, table_reference, target_project_id, target_dataset_id,
+                create_disposition, write_disposition, restoration_datetime):
+
         backup = BackupFinder.for_table(table_reference, restoration_datetime)
 
-        restore_request = BackupListRestoreRequest(
-            [BackupItem(backup.key)], None, target_dataset_id, None, None)
+        restore_request = BackupListRestoreRequest([BackupItem(backup.key)],
+                                                   target_project_id,
+                                                   target_dataset_id,
+                                                   create_disposition,
+                                                   write_disposition)
 
         restoration_job_id = BackupListRestoreService().restore(restore_request)
         logging.info("Scheduled restoration job: %s", restoration_job_id)
