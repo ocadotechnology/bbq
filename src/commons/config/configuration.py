@@ -40,7 +40,7 @@ class Configuration(object):
 
     @property
     def default_restoration_project_id(self):
-        return self.__project_config['project_settings'].get('default_restoration_project_id')
+        return self.__project_config['project_settings'].get('default_restoration_project_id', '')
 
     @property
     def projects_to_skip(self):
