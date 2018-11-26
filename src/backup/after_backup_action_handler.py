@@ -52,20 +52,21 @@ class AfterBackupActionHandler(JsonHandler):
             ErrorReporting().report(error_message)
             return
 
-        backup_table_metadata = BigQueryTableMetadata.get_table_by_reference(
-            copy_job_results.target_table_reference)
+        backup_table_metadata = BigQueryTableMetadata.get_table_by_big_query_table(
+            copy_job_results.target_bq_table
+        )
 
         if backup_table_metadata.table_exists():
             self.__create_backup(backup_table_metadata,
                                  copy_job_results)
             if backup_table_metadata.has_partition_expiration():
                 self.__disable_partition_expiration(
-                    copy_job_results.target_table_reference)
+                    TableReference.from_bq_table(copy_job_results.target_bq_table))
         else:
             pass
             ErrorReporting().report(
                 "Backup table {0} not exist. Backup entity is not created".format(
-                    copy_job_results.target_table_reference))
+                    copy_job_results.target_bq_table))
 
     def __disable_partition_expiration(self, backup_table_reference):
         self.BQ.disable_partition_expiration(
@@ -79,7 +80,7 @@ class AfterBackupActionHandler(JsonHandler):
     def __create_backup(backup_table_metadata, copy_job_results):
 
         table_entity = Table.get_table_by_reference(
-            copy_job_results.source_table_reference
+            TableReference.from_bq_table(copy_job_results.source_bq_table)
         )
 
         if table_entity is None:
