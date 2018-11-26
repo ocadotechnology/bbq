@@ -9,8 +9,8 @@ from google.appengine.ext import testbed
 from src.restore import after_restore_action_handler
 from src.restore.datastore.restore_item import RestoreItem
 from src.commons.table_reference import TableReference
-from tests.commons.copy_job_async.result_check.job_result_example import \
-    JobResultExample
+from tests.commons.big_query.copy_job_async.result_check.job_result_example \
+    import JobResultExample
 
 
 class TestAfterRestoreActionHandler(unittest.TestCase):

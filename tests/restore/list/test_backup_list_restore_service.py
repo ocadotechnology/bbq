@@ -3,15 +3,15 @@ import unittest
 from google.appengine.ext import testbed, ndb
 from mock import patch, PropertyMock
 
-from src.commons.exceptions import ParameterValidationException
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.commons.config.configuration import Configuration
+from src.commons.exceptions import ParameterValidationException
+from src.commons.table_reference import TableReference
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.datastore.restore_item import RestoreItem
 from src.restore.list.backup_list_restore_service import \
-    BackupItem, BackupListRestoreRequest, BackupListRestoreService
-from src.commons.table_reference import TableReference
+  BackupItem, BackupListRestoreRequest, BackupListRestoreService
 
 
 class TestBackupListRestoreService(unittest.TestCase):
@@ -71,7 +71,10 @@ class TestBackupListRestoreService(unittest.TestCase):
 
         # then
         mocked_restore_service.assert_called_once()
-        mocked_restore_service.assert_called_with("restorationId", [[expected_restore_item]])
+        mocked_restore_service.assert_called_with(
+            ndb.Key('RestorationJob', 'restorationId'),
+            [[expected_restore_item]]
+        )
 
     @patch.object(AsyncBatchRestoreService, 'restore',
                   return_value="restorationId")
@@ -110,7 +113,10 @@ class TestBackupListRestoreService(unittest.TestCase):
 
         # then
         mocked_restore_service.assert_called_once()
-        mocked_restore_service.assert_called_with("restorationId", [[expected_restore_item]])
+        mocked_restore_service.assert_called_with(
+            ndb.Key('RestorationJob', 'restorationId'),
+            [[expected_restore_item]]
+        )
 
     def test_that_restore_will_fail_if_backup_not_exists_in_ds(self):
         # given
