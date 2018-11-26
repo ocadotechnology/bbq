@@ -5,8 +5,10 @@
     <script type="text/javascript">
         function OnSubmitForm() {
             let params = {
-                'targetProjectId': document.restoreListForm.targetProjectId.value,
-                'targetDatasetId': document.restoreListForm.targetDatasetId.value,
+                'targetProjectId': document.getElementById('isRestoreToSource').checked
+                    ? null : document.restoreListForm.targetProjectId.value,
+                'targetDatasetId': document.getElementById('isRestoreToSource').checked
+                    ? null : document.restoreListForm.targetDatasetId.value,
                 'createDisposition': document.restoreListForm.createDisposition.value,
                 'writeDisposition': document.restoreListForm.writeDisposition.value
             };
@@ -44,7 +46,7 @@
             </label>
             <label class="radio-inline col-sm-1 col-form-label"
                    id="restoreToSource">
-                <input type="radio" name="optradio"
+                <input type="radio" name="optradio" id="isRestoreToSource"
                        onclick="restoreToSource()"> Yes
             </label>
             <label class="radio-inline col-form-label"
