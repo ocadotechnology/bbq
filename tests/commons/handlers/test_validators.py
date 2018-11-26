@@ -8,8 +8,8 @@ from src.commons.handlers.validators import WrongDatasetNameException, \
 
 class TestValidators(unittest.TestCase):
 
-    def test_validate_dataset_restore_params_happy_path(self):
-        validators.validate_dataset_restore_params(
+    def test_validate_restore_request_params_happy_path(self):
+        validators.validate_restore_request_params(
             source_project_id="source-project-id",
             source_dataset_id="source_dataset_id",
             target_project_id="target-project-id",
@@ -18,26 +18,10 @@ class TestValidators(unittest.TestCase):
             write_disposition="WRITE_APPEND"
         )
 
-    def test_validate_dataset_restore_params_for_none_parameters(self):
-        validators.validate_dataset_restore_params(
+    def test_validate_restore_request_params_for_none_parameters(self):
+        validators.validate_restore_request_params(
             source_project_id=None,
             source_dataset_id=None,
-            target_project_id=None,
-            target_dataset_id=None,
-            create_disposition=None,
-            write_disposition=None
-        )
-
-    def test_validate_list_restore_params_happy_path(self):
-        validators.validate_list_restore_params(
-            target_project_id="target-project-id",
-            target_dataset_id="target_dataset_id",
-            create_disposition="CREATE_NEVER",
-            write_disposition="WRITE_EMPTY"
-        )
-
-    def test_validate_list_restore_params_for_none_parameters(self):
-        validators.validate_list_restore_params(
             target_project_id=None,
             target_dataset_id=None,
             create_disposition=None,

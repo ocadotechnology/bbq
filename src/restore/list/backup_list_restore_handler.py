@@ -27,9 +27,11 @@ class BackupListRestoreHandler(JsonHandler):
         write_disposition = self.request.get('writeDisposition', None)
         create_disposition = self.request.get('createDisposition', None)
 
-        validators.validate_list_restore_params(
-            target_project_id, target_dataset_id,
-            create_disposition, write_disposition
+        validators.validate_restore_request_params(
+            target_project_id=target_project_id,
+            target_dataset_id=target_dataset_id,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition
         )
 
         body_json = self.__parse_body_json()

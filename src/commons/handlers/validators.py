@@ -25,26 +25,7 @@ available_create_dispositions = ["CREATE_IF_NEEDED", "CREATE_NEVER"]
 available_write_dispositions = ["WRITE_TRUNCATE", "WRITE_APPEND", "WRITE_EMPTY"]
 
 
-def validate_dataset_restore_params(source_project_id, source_dataset_id,
-                                    target_project_id, target_dataset_id,
-                                    create_disposition, write_disposition):
-    __validate_restore_request_params(source_project_id=source_project_id,
-                                      source_dataset_id=source_dataset_id,
-                                      target_project_id=target_project_id,
-                                      target_dataset_id=target_dataset_id,
-                                      create_disposition=create_disposition,
-                                      write_disposition=write_disposition)
-
-
-def validate_list_restore_params(target_project_id, target_dataset_id,
-                                 create_disposition, write_disposition):
-    __validate_restore_request_params(target_project_id=target_project_id,
-                                      target_dataset_id=target_dataset_id,
-                                      create_disposition=create_disposition,
-                                      write_disposition=write_disposition)
-
-
-def __validate_restore_request_params(
+def validate_restore_request_params(
         source_project_id=None, source_dataset_id=None,
         target_project_id=None, target_dataset_id=None,
         create_disposition=None, write_disposition=None):
