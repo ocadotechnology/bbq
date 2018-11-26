@@ -2,13 +2,8 @@ import unittest
 
 from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
-<<<<<<< HEAD:tests/commons/copy_job_async/test_copy_job_result.py
 from tests.commons.copy_job_async.result_check.job_result_example import \
     JobResultExample
-=======
-from tests.commons.big_query.copy_job_async.result_check.job_result_example \
-    import JobResultExample
->>>>>>> master:tests/commons/big_query/copy_job_async/test_copy_job_result.py
 
 
 class TestCopyJobResult(unittest.TestCase):
