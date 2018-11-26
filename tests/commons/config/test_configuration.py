@@ -3,7 +3,7 @@ import unittest
 from src.commons.config.configuration import Configuration
 
 
-class TestPrdConfiguration(unittest.TestCase):
+class TestConfiguration(unittest.TestCase):
 
     configuration = Configuration("config/config.yaml")
 
