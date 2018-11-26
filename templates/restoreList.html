@@ -1,80 +1,168 @@
 {% extends "bbq-menu.html" %}
 {% block main %}
 
-<h2>Restore custom backup list</h2>
-<script type="text/javascript">
-  function OnSubmitForm() {
-    var params = {
-      'targetDatasetId': document.restoreListForm.targetDatasetId.value
-    };
+    <h2 align="center" style="padding-bottom: 50px">
+        Restore custom backup list
+    </h2>
+    <script type="text/javascript">
+        function OnSubmitForm() {
+            let params = {
+                'targetProjectId': document.restoreListForm.targetProjectId.value,
+                'targetDatasetId': document.restoreListForm.targetDatasetId.value,
+                'createDisposition': document.restoreListForm.createDisposition.value,
+                'writeDisposition': document.restoreListForm.writeDisposition.value
+            };
+            let url = '/restore/list?' + encodeQueryData(params);
+            let xhttp = new XMLHttpRequest();
 
-    var url = '/restore/list?' + encodeQueryData(params);
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", url, true);
-    xhttp.timeout = 1000 * 3600;
-    xhttp.onload = function () {
-      document.getElementById("response").innerHTML = JSON.stringify(JSON.parse(xhttp.responseText),
-          undefined, 2);
-      makeUrlsClickable();
+            xhttp.open("POST", url, true);
+            xhttp.timeout = 1000 * 3600;
+            xhttp.onload = function () {
+                document.getElementById("response").innerHTML = JSON.stringify(
+                    JSON.parse(xhttp.responseText), undefined, 2);
+                makeUrlsClickable();
 
-    };
-    xhttp.ontimeout = function (e) {
-      document.getElementById("response").innerHTML = "Request timeout: " + e;
-    };
+            };
+            xhttp.ontimeout = function (e) {
+                document.getElementById("response").innerHTML = "Request timeout: " + e;
+            };
 
-    xhttp.send(document.restoreListForm.requestBody.value);
-    return false;
-  }
-</script>
+            xhttp.send(document.restoreListForm.requestBody.value);
 
-<form name="restoreListForm" onsubmit="return OnSubmitForm();">
-  <div class="form-group row">
-    <label for="targetDatasetId" class="col-sm-2 col-form-label">Target dataset id</label>
-    <div class="input-group col-sm-8">
-      <div class="input-group-prepend">
-        <span class="input-group-text" id="projectAddOn">{{ restoration_project_id }}.</span>
-      </div>
-      <input type="text" class="form-control" aria-describedby="projectAddOn" id="targetDatasetId"
-             name="targetDatasetId" placeholder="source_project_id___source_dataset_id">
-      <small id="targetDatasetIdHelp" class="form-text text-muted">Optional. Temporary dataset id
-        that will be used (and created if does not exist) as container for restored table. Remember
-        that this will be a temporary dataset with expiration time set to 7 days. Note that passed
-        dataset could already exists - it should be in the same location as backup. If target
-        dataset id is not passed, then source dataset id value will be used as a target dataset id
-        in restoration project
-      </small>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label for="requestBody" class="col-sm-2 col-form-label">Backups list</label>
-    <div class="input-group col-sm-8">
-      <textarea class="form-control" id="requestBody" name="requestBody" rows="20" cols="100" required>[
+            return false;
+        }
+    </script>
+
+    <form name="restoreListForm" onsubmit="return OnSubmitForm();">
+
+        <div class="form-group row">
+            <label for="targetProjectId" class="col-sm-2 col-form-label">
+                Target project id
+            </label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="targetProjectId"
+                       name="targetProjectId"
+                       placeholder="source_project_id">
+                <small id="targetProjectIdHelp"
+                       class="form-text text-muted">
+                    <b>Optional</b>. Target project id. If not passed,
+                    source project id will be used.
+                </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="targetDatasetId" class="col-sm-2 col-form-label">
+                Target dataset id
+            </label>
+            <div class="input-group col-sm-8">
+                <input type="text" class="form-control" id="targetDatasetId"
+                       name="targetDatasetId"
+                       placeholder="source_dataset_id">
+                <small id="targetDatasetIdHelp"
+                       class="form-text text-muted">
+                    <b>Optional</b>. Temporary dataset id that will be used
+                    (and created if does not exist) as container for
+                    restored table. Note that passed dataset could already
+                    exists - it should be in the same location as backup.
+                    If target dataset id is not passed, then source dataset
+                    id
+                    value will be used as a target dataset id in restoration
+                    project.
+                </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="createDisposition" class="col-sm-2 col-form-label">
+                Create disposition
+            </label>
+            <div class="col-sm-8">
+                <select class="form-control" id="createDisposition"
+                        name="createDisposition">
+                    <option>CREATE_IF_NEEDED</option>
+                    <option>CREATE_NEVER</option>
+                </select>
+                <small id="createDispositionHelp" class="form-text text-muted">
+                    Specifies whether the job is allowed to create new
+                    tables.<br>
+
+                    The following values are supported:<br>
+                    <b>CREATE_IF_NEEDED</b>: If the table does not exist,
+                    BigQuery creates the table.<br>
+                    <b>CREATE_NEVER</b>: The table must already exist. If it
+                    does not, a 'notFound' error is
+                    returned in the job result.<br>
+                    The default value is <b>CREATE_IF_NEEDED</b>.
+                </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="writeDisposition" class="col-sm-2 col-form-label">
+                Write disposition
+            </label>
+            <div class="col-sm-8">
+                <select class="form-control" id="writeDisposition"
+                        name="writeDisposition">
+                    <option>WRITE_EMPTY</option>
+                    <option>WRITE_TRUNCATE</option>
+                    <option>WRITE_APPEND</option>
+                </select>
+                <small id="writeDispositionHelp" class="form-text text-muted">
+                    Specifies the action that occurs if the destination table
+                    already exists.<br>
+
+                    The following values are supported:<br>
+                    <b>WRITE_EMPTY</b>: If the table already exists and contains
+                    data, a 'duplicate' error is
+                    returned in the job result.<br>
+                    <b>WRITE_TRUNCATE</b>: If the table already exists, BigQuery
+                    overwrites the table data.<br>
+                    <b>WRITE_APPEND</b>: If the table already exists, BigQuery
+                    appends the data to the
+                    table.<br>
+                    The default value is <b>WRITE_EMPTY</b>.
+                </small>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="requestBody" class="col-sm-2 col-form-label">
+                Backups list
+            </label>
+            <div class="input-group col-sm-8">
+                <textarea class="form-control" id="requestBody" name="requestBody"
+                        rows="20" cols="100" required>[
   {
     "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LPPicXIlCxIFVGFibGUYgICAkOaLgAgMCxIGQmFja3VwGICAgICAgJJJJA"
   },
   {
     "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LWJicXIlCxIFVGFibGUYgICAkJOlgAgMCxIGQmFja3VwGICAgICAgIAKDA"
   }
-]
-</textarea>
-    </div>
-  </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label"></label>
-    <div class="input-group col-sm-8">
-      <small id="requestBodyHelp" class="form-text text-muted">backupUrlSafeKey is a "URL-safe key" value taken
-        from <a href="https://console.cloud.google.com/datastore/entities/query?kind=Backup">Cloud Datastore Backup entities</a>
-      </small>
-    </div>
-  </div>
-  <div class="form-group row">
-    <div class="col-sm-4">
-      <button type="submit" class="btn btn-primary">Restore list of backups</button>
-    </div>
-  </div>
-</form>
+]</textarea>
+            </div>
+        </div>
 
-<br><strong>Response:</strong> <br>
-<pre id="response"></pre>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label"></label>
+            <div class="input-group col-sm-8">
+                <small id="requestBodyHelp" class="form-text text-muted">
+                    backupUrlSafeKey is a "URL-safe key" value taken from
+                    <a
+                    href="https://console.cloud.google.com/datastore/entities/query?kind=Backup">
+                    Cloud Datastore Backup entities</a>
+                </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-8">
+                <button type="submit" class="btn btn-primary">
+                    Restore list of backups
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <br><strong>Response:</strong> <br>
+    <pre id="response"></pre>
 
 {% endblock %}

@@ -1,13 +1,11 @@
 import json
 import os
-import uuid
 
 from google.appengine.ext import ndb, testbed
 
 from src.restore.list.backup_list_restore_service \
     import BackupListRestoreService, BackupItem
-from src.restore.status.restoration_job_status_service import \
-    RestorationJobStatusService
+
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 from src.restore.list import backup_list_restore_handler
@@ -26,60 +24,17 @@ class TestBackupListRestoreHandler(unittest.TestCase):
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub()
 
-    @patch.object(BackupListRestoreService, 'restore')
-    @patch.object(uuid, 'uuid4', return_value=123)
-    @patch.object(RestorationJobStatusService,
-                  'get_warnings_only_status_endpoint',
-                  return_value="http://domain.com/restore/jobs/123?warningsOnly")
-    @patch.object(RestorationJobStatusService, 'get_status_endpoint',
-                  return_value="http://domain.com/restore/jobs/123")
-    def test_all_proper_parameters_provided_for_list_restoration(self,
-                                                                 get_status_endpoint,
-                                                                 get_warnings_only_status_endpoint,
-                                                                 _,
-                                                                 mocked_restore_service):
-        # given
-        key1 = ndb.Key("Backup1", None)
-        key2 = ndb.Key("Backup2", None)
-        request_body = "[{{\"backupUrlSafeKey\": \"{}\"," \
-                       "\"test_param_key\":\"test_value\"}}," \
-                       "{{\"backupUrlSafeKey\": \"{}\"}}]". \
-            format(key1.urlsafe(), key2.urlsafe())
-        expected_response = {
-            "restorationJobId": "123",
-            "restorationStatusEndpoint": "http://domain.com/restore/jobs/123",
-            "restorationWarningsOnlyStatusEndpoint": "http://domain.com/restore/jobs/123?warningsOnly"
-        }
-
-        # when
-        response = self.under_test.post(
-            url='/restore/list?targetDatasetId=td123',
-            params=request_body,
-            content_type='application/json'
-        )
-
-        # then
-        get_status_endpoint.assert_called_once_with("123")
-        get_warnings_only_status_endpoint.assert_called_once_with("123")
-
-        self.assertEqual(response.body, json.dumps(expected_response))
-
-    @patch.object(BackupListRestoreService, 'restore')
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
     def test_default_parameters_provided_for_list_restoration(
             self, mocked_restore_service):
         # given
         key1 = ndb.Key("Backup1", None)
         key2 = ndb.Key("Backup2", None)
-        mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
 
         request_body = "[{{\"backupUrlSafeKey\": \"{}\"," \
                        "\"test_param_key\":\"test_value\"}}," \
                        "{{\"backupUrlSafeKey\": \"{}\"}}]". \
             format(key1.urlsafe(), key2.urlsafe())
-
-        expected_backup_item_1 = \
-            BackupItem(key1, {"test_param_key": "test_value"})
-        expected_backup_item_2 = BackupItem(key2, {})
 
         # when
         response = self.under_test.post(
@@ -97,11 +52,40 @@ class TestBackupListRestoreHandler(unittest.TestCase):
         passed_backup_items = list(mocked_restore_service_request.backup_items)
 
         self.assertEqual(len(passed_backup_items), 2)
+
+        expected_backup_item_1 = \
+            BackupItem(key1, {"test_param_key": "test_value"})
+        expected_backup_item_2 = BackupItem(key2, {})
+
         # no order required
         self.assertIn(expected_backup_item_1, passed_backup_items)
         self.assertIn(expected_backup_item_2, passed_backup_items)
 
-    @patch.object(BackupListRestoreService, 'restore')
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
+    def test_should_fail_on_wrong_project_format(self, mocked_restore_service):
+        # given
+        expected_error = '{"status": "failed", "message": "Invalid project ' \
+                         'value: \'project_with_underscore\'. Project IDs may ' \
+                         'contain letters, numbers, and dash", ' \
+                         '"httpStatus": 400}'
+        mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
+
+        # when
+        request_body = "[{\"backupUrlSafeKey\": \"url_safe_key1\"," \
+                       "\"test_param_key\":\"test_value\"}," \
+                       "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
+        response = self.under_test.post(
+            url='/restore/list?targetProjectId=project_with_underscore',
+            params=request_body,
+            content_type='application/json',
+            expect_errors=True
+        )
+
+        # then
+        self.assertEquals(400, response.status_int)
+        self.assertEquals(response.body, expected_error)
+
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
     def test_should_fail_on_wrong_dataset_format(self, mocked_restore_service):
         # given
         expected_error = '{"status": "failed", "message": "Invalid dataset ' \
@@ -116,6 +100,56 @@ class TestBackupListRestoreHandler(unittest.TestCase):
                        "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
         response = self.under_test.post(
             url='/restore/list?targetDatasetId=dataset-with-dash',
+            params=request_body,
+            content_type='application/json',
+            expect_errors=True
+        )
+
+        # then
+        self.assertEquals(400, response.status_int)
+        self.assertEquals(response.body, expected_error)
+
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
+    def test_should_fail_on_wrong_write_disposition_format(self,
+                                                           mocked_restore_service):
+        # given
+        expected_error = '{"status": "failed", "message": "Invalid write ' \
+                         'disposition: \'WRONG_WRITE\'. The following values ' \
+                         'are supported: WRITE_TRUNCATE, WRITE_APPEND, ' \
+                         'WRITE_EMPTY.", "httpStatus": 400}'
+        mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
+
+        # when
+        request_body = "[{\"backupUrlSafeKey\": \"url_safe_key1\"," \
+                       "\"test_param_key\":\"test_value\"}," \
+                       "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
+        response = self.under_test.post(
+            url='/restore/list?writeDisposition=WRONG_WRITE',
+            params=request_body,
+            content_type='application/json',
+            expect_errors=True
+        )
+
+        # then
+        self.assertEquals(400, response.status_int)
+        self.assertEquals(response.body, expected_error)
+
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
+    def test_should_fail_on_wrong_create_disposition_format(self,
+                                                            mocked_restore_service):
+        # given
+        expected_error = '{"status": "failed", "message": "Invalid create ' \
+                         'disposition: \'WRONG_CREATE\'. The following values ' \
+                         'are supported: CREATE_IF_NEEDED, CREATE_NEVER.", ' \
+                         '"httpStatus": 400}'
+        mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
+
+        # when
+        request_body = "[{\"backupUrlSafeKey\": \"url_safe_key1\"," \
+                       "\"test_param_key\":\"test_value\"}," \
+                       "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
+        response = self.under_test.post(
+            url='/restore/list?createDisposition=WRONG_CREATE',
             params=request_body,
             content_type='application/json',
             expect_errors=True
@@ -224,9 +258,8 @@ class TestBackupListRestoreHandler(unittest.TestCase):
         self.assertEquals(400, response.status_int)
         self.assertEquals(response.body, expected_error)
 
-    @patch.object(BackupListRestoreService, 'restore')
-    def test_should_work_with_backup_bq_key(
-            self, mocked_restore_service):
+    @patch.object(BackupListRestoreService, 'restore', return_value="123")
+    def test_should_work_with_backup_bq_key(self, mocked_restore_service):
         # given
         expected_key = ndb.Key("Backup", 5629499534213120,
                                parent=ndb.Key("Table", 6394035673497600))
@@ -282,4 +315,4 @@ class TestBackupListRestoreHandler(unittest.TestCase):
 
     @staticmethod
     def __get_mocked_service_argument(mocked_service):
-        return mocked_service.call_args[0][1]
+        return mocked_service.call_args[0][0]
