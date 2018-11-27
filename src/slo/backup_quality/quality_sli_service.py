@@ -1,12 +1,15 @@
 import logging
+import json
 
 from src.commons.big_query.big_query import BigQuery
+from src.commons.tasks import Tasks
+from google.appengine.api.taskqueue import Task
 from src.slo.predicate.sli_table_exists_predicate import \
-  SLITableExistsPredicate
+    SLITableExistsPredicate
 from src.slo.backup_quality.quality_query_specification import \
-  QualityQuerySpecification
+    QualityQuerySpecification
 from src.slo.backup_quality.predicate.sli_table_newer_modification_predicate import \
-  SLITableNewerModificationPredicate
+    SLITableNewerModificationPredicate
 from src.slo.sli_results_streamer import SLIResultsStreamer
 from src.slo.sli_view_querier import SLIViewQuerier
 
@@ -16,7 +19,7 @@ class QualitySliService(object):
     def __init__(self):
         big_query = BigQuery()
         self.querier = SLIViewQuerier(
-            big_query,  QualityQuerySpecification()
+            big_query, QualityQuerySpecification()
         )
         self.streamer = SLIResultsStreamer(
             table_id="SLI_backup_quality"
@@ -28,19 +31,32 @@ class QualitySliService(object):
         logging.info("Recalculating quality SLI has been started.")
 
         all_tables, snapshot_time = self.querier.query()
-        filtered_tables = [table for table in all_tables
-                           if self.__should_stay_as_sli_violation(table)]
+        tasks = []
+        for table in all_tables:
+            tasks.append(
+                Task(
+                    method='POST',
+                    url='/sli/quality/violation',
+                    payload=json.dumps({'table': table, 'snapshot_time': snapshot_time}),
+                    headers={'Content-Type': 'application/json'}
+                )
+            )
+        Tasks.schedule('sli-table-quality-violations', tasks)
 
-        logging.info("Quality SLI tables filtered from %s to %s", len(all_tables), len(filtered_tables))
-        self.streamer.stream(
-            filtered_tables,
-            snapshot_marker=self.__create_snapshot_marker_row(snapshot_time)
-        )
+        logging.info("Quality SLI tables filtered from %s to %s", len(all_tables), len(tasks))
+
+    def check_and_stream_violation(self, json_data):
+        table = json_data['table']
+        if self.__should_stay_as_sli_violation(table):
+            self.streamer.stream(
+                table,
+                snapshot_marker=self.__create_snapshot_marker_row(json_data['snapshot_time'])
+            )
 
     def __should_stay_as_sli_violation(self, table):
         try:
             if not self.table_existence_predicate.exists(table):
-              return False
+                return False
             return not self.table_newer_modification_predicate.is_modified_since_last_census_snapshot(table)
         except Exception:
             logging.exception("An error occurred while filtering table %s, "

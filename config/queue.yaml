@@ -85,3 +85,11 @@ queue:
   retry_parameters:
     task_retry_limit: 5
     task_age_limit: 1h
+
+- name: sli-table-quality-violations
+  rate: 20/s
+  bucket_size: 20
+  max_concurrent_requests: 30
+  retry_parameters:
+    task_retry_limit: 5
+    task_age_limit: 1h
