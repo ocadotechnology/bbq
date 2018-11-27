@@ -1,14 +1,14 @@
 {% extends "bbq-menu.html" %}
 {% block main %}
 
-    <h2 align="center" style="padding-bottom: 50px">
-        Restore custom backup list
-    </h2>
+    <h2>Restore custom backup list</h2>
     <script type="text/javascript">
         function OnSubmitForm() {
             let params = {
-                'targetProjectId': document.restoreListForm.targetProjectId.value,
-                'targetDatasetId': document.restoreListForm.targetDatasetId.value,
+                'targetProjectId': document.getElementById('isRestoreToSource').checked
+                    ? null : document.restoreListForm.targetProjectId.value,
+                'targetDatasetId': document.getElementById('isRestoreToSource').checked
+                    ? null : document.restoreListForm.targetDatasetId.value,
                 'createDisposition': document.restoreListForm.createDisposition.value,
                 'writeDisposition': document.restoreListForm.writeDisposition.value
             };
@@ -36,15 +36,39 @@
     <form name="restoreListForm" onsubmit="return OnSubmitForm();">
 
         <div class="form-group row">
+            <div class="col">
+                <h4>Target table information</h4>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="targetProjectId" class="col-sm-2 col-form-label">
+                Restore to source
+            </label>
+            <label class="radio-inline col-sm-1 col-form-label"
+                   id="restoreToSource">
+                <input type="radio" name="optradio" id="isRestoreToSource"
+                       onclick="restoreToSource()"> Yes
+            </label>
+            <label class="radio-inline col-form-label"
+                   id="restoreNotToSource">
+                <input type="radio" name="optradio" checked
+                       onclick="restoreNotToSource()"> No
+            </label>
+            <label class="col-sm-8 col-form-label"></label>
+            <label class="col-sm-2 col-form-label"></label>
+            <small class="form-text text-muted col-sm-8">
+                Will tables be restored straightforward into its source project?
+            </small>
+        </div>
+        <div class="form-group row">
             <label for="targetProjectId" class="col-sm-2 col-form-label">
                 Target project id
             </label>
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="targetProjectId"
-                       name="targetProjectId"
-                       placeholder="source_project_id">
-                <small id="targetProjectIdHelp"
-                       class="form-text text-muted">
+                       name="targetProjectId" placeholder="source_project_id"
+                       value="{{ default_restoration_project_id }}">
+                <small id="targetProjectIdHelp" class="form-text text-muted">
                     <b>Optional</b>. Target project id. If not passed,
                     source project id will be used.
                 </small>
@@ -56,19 +80,21 @@
             </label>
             <div class="input-group col-sm-8">
                 <input type="text" class="form-control" id="targetDatasetId"
-                       name="targetDatasetId"
-                       placeholder="source_dataset_id">
-                <small id="targetDatasetIdHelp"
-                       class="form-text text-muted">
+                       name="targetDatasetId" placeholder="source_dataset_id">
+                <small id="targetDatasetIdHelp" class="form-text text-muted">
                     <b>Optional</b>. Temporary dataset id that will be used
                     (and created if does not exist) as container for
                     restored table. Note that passed dataset could already
                     exists - it should be in the same location as backup.
-                    If target dataset id is not passed, then source dataset
-                    id
+                    If target dataset id is not passed, then source dataset id
                     value will be used as a target dataset id in restoration
                     project.
                 </small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col">
+                <h4>Options</h4>
             </div>
         </div>
         <div class="form-group row">
@@ -123,6 +149,11 @@
                 </small>
             </div>
         </div>
+        <div class="form-group row">
+            <div class="col">
+                <h4>Body</h4>
+            </div>
+        </div>
 
         <div class="form-group row">
             <label for="requestBody" class="col-sm-2 col-form-label">
@@ -130,7 +161,7 @@
             </label>
             <div class="input-group col-sm-8">
                 <textarea class="form-control" id="requestBody" name="requestBody"
-                        rows="20" cols="100" required>[
+                        rows="12" cols="100" required>[
   {
     "backupUrlSafeKey" : "ahFlfmRldi1wcm9qZWN0LPPicXIlCxIFVGFibGUYgICAkOaLgAgMCxIGQmFja3VwGICAgICAgJJJJA"
   },
@@ -153,8 +184,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-8">
+            <div class="col-sm-4">
                 <button type="submit" class="btn btn-primary">
                     Restore list of backups
                 </button>
