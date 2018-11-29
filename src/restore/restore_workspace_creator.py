@@ -29,14 +29,12 @@ class RestoreWorkspaceCreator(object):
     def __create_target_dataset(self, source_table_reference,
                                 target_table_reference):
         location = self.BQ.get_dataset_location(
-            source_table_reference.project_id,
-            source_table_reference.dataset_id)
-        table_expiration = (3600000 * 24 * 7)  # 7 days
+            project_id=source_table_reference.project_id,
+            dataset_id=source_table_reference.dataset_id)
         self.BQ.create_dataset(
-            target_table_reference.project_id,
-            target_table_reference.dataset_id,
-            location,
-            table_expiration
+            project_id=target_table_reference.project_id,
+            dataset_id=target_table_reference.dataset_id,
+            location=location
         )
 
     def __create_empty_partitioned_table_if_not_exists(self, source_table_reference, target_table_reference):
@@ -45,7 +43,3 @@ class RestoreWorkspaceCreator(object):
             if not target_table_metadata.table_exists():
                 source_table_metadata = BigQueryTableMetadata.get_table_by_reference_cached(source_table_reference)
                 source_table_metadata.create_the_same_empty_table(target_table_reference)
-
-    @staticmethod
-    def create_default_target_dataset_id(project_id, dataset_id):
-        return '{}___{}'.format(project_id, dataset_id).replace('-', '_')

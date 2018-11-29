@@ -1,32 +1,43 @@
+import webapp2
 from datetime import datetime
 
-import webapp2
-
-from src.commons.exceptions import ParameterValidationException
-from src.commons.handlers.json_handler import JsonHandler
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
-from src.commons.big_query import validators
 from src.commons.config.configuration import configuration
-from src.restore.table.table_restore_service import TableRestoreService
+from src.commons.exceptions import ParameterValidationException
+from src.commons.handlers import validators
+from src.commons.handlers.bbq_authenticated_handler import \
+    BbqAuthenticatedHandler
+from src.commons.handlers.json_handler import JsonHandler
 from src.commons.table_reference import TableReference
+from src.restore.table.table_restore_service import TableRestoreService
 
 
 class TableRestoreHandler(JsonHandler):
 
     def get(self, project_id, dataset_id, table_id):
         partition_id = self.request.get('partitionId', None)
+        target_project_id = self.request.get('targetProjectId', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
-        if target_dataset_id:
-            validators.validate_dataset_id(target_dataset_id)
+        create_disposition = self.request.get('createDisposition', None)
+        write_disposition = self.request.get('writeDisposition', None)
+
+        validators.validate_restore_request_params(
+            target_project_id=target_project_id,
+            target_dataset_id=target_dataset_id,
+            create_disposition=create_disposition,
+            write_disposition=write_disposition
+        )
 
         restoration_datetime = self.__get_restoration_datetime()
 
         table_reference = TableReference(project_id, dataset_id,
                                          table_id, partition_id)
 
-        restore_data = TableRestoreService.restore(
-            table_reference, target_dataset_id, restoration_datetime
-        )
+        restore_data = TableRestoreService.restore(table_reference,
+                                                   target_project_id,
+                                                   target_dataset_id,
+                                                   create_disposition,
+                                                   write_disposition,
+                                                   restoration_datetime)
         self._finish_with_success(restore_data)
 
     def __get_restoration_datetime(self):

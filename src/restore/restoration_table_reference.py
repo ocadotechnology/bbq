@@ -11,12 +11,3 @@ class RestoreTableReference(object):
             backup_entity.dataset_id,
             backup_entity.table_id,
             table_entity.partition_id)
-
-    @staticmethod
-    def target_table_reference(table_entity, target_dataset_id):
-        return TableReference(
-            configuration.restoration_project_id,
-            target_dataset_id,
-            table_entity.table_id,
-            table_entity.partition_id
-        )
