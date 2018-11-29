@@ -1,4 +1,3 @@
-import json
 import logging
 
 import webapp2
@@ -15,6 +14,7 @@ from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.config.configuration import configuration
 from src.commons.error_reporting import ErrorReporting
+from src.commons.handlers.json_request_helper import JsonRequestHelper
 from src.commons.table_reference import TableReference
 
 
@@ -28,16 +28,10 @@ class AfterBackupActionHandler(JsonHandler):
         self.BQ = BigQuery()
 
     def post(self, **_):
-        request_body_json = self.__parse_request_body()
+        request_body_json = JsonRequestHelper.parse_request_body(self.request.body)
         self.__validate(request_body_json)
         self.__process(request_body_json)
         self._finish_with_success()
-
-    def __parse_request_body(self):
-        try:
-            return json.loads(self.request.body)
-        except ValueError, e:
-            raise JsonNotParseableException(e.message)
 
     def __process(self, request_body_json):
         copy_job_results = CopyJobResult(request_body_json.get('jobJson'))
