@@ -3,7 +3,7 @@ import unittest
 from src.commons.config.configuration import Configuration
 
 
-class TestPrdConfiguration(unittest.TestCase):
+class TestConfiguration(unittest.TestCase):
 
     configuration = Configuration("config/config.yaml")
 
@@ -16,8 +16,8 @@ class TestPrdConfiguration(unittest.TestCase):
     def test_should_be_able_to_read__backup_project_id(self):
         self.__instance_of(self.configuration.backup_project_id, str)
 
-    def test_should_be_able_to_read__restoration_project_id(self):
-        self.__instance_of(self.configuration.restoration_project_id, str)
+    def test_should_be_able_to_read__default_restoration_project_id(self):
+        self.__instance_of(self.configuration.default_restoration_project_id, str)
 
     def test_should_be_able_to_read__projects_to_skip(self):
         self.__is_list_and_each_item_instance_of(self.configuration.projects_to_skip, str)

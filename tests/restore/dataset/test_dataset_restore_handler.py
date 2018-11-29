@@ -45,7 +45,12 @@ class TestDatasetRestoreHandler(unittest.TestCase):
         # when
         response = self.under_test.post(
             '/restore/project/p123/dataset/d123',
-            params={'targetDatasetId': 'td123', 'maxPartitionDays': '100'})
+            params={
+                'targetProjectId': 'p123',
+                'targetDatasetId': 'td123',
+                'createDisposition': 'CREATE_IF_NEEDED',
+                'writeDisposition': 'WRITE_EMPTY',
+                'maxPartitionDays': '100'})
 
         # then
         get_status_endpoint.assert_called_once_with("123")
@@ -55,7 +60,10 @@ class TestDatasetRestoreHandler(unittest.TestCase):
             restoration_job_id="123",
             project_id='p123',
             dataset_id='d123',
+            target_project_id='p123',
             target_dataset_id='td123',
+            create_disposition='CREATE_IF_NEEDED',
+            write_disposition='WRITE_EMPTY',
             max_partition_days=100
         )
         self.assertEqual(response.body, json.dumps(expected_response_body))
@@ -87,6 +95,39 @@ class TestDatasetRestoreHandler(unittest.TestCase):
         response = self.under_test.post('/restore/project/p123/dataset/d123',
                                         params={
                                             'targetDatasetId': 'dataset-with-dash'},
+                                        expect_errors=True)
+
+        # then
+        self.assertEqual(response.status_int, 400)
+
+    @patch.object(uuid, 'uuid4', return_value=123)
+    def test_return_400_if_not_valid_write_disposition(self, _):
+        # when
+        response = self.under_test.post('/restore/project/p123/dataset/d123',
+                                        params={
+                                            'writeDisposition': 'BAD_WRITE_DISPOSTION'},
+                                        expect_errors=True)
+
+        # then
+        self.assertEqual(response.status_int, 400)
+
+    @patch.object(uuid, 'uuid4', return_value=123)
+    def test_return_400_if_not_valid_create_disposition(self, _):
+        # when
+        response = self.under_test.post('/restore/project/p123/dataset/d123',
+                                        params={
+                                            'createDisposition': 'BAD_CREATE_DISPOSTION'},
+                                        expect_errors=True)
+
+        # then
+        self.assertEqual(response.status_int, 400)
+
+    @patch.object(uuid, 'uuid4', return_value=123)
+    def test_return_400_if_not_valid_target_project_id(self, _):
+        # when
+        response = self.under_test.post('/restore/project/p123/dataset/d123',
+                                        params={
+                                            'targetProjectId': 'projectwith_'},
                                         expect_errors=True)
 
         # then

@@ -54,8 +54,9 @@ class TestRestoreWorkspaceCreator(TestCase):
         RestoreWorkspaceCreator(self.BQ).create_workspace(source, target)
 
         # then
-        self.BQ.create_dataset.assert_called_with(target.project_id,
-                                                  target.dataset_id, ANY, ANY)
+        self.BQ.create_dataset.assert_called_with(project_id=target.project_id,
+                                                  dataset_id=target.dataset_id,
+                                                  location=ANY)
 
     def test_should_create_dataset_with_location_of_source_table(self):
         # given
@@ -67,22 +68,15 @@ class TestRestoreWorkspaceCreator(TestCase):
         RestoreWorkspaceCreator(self.BQ).create_workspace(source, target)
 
         # then
-        self.BQ.get_dataset_location.assert_called_with(source.project_id,
-                                                        source.dataset_id)
-        self.BQ.create_dataset.assert_called_with(ANY, ANY, 'UK', ANY)
-
-    def test_should_create_dataset_with_expiration_of_seven_days(self):
-        # given
-        source, target = self.__create_partitioned_table_references()
-        self.BQ.get_dataset_cached.return_value = None
-        seven_days_in_seconds = 3600000 * 24 * 7
-
-        # when
-        RestoreWorkspaceCreator(self.BQ).create_workspace(source, target)
-
-        # then
-        self.BQ.create_dataset.assert_called_with(ANY, ANY, ANY,
-                                                  seven_days_in_seconds)
+        self.BQ.get_dataset_location.assert_called_with(
+            project_id=source.project_id,
+            dataset_id=source.dataset_id
+        )
+        self.BQ.create_dataset.assert_called_with(
+            project_id=ANY,
+            dataset_id=ANY,
+            location='UK'
+        )
 
     def test_should_not_create_dataset_if_already_exist(self):
         # given

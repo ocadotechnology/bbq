@@ -7,8 +7,10 @@ from google.appengine.ext import testbed
 import webtest
 from mock import patch
 
+from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.google_cloud_storage_client import GoogleCloudStorageClient
+from src.commons.table_reference import TableReference
 from src.restore.test import restore_test_handler
 from src.restore.test.table_randomizer import TableRandomizer
 from src.restore.test.table_restore_invoker import TableRestoreInvoker
@@ -68,8 +70,9 @@ class TestRestoreTestHandler(unittest.TestCase):
                   return_value=BigQueryTableMetadata(example_table))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
+    @patch.object(BigQuery, 'delete_table')
     def test_handler_returns_ok_status_if_restore_is_success(
-            self, _, _1, _2, _create_http, wait_till_done):
+            self, _, _1, _2, _3, _create_http, wait_till_done):
         # given
         endpoint_invoke_result = HttpMockSequence([(
             {'status': '200'}, json.dumps({
@@ -113,8 +116,9 @@ class TestRestoreTestHandler(unittest.TestCase):
                   return_value=BigQueryTableMetadata(example_table))
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
                   return_value=BigQueryTableMetadata(example_table))
+    @patch.object(BigQuery, 'delete_table')
     def test_handler_outputs_success_status_file_to_GCS_if_restore_is_success(
-            self, _, _1, _2, _create_http, put_gcs_file_content):
+            self, _, _1, _2, _3, _create_http, put_gcs_file_content):
         # given
         endpoint_invoke_result = HttpMockSequence([(
             {'status': '200'}, json.dumps({
@@ -213,3 +217,33 @@ class TestRestoreTestHandler(unittest.TestCase):
             json.dumps(expected_restore_response),
             'application/json'
         )
+
+    @patch.object(BigQuery, 'delete_table')
+    @patch.object(TableRestoreInvoker, 'wait_till_done')
+    @patch.object(TableRestoreInvoker, '_create_http')
+    @patch.object(GoogleCloudStorageClient, 'put_gcs_file_content')
+    @patch.object(TableRandomizer, 'get_random_table_metadata',
+                  return_value=BigQueryTableMetadata(example_table))
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
+                  return_value=BigQueryTableMetadata(example_table))
+    def test_handler_delete_restored_table_after_success(
+            self, _, _1, _2, _create_http, wait_till_done, delete_table):
+        # given
+        table_reference = TableReference(
+            project_id=example_table['tableReference']["projectId"],
+            dataset_id=example_table['tableReference']["datasetId"],
+            table_id=example_table['tableReference']["tableId"],
+        )
+
+        endpoint_invoke_result = HttpMockSequence([(
+            {'status': '200'}, json.dumps({
+                "restorationJobId": "64c6e50c-b511-43eb-ba75-f44f3d131f84"}))])
+        _create_http.return_value = endpoint_invoke_result
+        wait_till_done.return_value = restoration_status_successful
+
+        # when
+        response = self.under_test.get('/restore/test')
+
+        # then
+        self.assertEquals(200, response.status_int)
+        delete_table.assert_called_with(table_reference)
