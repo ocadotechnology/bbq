@@ -15,15 +15,15 @@ class SLIMainHandler(webapp2.RequestHandler):
     @staticmethod
     def create_slo_recalculation_tasks():
         tasks = [
-            # Tasks.create(method='POST',
-            #              url='/sli/latency_for_x_days',
-            #              params={'x_days': x_days})
-            # for x_days in [3, 4, 5, 7]
+            Tasks.create(method='POST',
+                         url='/sli/latency_for_x_days',
+                         params={'x_days': x_days})
+            for x_days in [3, 4, 5, 7]
         ]
-        tasks = [
+        tasks.append(
             Tasks.create(
                 method='POST',
-                url='/sli/quality')]
+                url='/sli/quality'))
         return tasks
 
 
