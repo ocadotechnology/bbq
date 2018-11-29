@@ -41,17 +41,16 @@ class QualitySliService(object):
                     headers={'Content-Type': 'application/json'}
                 )
             )
-        Tasks.schedule('sli-table-quality-violations', tasks)
+        if tasks:
+            Tasks.schedule('sli-table-quality-violations', tasks)
 
-        logging.info("Quality SLI tables filtered from %s to %s", len(all_tables), len(tasks))
+        self.streamer.stream([], snapshot_marker=self.__create_snapshot_marker_row(snapshot_time))
+        logging.info("Snapshot marker sent %s", snapshot_time)
 
     def check_and_stream_violation(self, json_data):
-        table = json_data['table']
-        if self.__should_stay_as_sli_violation(table):
-            self.streamer.stream(
-                table,
-                snapshot_marker=self.__create_snapshot_marker_row(json_data['snapshot_time'])
-            )
+        if self.__should_stay_as_sli_violation(json_data['table']):
+            filtered_table = [json_data['table']]
+            self.streamer.stream(filtered_table)
 
     def __should_stay_as_sli_violation(self, table):
         try:
