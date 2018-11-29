@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 
+from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.config.configuration import configuration
 from src.commons.google_cloud_storage_client import GoogleCloudStorageClient as gcs
@@ -26,13 +27,15 @@ class RestoreTest(object):
             restoration_point_date=datetime.utcnow().date()
         )
 
-        response = table_restore_invoker\
+        response = table_restore_invoker \
             .wait_till_done(restoration_job_id, timeout=600)
         table_has_been_restored = response["status"]["result"] == "Success"
 
         if table_has_been_restored:
-            return self.__check_restored_table_matches_source(response,
-                                                              source_table)
+            response = self.__check_restored_table_matches_source(response,
+                                                                  source_table)
+            BigQuery().delete_table(table_reference)
+            return response
         else:
             resp_msg = "Restore test failed. " \
                        "Failed to restore a table {}".format(table_reference)
@@ -50,7 +53,8 @@ class RestoreTest(object):
 
         target_table_reference = \
             TableReference.parse_tab_ref(restoration_items[0]['targetTable'])
-        target_table = BigQueryTableMetadata.get_table_by_reference(target_table_reference)
+        target_table = BigQueryTableMetadata.get_table_by_reference(
+            target_table_reference)
 
         tables_match, assertion_msg = \
             self.__assert_restored_table_matches_source(src_table, target_table)
