@@ -1,0 +1,59 @@
+{% macro build_options() %}
+    <div class="form-group row">
+        <div class="col">
+            <h4>Options</h4>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="createDisposition" class="col-sm-2 col-form-label">
+            Create disposition
+        </label>
+        <div class="col-sm-8">
+            <select class="form-control" id="createDisposition"
+                    name="createDisposition">
+                <option>CREATE_IF_NEEDED</option>
+                <option>CREATE_NEVER</option>
+            </select>
+            <small id="createDispositionHelp" class="form-text text-muted">
+                Specifies whether the job is allowed to create new
+                tables.<br>
+
+                The following values are supported:<br>
+                <b>CREATE_IF_NEEDED</b>: If the table does not exist,
+                BigQuery creates the table.<br>
+                <b>CREATE_NEVER</b>: The table must already exist. If it
+                does not, a 'notFound' error is
+                returned in the job result.<br>
+                The default value is <b>CREATE_IF_NEEDED</b>.
+            </small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="writeDisposition" class="col-sm-2 col-form-label">
+            Write disposition
+        </label>
+        <div class="col-sm-8">
+            <select class="form-control" id="writeDisposition"
+                    name="writeDisposition">
+                <option>WRITE_EMPTY</option>
+                <option>WRITE_TRUNCATE</option>
+                <option>WRITE_APPEND</option>
+            </select>
+            <small id="writeDispositionHelp" class="form-text text-muted">
+                Specifies the action that occurs if the destination table
+                already exists.<br>
+
+                The following values are supported:<br>
+                <b>WRITE_EMPTY</b>: If the table already exists and contains
+                data, a 'duplicate' error is
+                returned in the job result.<br>
+                <b>WRITE_TRUNCATE</b>: If the table already exists, BigQuery
+                overwrites the table data.<br>
+                <b>WRITE_APPEND</b>: If the table already exists, BigQuery
+                appends the data to the
+                table.<br>
+                The default value is <b>WRITE_EMPTY</b>.
+            </small>
+        </div>
+    </div>
+{% endmacro %}
