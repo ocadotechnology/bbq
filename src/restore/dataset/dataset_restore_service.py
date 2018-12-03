@@ -2,7 +2,6 @@ import logging
 
 from google.appengine.ext import deferred
 
-from src.commons.config.configuration import configuration
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.dataset.dataset_restore_items_generator import \
     DatasetRestoreItemsGenerator
@@ -49,9 +48,6 @@ class DatasetRestoreService(_DatasetRestoreService):
     def restore(self, restoration_job_id, project_id, dataset_id,
                 target_project_id, target_dataset_id, create_disposition,
                 write_disposition, max_partition_days):
-
-        if target_project_id is None:
-            target_project_id = project_id
 
         if target_dataset_id is None:
             target_dataset_id = dataset_id
