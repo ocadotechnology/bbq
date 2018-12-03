@@ -50,29 +50,6 @@
     content = content.replace(/"(http.*)"/g, "<a href=\"$1\">$1</a>");
     document.getElementById("response").innerHTML = content;
   }
-
-  function restoreToSource() {
-    let project = document.getElementById("targetProjectId").value;
-    let dataset = document.getElementById("targetDatasetId").value;
-
-    localStorage.setItem("targetproject", project);
-    localStorage.setItem("targetdataset", dataset);
-
-    document.getElementById("targetProjectId").disabled = true;
-    document.getElementById("targetDatasetId").disabled = true;
-    document.getElementById("targetProjectId").value = '';
-    document.getElementById("targetDatasetId").value = '';
-  }
-
-  function restoreNotToSource() {
-    let project = localStorage.getItem("targetproject");
-    let dataset = localStorage.getItem("targetdataset");
-
-    document.getElementById("targetProjectId").disabled = false;
-    document.getElementById("targetDatasetId").disabled = false;
-    document.getElementById("targetProjectId").value = project;
-    document.getElementById("targetDatasetId").value = dataset;
-  }
 </script>
 
 <main role="main" class="container">
