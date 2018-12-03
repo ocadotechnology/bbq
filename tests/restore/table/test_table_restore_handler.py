@@ -34,7 +34,7 @@ class TestTableRestoreHandler(unittest.TestCase):
         self.under_test.get(
             RESTORE_TABLE_URL,
             params={'partitionId': '20170725',
-                    'targetProjectId': "target-project-id",
+                    'isRestoreToSourceProject': True,
                     'targetDatasetId': 'target_dataset_id',
                     'createDisposition': 'CREATE_IF_NEEDED',
                     'writeDisposition': 'WRITE_EMPTY',
@@ -44,7 +44,7 @@ class TestTableRestoreHandler(unittest.TestCase):
         # then
         restore.assert_called_once_with(
             TableReference('project-id', 'dataset_id', 'table_id', '20170725'),
-            "target-project-id",
+            None,
             "target_dataset_id",
             "CREATE_IF_NEEDED",
             "WRITE_EMPTY",
@@ -60,7 +60,7 @@ class TestTableRestoreHandler(unittest.TestCase):
         expected_table_reference = \
             TableReference('project-id', 'dataset_id', 'table_id')
         restore.assert_called_once_with(expected_table_reference,
-                                        None, None, None, None, None)
+                                        '', None, None, None, None)
 
     @patch.object(TableRestoreService, 'restore', return_value={})
     def test_should_fail_on_wrong_date_format(self, _):
