@@ -2,7 +2,6 @@ import logging
 
 from google.appengine.ext import deferred
 
-from src.commons.config.configuration import configuration
 from src.restore.async_batch_restore_service import AsyncBatchRestoreService
 from src.restore.dataset.dataset_restore_items_generator import \
     DatasetRestoreItemsGenerator

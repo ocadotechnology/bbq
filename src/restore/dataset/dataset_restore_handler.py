@@ -3,8 +3,8 @@ import uuid
 
 import webapp2
 
-from src.commons.handlers import validators
 from src.commons.config.configuration import configuration
+from src.commons.handlers import validators
 from src.commons.handlers.bbq_authenticated_handler import \
     BbqAuthenticatedHandler
 from src.commons.handlers.json_handler import JsonHandler
@@ -17,11 +17,14 @@ from src.restore.status.restoration_job_status_service import \
 class DatasetRestoreHandler(JsonHandler):
 
     def post(self, project_id, dataset_id):
-        target_project_id = self.request.get('targetProjectId', None)
+        is_restore_to_source_project = self.request.get('isRestoreToSourceProject', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         create_disposition = self.request.get('createDisposition', None)
         write_disposition = self.request.get('writeDisposition', None)
         max_partition_days = self.__get_max_partition_days()
+
+        target_project_id = project_id if is_restore_to_source_project \
+            else configuration.default_restoration_project_id
 
         validators.validate_restore_request_params(
             source_project_id=project_id,

@@ -62,30 +62,6 @@ class TestBackupListRestoreHandler(unittest.TestCase):
         self.assertIn(expected_backup_item_2, passed_backup_items)
 
     @patch.object(BackupListRestoreService, 'restore', return_value="123")
-    def test_should_fail_on_wrong_project_format(self, mocked_restore_service):
-        # given
-        expected_error = '{"status": "failed", "message": "Invalid project ' \
-                         'value: \'project_with_underscore\'. Project IDs may ' \
-                         'contain letters, numbers, and dash", ' \
-                         '"httpStatus": 400}'
-        mocked_restore_service.return_value = {"restorationJobId": "restore_id"}
-
-        # when
-        request_body = "[{\"backupUrlSafeKey\": \"url_safe_key1\"," \
-                       "\"test_param_key\":\"test_value\"}," \
-                       "{\"backupUrlSafeKey\": \"url_safe_key2\"}]"
-        response = self.under_test.post(
-            url='/restore/list?targetProjectId=project_with_underscore',
-            params=request_body,
-            content_type='application/json',
-            expect_errors=True
-        )
-
-        # then
-        self.assertEquals(400, response.status_int)
-        self.assertEquals(response.body, expected_error)
-
-    @patch.object(BackupListRestoreService, 'restore', return_value="123")
     def test_should_fail_on_wrong_dataset_format(self, mocked_restore_service):
         # given
         expected_error = '{"status": "failed", "message": "Invalid dataset ' \
