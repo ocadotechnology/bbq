@@ -1,7 +1,8 @@
 {% macro build_target_information() %}
     <script type="text/javascript">
         window.onload = function prepareTargetProjectIdSelect() {
-            if (document.getElementById('defaultTargetProjectId').value === '') {
+            let defaultTargetProjectId = $( "#defaultTargetProjectId" ).text();
+            if (defaultTargetProjectId === '') {
                 document.getElementById('defaultTargetProjectId').hidden = true;
             }
         }
@@ -14,9 +15,7 @@
         <div class="col-sm-8">
             <select class="form-control" id="isRestoreToSourceProject">
                 <option value="true">Restore to source project</option>
-                <option value="false" id="defaultTargetProjectId">
-                    {{ default_restoration_project_id }}
-                </option>
+                <option value="false" id="defaultTargetProjectId">{{ default_restoration_project_id }}</option>
             </select>
             <small id="isRestoreToSourceProjectHelper"
                    class="form-text text-muted">

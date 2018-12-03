@@ -7,7 +7,7 @@
     <script type="text/javascript">
         function OnSubmitForm() {
             let params = {
-                'restoreToSource': document.getElementById('isRestoreToSourceProject').value ==='true',
+                'isRestoreToSourceProject': document.getElementById('isRestoreToSourceProject').value ==='true',
                 'targetDatasetId': document.getElementById('targetDatasetId').value === ''
                     ? null : document.restoreListForm.targetDatasetId.value,
                 'createDisposition': document.restoreListForm.createDisposition.value,
