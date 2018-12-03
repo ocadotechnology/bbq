@@ -1,13 +1,14 @@
 {% extends "bbq-menu.html" %}
 {% block main %}
+{% from "macros/restore-target-information.html" import build_target_information with context %}
+{% from "macros/restore-options.html" import build_options with context %}
 
     <h2>Restore table</h2>
     <script type="text/javascript">
         function OnSubmitForm() {
             let params = {
-                'targetProjectId': document.getElementById('isRestoreToSource').checked
-                    ? null : document.restoreTableForm.targetProjectId.value,
-                'targetDatasetId': document.getElementById('isRestoreToSource').checked
+                'isRestoreToSourceProject': document.getElementById('isRestoreToSourceProject').value ==='true',
+                'targetDatasetId': document.getElementById('targetDatasetId').value === ''
                     ? null : document.restoreTableForm.targetDatasetId.value,
                 'createDisposition': document.restoreTableForm.createDisposition.value,
                 'writeDisposition': document.restoreTableForm.writeDisposition.value,
@@ -66,7 +67,7 @@
             </label>
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="sourceDatasetId"
-                       name="datasetId" placeholder="dataset id">
+                       name="datasetId" placeholder="dataset id" required>
             </div>
         </div>
         <div class="form-group row">
@@ -75,7 +76,7 @@
             </label>
             <div class="col-sm-8">
                 <input type="text" class="form-control" id="sourceTableId"
-                       name="tableId" placeholder="table id">
+                       name="tableId" placeholder="table id" required>
             </div>
         </div>
         <div class="form-group row">
@@ -97,115 +98,9 @@
                 <h4>Target table information</h4>
             </div>
         </div>
-        <div class="form-group row">
-            <label for="targetProjectId" class="col-sm-2 col-form-label">
-                Restore to source
-            </label>
-            <label class="radio-inline col-sm-1 col-form-label"
-                   id="restoreToSource">
-                <input type="radio" name="optradio" id="isRestoreToSource"
-                       onclick="restoreToSource()"> Yes
-            </label>
-            <label class="radio-inline col-form-label"
-                   id="restoreNotToSource">
-                <input type="radio" name="optradio" checked
-                       onclick="restoreNotToSource()"> No
-            </label>
-            <label class="col-sm-8 col-form-label"></label>
-            <label class="col-sm-2 col-form-label"></label>
-            <small class="form-text text-muted col-sm-8">
-                Will table be restored straightforward into source project?
-            </small>
-        </div>
-        <div class="form-group row">
-            <label for="targetProjectId" class="col-sm-2 col-form-label">
-                Target project id
-            </label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="targetProjectId"
-                       name="targetProjectId" placeholder="source_project_id"
-                       value="{{ default_restoration_project_id }}">
-                <small id="targetProjectIdHelp" class="form-text text-muted">
-                    <b>Optional</b>. Target project id. If not passed,
-                    source project id will be used.
-                </small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="targetDatasetId" class="col-sm-2 col-form-label">
-                Target dataset id
-            </label>
-            <div class="input-group col-sm-8">
-                <input type="text" class="form-control" id="targetDatasetId"
-                       name="targetDatasetId" placeholder="source_dataset_id">
-                <small id="targetDatasetIdHelp" class="form-text text-muted">
-                    <b>Optional</b>. Temporary dataset id that will be used
-                    (and created if does not exist) as container for
-                    restored table. Note that passed dataset could already
-                    exists - it should be in the same location as backup.
-                    If target dataset id is not passed, then source dataset id
-                    value will be used as a target dataset id in restoration
-                    project.
-                </small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col">
-                <h4>Options</h4>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="createDisposition" class="col-sm-2 col-form-label">
-                Create disposition
-            </label>
-            <div class="col-sm-8">
-                <select class="form-control" id="createDisposition"
-                        name="createDisposition">
-                    <option>CREATE_IF_NEEDED</option>
-                    <option>CREATE_NEVER</option>
-                </select>
-                <small id="createDispositionHelp" class="form-text text-muted">
-                    Specifies whether the job is allowed to create new
-                    tables.<br>
+        {{ build_target_information() }}
 
-                    The following values are supported:<br>
-                    <b>CREATE_IF_NEEDED</b>: If the table does not exist,
-                    BigQuery creates the table.<br>
-                    <b>CREATE_NEVER</b>: The table must already exist. If it
-                    does not, a 'notFound' error is
-                    returned in the job result.<br>
-                    The default value is <b>CREATE_IF_NEEDED</b>.
-                </small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="writeDisposition" class="col-sm-2 col-form-label">
-                Write disposition
-            </label>
-            <div class="col-sm-8">
-                <select class="form-control" id="writeDisposition"
-                        name="writeDisposition">
-                    <option>WRITE_EMPTY</option>
-                    <option>WRITE_TRUNCATE</option>
-                    <option>WRITE_APPEND</option>
-                </select>
-                <small id="writeDispositionHelp" class="form-text text-muted">
-                    Specifies the action that occurs if the destination table
-                    already exists.<br>
-
-                    The following values are supported:<br>
-                    <b>WRITE_EMPTY</b>: If the table already exists and contains
-                    data, a 'duplicate' error is
-                    returned in the job result.<br>
-                    <b>WRITE_TRUNCATE</b>: If the table already exists, BigQuery
-                    overwrites the table data.<br>
-                    <b>WRITE_APPEND</b>: If the table already exists, BigQuery
-                    appends the data to the
-                    table.<br>
-                    The default value is <b>WRITE_EMPTY</b>.
-                </small>
-            </div>
-        </div>
+        {{ build_options() }}
         <div class="form-group row">
             <label for="restorationDate" class="col-sm-2 col-form-label">
                 Restoration date

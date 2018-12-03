@@ -15,10 +15,13 @@ class TableRestoreHandler(JsonHandler):
 
     def get(self, project_id, dataset_id, table_id):
         partition_id = self.request.get('partitionId', None)
-        target_project_id = self.request.get('targetProjectId', None)
+        is_restore_to_source_project = self.request.get('isRestoreToSourceProject', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         create_disposition = self.request.get('createDisposition', None)
         write_disposition = self.request.get('writeDisposition', None)
+
+        target_project_id = None if is_restore_to_source_project \
+            else configuration.default_restoration_project_id
 
         validators.validate_restore_request_params(
             target_project_id=target_project_id,
