@@ -19,6 +19,6 @@ class TestSliResultsStreamer(unittest.TestCase):
         # pass
         under_test = SLIResultsStreamer("table1", "dataset1", "project1")
 
-        under_test.stream([{"col1":"val1", "col2":"val2"}], snapshot_marker={"col1":"MARKER", "col2":"MARKER"})
+        under_test.stream([{"col1": "MARKER", "col2": "MARKER"}])
 
-        stream_stats.assert_called_once_with([{"col1":"val1", "col2":"val2"}, {"col1":"MARKER", "col2":"MARKER"}])
+        stream_stats.assert_called_once_with([{"col1": "MARKER", "col2": "MARKER"}])
