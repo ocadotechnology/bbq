@@ -22,13 +22,13 @@ class BackupListRestoreHandler(JsonHandler):
 
     def post(self):
 
-        to_source_project = self.request.get('toSourceProject', None)
+        is_restore_to_source_project = self.request.get('isRestoreToSourceProject', None)
         target_dataset_id = self.request.get('targetDatasetId', None)
         write_disposition = self.request.get('writeDisposition', None)
         create_disposition = self.request.get('createDisposition', None)
 
         target_project_id = None
-        if not to_source_project:
+        if not is_restore_to_source_project:
             target_project_id = configuration.default_restoration_project_id
 
         validators.validate_restore_request_params(

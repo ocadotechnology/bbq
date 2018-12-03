@@ -50,6 +50,9 @@ class DatasetRestoreService(_DatasetRestoreService):
                 target_project_id, target_dataset_id, create_disposition,
                 write_disposition, max_partition_days):
 
+        if target_project_id is None:
+            target_project_id = project_id
+
         if target_dataset_id is None:
             target_dataset_id = dataset_id
 
