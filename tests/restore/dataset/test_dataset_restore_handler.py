@@ -46,7 +46,7 @@ class TestDatasetRestoreHandler(unittest.TestCase):
         response = self.under_test.post(
             '/restore/project/p123/dataset/d123',
             params={
-                'targetProjectId': 'p123',
+                'isRestoreToSourceProject': True,
                 'targetDatasetId': 'td123',
                 'createDisposition': 'CREATE_IF_NEEDED',
                 'writeDisposition': 'WRITE_EMPTY',
@@ -117,17 +117,6 @@ class TestDatasetRestoreHandler(unittest.TestCase):
         response = self.under_test.post('/restore/project/p123/dataset/d123',
                                         params={
                                             'createDisposition': 'BAD_CREATE_DISPOSTION'},
-                                        expect_errors=True)
-
-        # then
-        self.assertEqual(response.status_int, 400)
-
-    @patch.object(uuid, 'uuid4', return_value=123)
-    def test_return_400_if_not_valid_target_project_id(self, _):
-        # when
-        response = self.under_test.post('/restore/project/p123/dataset/d123',
-                                        params={
-                                            'targetProjectId': 'projectwith_'},
                                         expect_errors=True)
 
         # then
