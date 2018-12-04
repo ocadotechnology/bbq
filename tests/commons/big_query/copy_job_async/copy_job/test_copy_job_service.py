@@ -218,6 +218,66 @@ class TestCopyJobService(unittest.TestCase):
             }
         )
 
+    @patch.object(BigQuery, 'insert_job')
+    @patch.object(TaskCreator, 'create_post_copy_action')
+    def test_that_copy_table_should_create_correct_post_copy_action_if_access_denied_http_error_thrown_on_copy_job_creation(
+            self, create_post_copy_action, insert_job):
+        # given
+        http_error_content = "{\"error\": " \
+                             "  {\"errors\": [" \
+                             "    {\"reason\": \"Access Denied\"," \
+                             "     \"message\": \"Access Denied\"" \
+                             "  }]," \
+                             "  \"code\": 403,\"" \
+                             "  message\": \"Access Denied\"}}"
+        insert_job.side_effect = HttpError(Mock(status=403), http_error_content)
+        post_copy_action_request = PostCopyActionRequest(url='/my/url', data={
+            'key1': 'value1'})
+        request = CopyJobRequest(
+            task_name_suffix='task_name_suffix',
+            copy_job_type_id='test-process',
+            source_big_query_table=self.example_source_bq_table,
+            target_big_query_table=self.example_target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
+            retry_count=0,
+            post_copy_action_request=post_copy_action_request
+        )
+
+        # when
+        CopyJobService().run_copy_job_request(request)
+
+        # then
+        create_post_copy_action.assert_called_once_with(
+            copy_job_type_id='test-process',
+            post_copy_action_request=post_copy_action_request,
+            job_json={
+                'status': {
+                    'state': 'DONE',
+                    'errors': [
+                        {
+                            'reason': 'invalid',
+                            'message': 'Job not scheduled'
+                        }
+                    ]
+                },
+                'configuration': {
+                    'copy': {
+                        'sourceTable': {
+                            'projectId': self.example_source_bq_table.get_project_id(),
+                            'tableId': self.example_source_bq_table.get_table_id(),
+                            'datasetId': self.example_source_bq_table.get_dataset_id()
+                        },
+                        'destinationTable': {
+                            'projectId': self.example_target_bq_table.get_project_id(),
+                            'tableId': self.example_target_bq_table.get_table_id(),
+                            'datasetId': self.example_target_bq_table.get_dataset_id()
+                        }
+                    }
+                }
+            }
+        )
+
     @patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata')
     @patch.object(TaskCreator, 'create_copy_job_result_check')
     @patch.object(CopyJobService, '_create_random_job_id',
