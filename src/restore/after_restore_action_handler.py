@@ -1,13 +1,12 @@
-import json
 
 import webapp2
 from google.appengine.ext import ndb
 
-from src.commons.exceptions import JsonNotParseableException, \
-    WrongJsonFormatException
+from src.commons.exceptions import WrongJsonFormatException
 from src.commons.handlers.json_handler import JsonHandler
 from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
 from src.commons.config.configuration import configuration
+from src.commons.handlers.json_request_helper import JsonRequestHelper
 from src.restore.datastore.restore_item import RestoreItem
 
 
@@ -16,7 +15,7 @@ class AfterRestoreActionHandler(JsonHandler):
         super(AfterRestoreActionHandler, self).__init__(request, response)
 
     def post(self, **_):
-        request_body_json = self.__parse_request_body()
+        request_body_json = JsonRequestHelper.parse_request_body(self.request.body)
         self.__validate_json(request_body_json)
 
         url_safe_key = request_body_json.get('data').get('restoreItemKey')
@@ -30,12 +29,6 @@ class AfterRestoreActionHandler(JsonHandler):
             RestoreItem.update_with_done(restore_item_key)
 
         self._finish_with_success()
-
-    def __parse_request_body(self):
-        try:
-            return json.loads(self.request.body)
-        except ValueError, e:
-            raise JsonNotParseableException(e.message)
 
     @staticmethod
     def __validate_json(request_json):
