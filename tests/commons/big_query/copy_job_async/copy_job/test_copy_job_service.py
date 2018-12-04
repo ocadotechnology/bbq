@@ -220,10 +220,17 @@ class TestCopyJobService(unittest.TestCase):
 
     @patch.object(BigQuery, 'insert_job')
     @patch.object(TaskCreator, 'create_post_copy_action')
-    def test_that_copy_table_should_create_correct_post_copy_action_if_403_http_error_thrown_on_copy_job_creation(
+    def test_that_copy_table_should_create_correct_post_copy_action_if_access_denied_http_error_thrown_on_copy_job_creation(
             self, create_post_copy_action, insert_job):
         # given
-        insert_job.side_effect = HttpError(Mock(status=403), 'Forbidden')
+        http_error_content = "{\"error\": " \
+                             "  {\"errors\": [" \
+                             "    {\"reason\": \"Access Denied\"," \
+                             "     \"message\": \"Access Denied\"" \
+                             "  }]," \
+                             "  \"code\": 403,\"" \
+                             "  message\": \"Access Denied\"}}"
+        insert_job.side_effect = HttpError(Mock(status=403), http_error_content)
         post_copy_action_request = PostCopyActionRequest(url='/my/url', data={
             'key1': 'value1'})
         request = CopyJobRequest(
