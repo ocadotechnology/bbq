@@ -9,7 +9,8 @@ class LatencyViolationSliHandler(webapp2.RequestHandler):
     def post(self):
         json_data = JsonRequestHelper.parse_request_body(self.request.body)
         json_table = json_data['table']
-        LatencyViolationSliService.check_and_stream_violation(json_table)
+        x_days = json_data['x_days']
+        LatencyViolationSliService(x_days).check_and_stream_violation(json_table)
 
 
 app = webapp2.WSGIApplication([

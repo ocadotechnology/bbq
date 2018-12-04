@@ -42,7 +42,7 @@ class LatencySliService(object):
                 Task(
                     method='POST',
                     url='/sli/latency/violation',
-                    payload=json.dumps({'table': table}),
+                    payload=json.dumps({'table': table, 'x_days': self.x_days}),
                     headers={'Content-Type': 'application/json'}
                 )
             )
