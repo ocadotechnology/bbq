@@ -141,5 +141,4 @@ class BackupListRestoreService(object):
             target_dataset_id = source_entity.dataset_id
         return TableReference(target_project_id,
                               target_dataset_id,
-                              source_entity.table_id,
-                              source_entity.partition_id)
+                              source_entity.table_id)
