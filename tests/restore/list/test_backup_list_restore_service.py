@@ -66,7 +66,6 @@ class TestBackupListRestoreService(unittest.TestCase):
             "target_project_id",
             "target_dataset_id",
             "source_table_id",
-            "source_partition_id"
         )
         expected_restore_item = RestoreItem.create(
             expected_source_table_reference,
@@ -116,7 +115,6 @@ class TestBackupListRestoreService(unittest.TestCase):
             "source_project_id",
             "source_dataset_id",
             "source_table_id",
-            "source_partition_id"
         )
         expected_restore_item = RestoreItem.create(
             expected_source_table_reference, expected_target_table_reference
