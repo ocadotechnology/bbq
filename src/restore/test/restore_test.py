@@ -1,14 +1,16 @@
 import json
 import logging
+
 from datetime import datetime
 
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.config.configuration import configuration
-from src.commons.google_cloud_storage_client import GoogleCloudStorageClient as gcs
+from src.commons.google_cloud_storage_client import \
+    GoogleCloudStorageClient as gcs
+from src.commons.table_reference import TableReference
 from src.restore.test.table_randomizer import TableRandomizer
 from src.restore.test.table_restore_invoker import TableRestoreInvoker
-from src.commons.table_reference import TableReference
 
 RESTORE_DATASET_ID_US = 'smoke_test_US'
 RESTORE_DATASET_ID_EU = 'smoke_test_EU'
@@ -32,10 +34,13 @@ class RestoreTest(object):
         table_has_been_restored = response["status"]["result"] == "Success"
 
         if table_has_been_restored:
-            response = self.__check_restored_table_matches_source(response,
-                                                                  source_table)
-            BigQuery().delete_table(table_reference)
-            return response
+            result = self.__check_restored_table_matches_source(response,
+                                                                source_table)
+
+            target_table_reference = self.__get_target_tab_ref(response)
+            BigQuery().delete_table(target_table_reference)
+
+            return result
         else:
             resp_msg = "Restore test failed. " \
                        "Failed to restore a table {}".format(table_reference)
@@ -48,13 +53,9 @@ class RestoreTest(object):
             else RESTORE_DATASET_ID_US
 
     def __check_restored_table_matches_source(self, response, src_table):
-        restoration_items = response["restorationItems"]
-        assert len(restoration_items) == 1
-
-        target_table_reference = \
-            TableReference.parse_tab_ref(restoration_items[0]['targetTable'])
-        target_table = BigQueryTableMetadata.get_table_by_reference(
-            target_table_reference)
+        target_table_reference = self.__get_target_tab_ref(response)
+        target_table = \
+            BigQueryTableMetadata.get_table_by_reference(target_table_reference)
 
         tables_match, assertion_msg = \
             self.__assert_restored_table_matches_source(src_table, target_table)
@@ -70,6 +71,12 @@ class RestoreTest(object):
                        "table. {0} {1}".format(assertion_msg, response)
             self.__save_test_status(source_table_reference, False, response)
             raise Exception(resp_msg)
+
+    @staticmethod
+    def __get_target_tab_ref(response):
+        restoration_items = response["restorationItems"]
+        assert len(restoration_items) == 1
+        return TableReference.parse_tab_ref(restoration_items[0]['targetTable'])
 
     @staticmethod
     def __pick_random_table():

@@ -1,10 +1,9 @@
 import json
 import unittest
 
+import webtest
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
-
-import webtest
 from mock import patch
 
 from src.commons.big_query.big_query import BigQuery
@@ -14,7 +13,6 @@ from src.commons.table_reference import TableReference
 from src.restore.test import restore_test_handler
 from src.restore.test.table_randomizer import TableRandomizer
 from src.restore.test.table_restore_invoker import TableRestoreInvoker
-
 
 example_table = {
     'tableReference': {
@@ -229,12 +227,6 @@ class TestRestoreTestHandler(unittest.TestCase):
     def test_handler_delete_restored_table_after_success(
             self, _, _1, _2, _create_http, wait_till_done, delete_table):
         # given
-        table_reference = TableReference(
-            project_id=example_table['tableReference']["projectId"],
-            dataset_id=example_table['tableReference']["datasetId"],
-            table_id=example_table['tableReference']["tableId"],
-        )
-
         endpoint_invoke_result = HttpMockSequence([(
             {'status': '200'}, json.dumps({
                 "restorationJobId": "64c6e50c-b511-43eb-ba75-f44f3d131f84"}))])
@@ -246,4 +238,6 @@ class TestRestoreTestHandler(unittest.TestCase):
 
         # then
         self.assertEquals(200, response.status_int)
-        delete_table.assert_called_with(table_reference)
+        delete_table.assert_called_with(TableReference('target-project',
+                                                       'target_dataset',
+                                                       'target_table'))
