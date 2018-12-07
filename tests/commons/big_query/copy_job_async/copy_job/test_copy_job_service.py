@@ -196,8 +196,10 @@ class TestCopyJobService(unittest.TestCase):
                     'state': 'DONE',
                     'errors': [
                         {
-                            'reason': 'invalid',
-                            'message': 'Job not scheduled'
+                            'reason': '404',
+                            'message': (
+                                "404 while creating Copy Job from {} to {}".format(
+                                    self.example_source_bq_table, self.example_target_bq_table))
                         }
                     ]
                 },
@@ -256,8 +258,10 @@ class TestCopyJobService(unittest.TestCase):
                     'state': 'DONE',
                     'errors': [
                         {
-                            'reason': 'invalid',
-                            'message': 'Job not scheduled'
+                            'reason': 'Access Denied',
+                            'message': (
+                                "Access Denied while creating Copy Job from {} to {}".format(
+                                    self.example_source_bq_table, self.example_target_bq_table))
                         }
                     ]
                 },
