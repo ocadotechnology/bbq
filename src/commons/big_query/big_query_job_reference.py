@@ -1,3 +1,8 @@
+from src.commons.big_query.copy_job_async.result_check.result_check_request import \
+    ResultCheckRequest
+from src.commons.big_query.copy_job_async.task_creator import TaskCreator
+
+
 class BigQueryJobReference(object):
     def __init__(self, project_id, job_id, location):
         self.project_id = project_id
@@ -19,3 +24,14 @@ class BigQueryJobReference(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def create_post_copy_action(self, copy_job_request):
+        TaskCreator.create_copy_job_result_check(
+            ResultCheckRequest(
+                task_name_suffix=copy_job_request.task_name_suffix,
+                copy_job_type_id=copy_job_request.copy_job_type_id,
+                job_reference=self,
+                retry_count=copy_job_request.retry_count,
+                post_copy_action_request=copy_job_request.post_copy_action_request
+            )
+        )

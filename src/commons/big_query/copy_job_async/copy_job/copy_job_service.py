@@ -3,11 +3,8 @@ import uuid
 
 from apiclient.errors import HttpError
 
-from src.commons.big_query.copy_job_async.copy_job_error import CopyJobError
-from src.commons.big_query.copy_job_async.result_check.result_check_request import \
-    ResultCheckRequest
-from src.commons.big_query.copy_job_async.task_creator import TaskCreator
 from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_job_error import BigQueryJobError
 from src.commons.big_query.big_query_job_reference import BigQueryJobReference
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.decorators.retry import retry
@@ -19,34 +16,15 @@ class CopyJobService(object):
     def run_copy_job_request(copy_job_request):
         source_big_query_table = copy_job_request.source_big_query_table
         target_big_query_table = copy_job_request.target_big_query_table
-        retry_count = copy_job_request.retry_count
 
-        result = CopyJobService.__schedule(
+        copy_job_result = CopyJobService.__schedule(
             source_big_query_table=source_big_query_table,
             target_big_query_table=target_big_query_table,
             job_id=CopyJobService._create_random_job_id(),
             create_disposition=copy_job_request.create_disposition,
             write_disposition=copy_job_request.write_disposition)
 
-        if isinstance(result, BigQueryJobReference):
-            TaskCreator.create_copy_job_result_check(
-                ResultCheckRequest(
-                    task_name_suffix=copy_job_request.task_name_suffix,
-                    copy_job_type_id=copy_job_request.copy_job_type_id,
-                    job_reference=result,
-                    retry_count=retry_count,
-                    post_copy_action_request=copy_job_request.post_copy_action_request
-                )
-            )
-        else:
-            assert isinstance(result, CopyJobError)
-            logging.error('Schedule of Copy Job from %s to %s failed' % (source_big_query_table, target_big_query_table))
-            if copy_job_request.post_copy_action_request is not None:
-                TaskCreator.create_post_copy_action(
-                    copy_job_type_id=copy_job_request.copy_job_type_id,
-                    post_copy_action_request=copy_job_request.post_copy_action_request,
-                    job_json=result.to_json()
-                )
+        copy_job_result.create_post_copy_action(copy_job_request)
 
     @staticmethod
     @retry(Exception, tries=6, delay=2, backoff=2)
@@ -81,9 +59,9 @@ class CopyJobService(object):
             logging.info("Successfully insert: %s", job_reference)
             return job_reference
         except HttpError as bq_error:
-            copy_job_error = CopyJobError(bq_error,
-                                          source_big_query_table,
-                                          target_big_query_table)
+            copy_job_error = BigQueryJobError(bq_error,
+                                              source_big_query_table,
+                                              target_big_query_table)
             if copy_job_error.should_be_retried():
                 logging.warning(copy_job_error)
                 return BigQueryJobReference(

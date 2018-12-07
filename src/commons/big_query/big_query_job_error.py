@@ -1,4 +1,9 @@
-class CopyJobError(object):
+import logging
+
+from src.commons.big_query.copy_job_async.task_creator import TaskCreator
+
+
+class BigQueryJobError(object):
     def __init__(self, bq_error, source_bq_table, target_bq_table):
         self.bq_error = bq_error
         self.source_bq_table = source_bq_table
@@ -8,6 +13,15 @@ class CopyJobError(object):
     def __str__(self):
         return "{} while creating Copy Job from {} to {}" \
             .format(self.reason, self.source_bq_table, self.target_bq_table)
+
+    def create_post_copy_action(self, copy_job_request):
+        logging.error(self)
+        if copy_job_request.post_copy_action_request is not None:
+            TaskCreator.create_post_copy_action(
+                copy_job_type_id=copy_job_request.copy_job_type_id,
+                post_copy_action_request=copy_job_request.post_copy_action_request,
+                job_json=self.__create_post_copy_job_json()
+            )
 
     def should_be_retried(self):
         if self.__is_access_denied() or self.__is_404():
@@ -37,7 +51,7 @@ class CopyJobError(object):
         else:
             return 'Unknown reason'
 
-    def to_json(self):
+    def __create_post_copy_job_json(self):
         return {
             "status": {
                 "state": "DONE",
