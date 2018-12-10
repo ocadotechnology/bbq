@@ -8,11 +8,12 @@ class BigQueryJobError(object):
         self.bq_error = bq_error
         self.source_bq_table = source_bq_table
         self.target_bq_table = target_bq_table
-        self.reason = self.__get_reason()
+        self.full_reason = bq_error._get_reason()
+        self.short_reason = self.__get_short_reason()
 
     def __str__(self):
         return "{} while creating Copy Job from {} to {}" \
-            .format(self.reason, self.source_bq_table, self.target_bq_table)
+            .format(self.short_reason, self.source_bq_table, self.target_bq_table)
 
     def create_post_copy_action(self, copy_job_request):
         logging.error(self)
@@ -32,8 +33,9 @@ class BigQueryJobError(object):
             raise self.bq_error
 
     def __is_access_denied(self):
-        return self.bq_error.resp.status == 403 and \
-               'Access Denied' in self.reason
+        result = self.bq_error.resp.status == 403 and \
+                 self.full_reason.find('Access Denied') != -1
+        return result
 
     def __is_404(self):
         return self.bq_error.resp.status == 404
@@ -41,7 +43,7 @@ class BigQueryJobError(object):
     def __is_409(self):
         return self.bq_error.resp.status == 409
 
-    def __get_reason(self):
+    def __get_short_reason(self):
         if self.__is_access_denied():
             return 'Access Denied'
         elif self.__is_404():
@@ -57,7 +59,7 @@ class BigQueryJobError(object):
                 "state": "DONE",
                 "errors": [
                     {
-                        "reason": self.reason,
+                        "reason": self.short_reason,
                         "message": self.__str__()
                     }
                 ]
