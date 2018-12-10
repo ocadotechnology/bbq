@@ -33,7 +33,7 @@ class BigQueryJobError(object):
 
     def __is_access_denied(self):
         return self.bq_error.resp.status == 403 and \
-               self.bq_error._get_reason().startswith('Access Denied')
+               'Access Denied' in self.reason
 
     def __is_404(self):
         return self.bq_error.resp.status == 404
