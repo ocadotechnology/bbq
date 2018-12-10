@@ -196,7 +196,7 @@ class TestCopyJobService(unittest.TestCase):
                     'state': 'DONE',
                     'errors': [
                         {
-                            'reason': '404',
+                            'reason': 'Invalid',
                             'message': (
                                 "404 while creating Copy Job from {} to {}".format(
                                     self.example_source_bq_table, self.example_target_bq_table))
@@ -258,7 +258,7 @@ class TestCopyJobService(unittest.TestCase):
                     'state': 'DONE',
                     'errors': [
                         {
-                            'reason': 'Access Denied',
+                            'reason': 'Invalid',
                             'message': (
                                 "Access Denied while creating Copy Job from {} to {}".format(
                                     self.example_source_bq_table, self.example_target_bq_table))

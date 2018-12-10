@@ -59,7 +59,7 @@ class BigQueryJobError(object):
                 "state": "DONE",
                 "errors": [
                     {
-                        "reason": self.short_reason,
+                        "reason": 'Invalid',
                         "message": self.__str__()
                     }
                 ]
