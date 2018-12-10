@@ -260,8 +260,7 @@ class TestDatasetRestoreItemsGenerator(TestCase):
             custom_target_dataset)
         expected_target = TableReference(project_id=target_project_id,
                                          dataset_id=target_dataset,
-                                         table_id=table.table_id,
-                                         partition_id=table.partition_id)
+                                         table_id=table.table_id)
         expected_restore_item = RestoreItem.create(expected_source,
                                                    expected_target)
         return expected_restore_item
