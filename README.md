@@ -73,7 +73,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 BBQ consists of:
 - multiple source projects - data of those projects will be backed up,
 - BBQ project - main project where GAE runs and backups are stored,
-- restoration project - into which data is restored.
+- (optionally) default restoration project - BBQ will restore data into that project by default if provided in [config.yaml](./config/config.yaml).  
 
 BBQ allows to perform 3 operations:
 - backups - create backup tables of source tables,
