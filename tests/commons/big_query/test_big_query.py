@@ -160,6 +160,12 @@ class TestBigQuery(unittest.TestCase):
         # when then
         BigQuery().create_dataset("project123", "dataset_id", "US")
 
+    def test_create_dataset_do_nothing_if_access_denied(self):
+        # given
+        self._create_http.return_value = self.__create_access_denied_response()
+        # when then
+        BigQuery().create_dataset("project123", "dataset_id", "US")
+
     @staticmethod
     def count(generator):
         return sum(1 for _ in generator)
@@ -358,3 +364,11 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_v2_test_schema.json')),
             ({'status': '409'},
              content('tests/json_samples/bigquery_dataset_create.json')), ])
+
+    @staticmethod
+    def __create_access_denied_response():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '403'},
+             content('tests/json_samples/bigquery_access_denied.json')), ])
