@@ -57,7 +57,8 @@ In such scenario we're not able to restore data using BigQuery build-in features
 * [external data sources](https://cloud.google.com/bigquery/external-data-sources),
 * Views (you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that),
 * Dataset/table labels as they are not copied by BigQuery copy job (again, you can use [GCP Census](https://github.com/ocadotechnology/gcp-census) for that)
-* Empty partitioned tables without any partitions. 
+* Empty partitioned tables without any partitions.
+* Clustered partitioned table. 
 
 ### Known caveats
 * Modification of table metadata (including table description) qualifies table to be backed up at the next cycle. It can be a problem for partitioned tables, where such change updates last modified time in every partition. Then BBQ will backup all partitions again, even though there was no actually change in partition data,
@@ -72,7 +73,7 @@ In such scenario we're not able to restore data using BigQuery build-in features
 BBQ consists of:
 - multiple source projects - data of those projects will be backed up,
 - BBQ project - main project where GAE runs and backups are stored,
-- restoration project - into which data is restored.
+- (optionally) default restoration project - BBQ will restore data into that project by default if provided in [config.yaml](./config/config.yaml).  
 
 BBQ allows to perform 3 operations:
 - backups - create backup tables of source tables,
@@ -98,15 +99,15 @@ Every partition in partitioned table is treated as separate table (i.e. BBQ copi
 
 ## Restore process
 
-Backups are restored in a separate GCP project. BBQ doesn't restore data into original source project for 2 reasons:
-* security - BBQ should have read-only access to production data to minimise risk of loosing both production and backup data,
-* consistency - BBQ doesn't know if restored data should append or replace source data. It's up to the user to finish restoration based on his specific needs.
-
 There are few ways in which you may restore data:
-* restoring whole dataset by specifying project and dataset name. Most recent backups of tables in this dataset will be restored,
+* restoring whole dataset. Most recent backups of tables in this dataset will be restored,
 * restoring table by providing specific backup version. List of backups can be provided as input.
 
-Restored data will automatically expire after 7 days (target dataset is created with table default expiration).
+BBQ supports restoring data only into original source project or default restoration project provided in [config.yaml](./config/config.yaml). 
+Both of them requires to assign BBQ Service Account appropriate IAM role that allows to manage Big Query data. 
+It is also possible to set write and create disposition that specifies whether BBQ should append or replace source data.
+
+As appending or replacing production data is super risky it is highly recommended to do it carefully, giving BBQ write access to source project should be temporary!
 
 ### Example of restoring selected partitions from partitioned table 
 ![Restore process](docs/images/bbq_restore_process.gif)
