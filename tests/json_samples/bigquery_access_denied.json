@@ -1,0 +1,13 @@
+{
+  "error": {
+    "errors": [
+      {
+        "domain": "global",
+        "reason": "Access Denied",
+        "message": "Access Denied: ...."
+      }
+    ],
+    "code": 403,
+    "message": "Access Denied: ...."
+  }
+}

@@ -292,11 +292,19 @@ class BigQuery(object):
                 projectId=project_id, body=body
             ).execute()
         except HttpError as error:
-            if error.resp.status == 409:
+            if self.__is_access_denied(error):
+                logging.warning('Access Denied, can not create dataset %s:%s',
+                                project_id, dataset_id)
+            elif error.resp.status == 409:
                 logging.info('Dataset %s / %s already exists',
                              project_id, dataset_id)
             else:
                 raise
+
+    @staticmethod
+    def __is_access_denied(error):
+        return error.resp.status == 403 and \
+               error._get_reason().find('Access Denied') != -1
 
     @retry(Error, tries=6, delay=2, backoff=2)
     def delete_table(self, table_reference):
