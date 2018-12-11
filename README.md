@@ -106,7 +106,7 @@ BBQ supports restoring data only into original source project or default restora
 Both of them requires to assign BBQ Service Account appropriate IAM role that allows to manage Big Query data. 
 It is also possible to set write and create disposition that specifies whether BBQ should append or replace source data.
 
-As appending or replacing production data is super risky it is highly recommended to do it carefully!
+As appending or replacing production data is super risky it is highly recommended to do it carefully, giving BBQ write access to source project should be temporary!
 
 ### Example of restoring selected partitions from partitioned table 
 ![Restore process](docs/images/bbq_restore_process.gif)
