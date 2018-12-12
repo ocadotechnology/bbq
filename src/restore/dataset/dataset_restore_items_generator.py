@@ -34,6 +34,7 @@ class DatasetRestoreItemsGenerator(object):
                         target_project_id,
                         target_dataset_id,
                         table_entity.table_id,
+                        table_entity.partition_id
                     )
 
                     restore_item = RestoreItem.create(source_table_reference,
