@@ -73,7 +73,7 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
   * **custom_project_list** - list of projects to backup. If empty, BBQ will backup everything it has read (**BigQuery Data Viewer**) access to. If list is provided you still need to grant **BigQuery Data Viewer** role to BBQ service account for each mentioned project.
   * **projects_to_skip** - list of projects to skip (it's highly recommended to skip the project where BBQ runs and backups are stored). Common practice is to grant **BigQuery Data Viewer** to BBQ service account for the whole organization or folder and then exclude some of the projects.
   * **backup_project_id** - project id where backups will be stored (it usually is the same project on which BBQ runs)
-  * **restoration_project_id** - project into which data will be restored during restoration process
+  * **default_restoration_project_id** - project into which data will be restored by default during the restoration process
 
 
 ### Local environment setup
