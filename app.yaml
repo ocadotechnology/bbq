@@ -126,3 +126,7 @@ handlers:
   script: src.restore.restore_ui_handler.app
   secure: always
   login: admin
+- url: /cleanup/orphaned/backup
+  script: src.cleanup.bigquery.orphaned_backup_gc_handler.app
+  secure: always
+  login: admin

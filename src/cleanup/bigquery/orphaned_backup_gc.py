@@ -12,12 +12,10 @@ class OrphanedBackupGC(object):
 
     def cleanup_orphaned_backups(self):
         query = self.big_query.create_orphaned_backups_query(configuration.backup_project_id)
-        print query
         results = self.big_query.execute_query(query)
         logging.info('cleanup orphaned backups query finished with success.'
                      ' Start of deletion found tables is about to begin.')
         formatted_results = self.__format_query_results(results)
-        print(formatted_results)
         self.__delete_orphaned_tables(formatted_results)
         logging.info('finished cleanup process of orphaned backups')
 

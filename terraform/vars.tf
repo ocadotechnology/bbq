@@ -63,3 +63,7 @@ variable "SLI_history_dataset" {
 variable "SLI_views_location" {
   default = "EU"
 }
+
+variable "orhpaned_backups_views_dataset" {
+  default = "orphaned_backups_views"
+}
