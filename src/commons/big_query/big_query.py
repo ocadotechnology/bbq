@@ -348,14 +348,8 @@ class BigQuery(object):
 
     @staticmethod
     def create_orphaned_backups_query(project_id):
-        return "SELECT tableId, datasetId, projectId "\
-               "FROM [ocado-gcp-metadata:bigquery_view.table_metadata_deduplicated_aggregated] "\
-               "WHERE projectId = '{0}' "\
-               "AND tableId LIKE '201%' "\
-               "AND tableId "\
-               "NOT IN (SELECT backup_table_id "\
-               "FROM [{0}:datastore_export_views_legacy.all_backups])"\
-               .format(project_id)
+        return "SELECT * FROM [{0}:orphaned_backups_views.orphaned_backups_view]"\
+                .format(project_id)
 
 
 class RandomizationError(BaseException):
