@@ -119,6 +119,7 @@ resource "google_bigquery_table" "SLI_quality" {
             WHERE
               (source_table.numBytes != last_backup_in_census.backup_num_bytes
                 OR source_table.numRows != last_backup_in_census.backup_num_rows)
+              OR last_backup_in_census.backup_num_bytes IS NULL
         EOF
     use_legacy_sql = true
   }
