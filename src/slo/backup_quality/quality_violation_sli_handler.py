@@ -9,7 +9,7 @@ class ViolationSliHandler(webapp2.RequestHandler):
     def post(self):
         json_data = JsonRequestHelper.parse_request_body(self.request.body)
         json_table = json_data['table']
-        QualityViolationSliService.check_and_stream_violation(json_table)
+        QualityViolationSliService().check_and_stream_violation(json_table)
 
 
 app = webapp2.WSGIApplication([

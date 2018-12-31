@@ -49,8 +49,8 @@ resource "google_bigquery_table" "last_backup_in_census" {
               last_backup.source_partition_id AS source_partition_id,
               last_backup.backup_last_modified AS backup_entity_last_modified_time,
               last_backup.backup_num_bytes AS backup_entity_num_bytes,
-              census.datasetId AS backup_dataset_id,
-              census.tableId AS backup_table_id,
+              last_backup.backup_dataset_id AS backup_dataset_id,
+              last_backup.backup_table_id AS backup_table_id,
               census.lastModifiedTime as backup_last_modified,
               census.numBytes AS backup_num_bytes,
               census.numRows AS backup_num_rows
@@ -117,9 +117,10 @@ resource "google_bigquery_table" "SLI_quality" {
               AND source_table.tableId=last_backup_in_census.source_table_id
               AND source_table.partitionId=last_backup_in_census.source_partition_id
             WHERE
-              (source_table.numBytes != last_backup_in_census.backup_num_bytes
-                OR source_table.numRows != last_backup_in_census.backup_num_rows)
-              OR last_backup_in_census.backup_num_bytes IS NULL
+              last_backup_in_census.backup_table_id IS NOT NULL
+              AND (source_table.numBytes != last_backup_in_census.backup_num_bytes
+                   OR source_table.numRows != last_backup_in_census.backup_num_rows
+                   OR last_backup_in_census.backup_num_bytes IS NULL)
         EOF
     use_legacy_sql = true
   }
