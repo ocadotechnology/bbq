@@ -14,9 +14,9 @@ class SLITableNewerModificationPredicate(object):
     def is_modified_since_last_census_snapshot(self, sli_table_entry):
         table_reference = QualityQuerySpecification.to_table_reference(sli_table_entry)
         table = self.big_query.get_table(
-            project_id=table_reference.project_id,
-            dataset_id=table_reference.dataset_id,
-            table_id=table_reference.table_id)
+            project_id=table_reference.get_project_id(),
+            dataset_id=table_reference.get_dataset_id(),
+            table_id=table_reference.get_table_id_with_partition_id())
         table_metadata = BigQueryTableMetadata(table)
 
         is_table_modified = table_metadata.get_last_modified_datetime() > datetime.datetime.utcfromtimestamp(sli_table_entry["lastModifiedTime"])

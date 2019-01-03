@@ -1,7 +1,6 @@
 import logging
 
 from src.commons.big_query.big_query import BigQuery
-from src.slo.backup_quality.predicate.sli_bq_backup_exists_predicate import SLIBQBackupExistsPredicate
 from src.slo.predicate.sli_table_exists_predicate import \
     SLITableExistsPredicate
 from src.slo.backup_quality.quality_query_specification import \
@@ -24,7 +23,6 @@ class QualityViolationSliService(object):
         )
         self.table_newer_modification_predicate = SLITableNewerModificationPredicate(big_query)
         self.table_existence_predicate = SLITableExistsPredicate(big_query, QualityQuerySpecification)
-        self.bq_backup_existence_predicate = SLIBQBackupExistsPredicate()
 
     def check_and_stream_violation(self, json_table):
         if self.__should_stay_as_sli_violation(json_table):
@@ -33,8 +31,6 @@ class QualityViolationSliService(object):
 
     def __should_stay_as_sli_violation(self, table):
         try:
-            if not self.bq_backup_existence_predicate.exists(table):
-                return True
             if not self.table_existence_predicate.exists(table):
                 return False
             return not self.table_newer_modification_predicate.is_modified_since_last_census_snapshot(table)
