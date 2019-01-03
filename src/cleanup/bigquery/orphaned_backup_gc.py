@@ -11,7 +11,7 @@ class OrphanedBackupGC(object):
         self.big_query = BigQuery()
 
     def cleanup_orphaned_backups(self):
-        query = self.big_query.create_orphaned_backups_query(configuration.backup_project_id)
+        query = self.__create_orphaned_backups_query(configuration.backup_project_id)
         results = self.big_query.execute_query(query)
         logging.info('cleanup orphaned backups query finished with success.'
                      ' Start of deletion found tables is about to begin.')
@@ -28,3 +28,7 @@ class OrphanedBackupGC(object):
                                             result['f'][0]['v']
                                             ) for result in results]
         return formatted_results
+
+    def __create_orphaned_backups_query(self, project_id):
+        return "SELECT * FROM [{0}:orphaned_backups_views.orphaned_backups_view]"\
+                .format(project_id)
