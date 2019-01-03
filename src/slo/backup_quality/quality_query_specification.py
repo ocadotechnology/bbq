@@ -18,13 +18,13 @@ class QualityQuerySpecification(object):
                               "backupDatasetId": result['f'][4]['v'],
                               "backupTableId": result['f'][5]['v'],
                               "lastModifiedTime": float(result['f'][6]['v']),
-                              "backupLastModifiedTime": float(result['f'][7]['v']),
+                              "backupLastModifiedTime": float(result['f'][7]['v']) if result['f'][7]['v'] is not None else None,
                               "backupEntityLastModifiedTime": float(result['f'][8]['v']),
                               "numBytes": int(result['f'][9]['v']),
-                              "backupNumBytes": int(result['f'][10]['v']),
+                              "backupNumBytes": int(result['f'][10]['v']) if result['f'][10]['v'] is not None else None,
                               "backupEntityNumBytes": int(result['f'][11]['v']),
                               "numRows": int(result['f'][12]['v']),
-                              "backupNumRows": int(result['f'][13]['v'])
+                              "backupNumRows": int(result['f'][13]['v']) if result['f'][13]['v'] is not None else None,
                               } for result in results]
         return formatted_results
 
