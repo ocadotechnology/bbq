@@ -16,5 +16,4 @@ cron:
     job_retry_limit: 5
 - description: execute cleanup of orphaned backups from Big Query
   url: /cleanup/orphaned/backup
-  schedule: 1 of month 23:00
-  timezone: Europe/Warsaw
+  schedule: every monday 09:00

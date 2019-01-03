@@ -34,6 +34,8 @@ resource "google_bigquery_table" "orphaned_backups" {
           AND
             tableId LIKE "20%"
           AND
+            lastModifiedTime < DATE_ADD(CURRENT_DATE(), -7, "DAY")
+          AND
             tableId NOT IN (SELECT backup_table_id
           FROM
             [${var.bbq_project}:datastore_export_views_legacy.all_backups])

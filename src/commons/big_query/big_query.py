@@ -346,11 +346,6 @@ class BigQuery(object):
             tableId=table_id,
             body=table_data).execute()
 
-    @staticmethod
-    def create_orphaned_backups_query(project_id):
-        return "SELECT * FROM [{0}:orphaned_backups_views.orphaned_backups_view]"\
-                .format(project_id)
-
 
 class RandomizationError(BaseException):
     pass
