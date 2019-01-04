@@ -117,7 +117,8 @@ resource "google_bigquery_table" "SLI_quality" {
               AND source_table.tableId=last_backup_in_census.source_table_id
               AND source_table.partitionId=last_backup_in_census.source_partition_id
             WHERE
-              last_backup_in_census.backup_table_id IS NOT NULL
+              DATEDIFF(CURRENT_TIMESTAMP(), backup_entity_last_modified_time)>=3
+              AND last_backup_in_census.backup_table_id IS NOT NULL
               AND (source_table.numBytes != last_backup_in_census.backup_num_bytes
                    OR source_table.numRows != last_backup_in_census.backup_num_rows
                    OR last_backup_in_census.backup_num_bytes IS NULL)
