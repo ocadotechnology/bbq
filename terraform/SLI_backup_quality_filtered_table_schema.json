@@ -50,8 +50,8 @@
   {
     "name": "backupLastModifiedTime",
     "type": "TIMESTAMP",
-    "mode": "REQUIRED",
-    "description": "date of last modification (from GCP Census) that will be included in the Backup (copyJob start time - as it is atomic operation and every change before that point is included in copy)"
+    "mode": "NULLABLE",
+    "description": "date of last modification (from GCP Census) of backup table"
   },
   {
     "name": "backupEntityLastModifiedTime",
@@ -68,7 +68,7 @@
   {
     "name": "backupNumBytes",
     "type": "INTEGER",
-    "mode": "REQUIRED",
+    "mode": "NULLABLE",
     "description": "Number of bytes of table backup (from GCP Census)"
   },
   {
@@ -86,7 +86,7 @@
   {
     "name": "backupNumRows",
     "type": "INTEGER",
-    "mode": "REQUIRED",
+    "mode": "NULLABLE",
     "description": "Number of rows of table backup (from GCP Census)"
   }
 ]

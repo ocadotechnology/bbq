@@ -30,7 +30,9 @@ class QualityQuerySpecification(object):
 
     @staticmethod
     def to_table_reference(table):
+        partition_id = table['partitionId'] if table['partitionId'] != "None" else None
         return TableReference(project_id=table['projectId'],
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
-                              partition_id=table['partitionId'])
+                              partition_id=partition_id)
+
