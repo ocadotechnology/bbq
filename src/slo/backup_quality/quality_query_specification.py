@@ -5,9 +5,10 @@ from src.commons.table_reference import TableReference
 class QualityQuerySpecification(object):
 
     def query_string(self):
+        projects_to_skip = tuple(configuration.projects_to_skip)
         return \
-            "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality]"\
-              .format(configuration.backup_project_id)
+            "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality] WHERE projectId NOT IN {}"\
+              .format(configuration.backup_project_id, projects_to_skip)
 
     def format_query_results(self, results, snapshot_time):
         formatted_results = [{"snapshotTime": snapshot_time,
