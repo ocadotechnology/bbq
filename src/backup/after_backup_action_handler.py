@@ -38,11 +38,11 @@ class AfterBackupActionHandler(JsonHandler):
         data = request_body_json.get('data')
 
         if copy_job_results.has_errors():
-            error_message = "Backup for source: {}, " \
-                            "target: {} has not been done. " \
-                            "Copy job failed with errors: {} " \
-                .format(data["sourceBqTable"], data["targetBqTable"],
-                        copy_job_results.error_message)
+            error_message = "Copy job failed with errors: {} ." \
+                            "Backup for source: {}, target: {} " \
+                            "has not been done. " \
+                .format(copy_job_results.error_message,
+                        data["sourceBqTable"], data["targetBqTable"])
             ErrorReporting().report(error_message)
             return
 
