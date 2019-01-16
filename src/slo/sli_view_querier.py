@@ -1,14 +1,12 @@
 import logging
 import time
 
-from src.commons.table_reference import TableReference
-
 
 class SLIViewQuerier(object):
 
     def __init__(self, big_query, query_specification):
-        self.query_specification = query_specification
         self.big_query = big_query
+        self.query_specification = query_specification
 
     def query(self):
         self.snapshot_time = time.time()

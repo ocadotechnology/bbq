@@ -7,7 +7,7 @@ class QualityQuerySpecification(object):
     def query_string(self):
         projects_to_skip = tuple(configuration.projects_to_skip)
         return \
-            "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality] WHERE projectId NOT IN {}"\
+            "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality] WHERE source_project_id NOT IN {}"\
               .format(configuration.backup_project_id, projects_to_skip)
 
     def format_query_results(self, results, snapshot_time):
