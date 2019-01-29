@@ -10,12 +10,12 @@ resource "google_bigquery_dataset" "orphaned_backups_dataset" {
     special_group = "projectWriters"
   }
   access {
-    role   = "OWNER"
-    special_group = "projectOwners"
-  }
-  access {
     role   = "WRITER"
     special_group = "projectReaders"
+  }
+  access {
+    role   = "OWNER"
+    special_group = "projectOwners"
   }
 }
 
