@@ -25,3 +25,10 @@ class PostCopyActionRequest(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def to_json(self):
+        return dict(url=self.__url, data=self.__data)
+
+    @classmethod
+    def from_json(cls, json):
+        return PostCopyActionRequest(url=json["url"], data=json["data"])
