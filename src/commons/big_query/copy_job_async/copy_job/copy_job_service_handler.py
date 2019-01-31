@@ -1,9 +1,12 @@
+import json
 import logging
 
-import jsonpickle
 import webapp2
 
-from src.commons.big_query.copy_job_async.copy_job.copy_job_service import CopyJobService
+from src.commons.big_query.copy_job_async.copy_job.copy_job_request import \
+    CopyJobRequest
+from src.commons.big_query.copy_job_async.copy_job.copy_job_service import \
+    CopyJobService
 from src.commons.config.configuration import configuration
 
 
@@ -18,7 +21,9 @@ class CopyJobServiceHandler(webapp2.RequestHandler):
 
     @staticmethod
     def __deserialize_copy_job_request(request):
-        return jsonpickle.decode(request.get("copyJobRequest"))
+        copy_job_request_json = json.loads(request.get("copyJobRequest"))
+        return CopyJobRequest.from_json(copy_job_request_json)
+
 
 app = webapp2.WSGIApplication([
     ('/tasks/copy_job_async/copy_job', CopyJobServiceHandler)
