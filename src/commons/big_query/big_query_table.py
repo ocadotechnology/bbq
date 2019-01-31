@@ -29,6 +29,17 @@ class BigQueryTable(object):
     def __ne__(self, other):
         return not (self == other)
 
+    def to_json(self):
+        return dict(project_id=self.project_id,
+                    dataset_id=self.dataset_id,
+                    table_id=self.table_id)
+
+    @classmethod
+    def from_json(cls, json):
+        return BigQueryTable(project_id=json["project_id"],
+                             dataset_id=json["dataset_id"],
+                             table_id=json["table_id"])
+
     @staticmethod
     def split_table_and_partition_id(table_id):
         table_id = table_id
