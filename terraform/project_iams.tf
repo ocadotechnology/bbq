@@ -9,7 +9,7 @@
 
 resource "google_project_iam_member" "project_indexadmin_iam" {
   project = "${var.bbq_project}"
-  role    = "roles/datastore.indexAdmin"
+  role    = "roles/datastore.importExportAdmin"
   member  = "serviceAccount:${var.bbq_project}@appspot.gserviceaccount.com"
 }
 
