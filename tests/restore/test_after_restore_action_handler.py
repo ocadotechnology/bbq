@@ -1,14 +1,14 @@
+import json
 import unittest
 from datetime import datetime
 
-import jsonpickle
 import webtest
 from freezegun import freeze_time
 from google.appengine.ext import testbed
 
+from src.commons.table_reference import TableReference
 from src.restore import after_restore_action_handler
 from src.restore.datastore.restore_item import RestoreItem
-from src.commons.table_reference import TableReference
 from tests.commons.big_query.copy_job_async.result_check.job_result_example \
     import JobResultExample
 
@@ -32,7 +32,7 @@ class TestAfterRestoreActionHandler(unittest.TestCase):
     def test_should_update_restore_item_when_copy_job_status_is_done(self):
         # given
         restore_item_key = self.prepare_initial_restore_item()
-        payload = jsonpickle.encode(
+        payload = json.dumps(
             {"data": {"restoreItemKey": restore_item_key.urlsafe()},
              "jobJson": JobResultExample.DONE})
 
@@ -49,7 +49,7 @@ class TestAfterRestoreActionHandler(unittest.TestCase):
         # given
         restore_item_key = self.prepare_initial_restore_item()
         expected_error_message = 'Copy job finished with errors: invalid:Cannot read a table without a schema, backendError:Backend error'
-        payload = jsonpickle.encode(
+        payload = json.dumps(
             {"data": {"restoreItemKey": restore_item_key.urlsafe()},
              "jobJson": JobResultExample.DONE_WITH_NOT_REPETITIVE_ERRORS})
 
@@ -78,7 +78,7 @@ class TestAfterRestoreActionHandler(unittest.TestCase):
     def test_should_fail_when_data_is_missing_in_payload(self):
         # given
         expected_error = '{"status": "failed", "message": "JSON should have \\"data\\" element", "httpStatus": 400}'
-        payload = jsonpickle.encode(
+        payload = json.dumps(
             {"jobJson": {"state": "DONE"}})
 
         # when
@@ -91,7 +91,7 @@ class TestAfterRestoreActionHandler(unittest.TestCase):
     def test_should_fail_when_restore_item_key_is_missing_in_data(self):
         # given
         expected_error = '{"status": "failed", "message": "JSON should have \\"restoreItemKey\\" element", "httpStatus": 400}'
-        payload = jsonpickle.encode(
+        payload = json.dumps(
             {"data": {},
              "jobJson": {"state": "DONE"}})
 
@@ -105,7 +105,7 @@ class TestAfterRestoreActionHandler(unittest.TestCase):
     def test_should_fail_when_job_status_is_missing_in_payload(self):
         # given
         expected_error = '{"status": "failed", "message": "JSON should have \\"jobJson\\" element", "httpStatus": 400}'
-        payload = jsonpickle.encode(
+        payload = json.dumps(
             {"data": {"restoreItemKey": "restoreItemUrlSafeKeyValue"}})
 
         # when

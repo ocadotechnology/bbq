@@ -1,17 +1,16 @@
-import jsonpickle
+import json
 import os
 from datetime import datetime
 
-from jsonpickle import json
 from mock.mock import Mock
-
-from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
-from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
-from tests import test_utils
 
 from src.backup.datastore.Table import Table
 from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.big_query.copy_job_async.copy_job_result import CopyJobResult
+from src.commons.encoders.request_encoder import RequestEncoder
 from src.commons.table_reference import TableReference
+from tests import test_utils
 from tests.commons.big_query.copy_job_async.result_check.job_result_example \
     import JobResultExample
 from tests.test_utils import content
@@ -66,10 +65,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
                                              "target_table_id")
         data = {"sourceBqTable": source_bq_table,
                 "targetBqTable": destination_bq_table}
-        payload = jsonpickle.encode({
+        payload = json.dumps({
             "data": data,
-            "jobJson": JobResultExample.DONE}
-        )
+            "jobJson": JobResultExample.DONE
+        }, cls=RequestEncoder)
         copy_job_result = CopyJobResult(json.loads(payload).get('jobJson'))
 
         # when
@@ -113,10 +112,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
                                              "target_table_id")
         data = {"sourceBqTable": source_bq_table,
                 "targetBqTable": destination_bq_table}
-        payload = jsonpickle.encode({
+        payload = json.dumps({
             "data": data,
-            "jobJson": JobResultExample.DONE_WITH_NOT_REPETITIVE_ERRORS}
-        )
+            "jobJson": JobResultExample.DONE_WITH_NOT_REPETITIVE_ERRORS
+        }, cls=RequestEncoder)
 
         # when
         response = self.under_test.post(
@@ -156,10 +155,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
                                              "target_table_id")
         data = {"sourceBqTable": source_bq_table,
                 "targetBqTable": destination_bq_table}
-        payload = jsonpickle.encode({
+        payload = json.dumps({
             "data": data,
-            "jobJson": JobResultExample.DONE}
-        )
+            "jobJson": JobResultExample.DONE
+        }, cls=RequestEncoder)
 
         # when
         response = self.under_test.post(
@@ -171,7 +170,6 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(response.status_int, 200)
         self.assertIsNone(backup)
         error_reporting.assert_called_once()
-
 
     @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_big_query_table', return_value=BigQueryTableMetadata(None))
@@ -198,10 +196,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
                                              "target_table_id")
         data = {"sourceBqTable": source_bq_table,
                 "targetBqTable": destination_bq_table}
-        payload = jsonpickle.encode({
+        payload = json.dumps({
             "data": data,
-            "jobJson": JobResultExample.DONE}
-        )
+            "jobJson": JobResultExample.DONE
+        }, cls=RequestEncoder)
 
         # when
         response = self.under_test.post(
