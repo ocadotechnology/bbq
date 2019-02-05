@@ -1,7 +1,7 @@
 import json
 
 
-class JsonEncoder(json.JSONEncoder):
+class RequestEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'to_json'):
             return obj.to_json()
