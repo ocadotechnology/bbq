@@ -1,12 +1,13 @@
+import json
 import logging
 
-import jsonpickle
 from google.appengine.api.taskqueue import Task
 
-from src.commons.tasks import Tasks
 from src.commons.big_query.copy_job_async.copy_job.copy_job_task_name import \
     CopyJobTaskName
 from src.commons.config.configuration import configuration
+from src.commons.encoders.request_encoder import RequestEncoder
+from src.commons.tasks import Tasks
 
 
 class TaskCreator(object):
@@ -22,7 +23,8 @@ class TaskCreator(object):
             method='POST',
             url='/tasks/copy_job_async/copy_job',
             name=task_name,
-            params={"copyJobRequest": jsonpickle.encode(copy_job_request)},
+            params={"copyJobRequest": json.dumps(copy_job_request,
+                                                 cls=RequestEncoder)},
         )
         Tasks.schedule(queue_name, task)
 
@@ -41,7 +43,8 @@ class TaskCreator(object):
             url='/tasks/copy_job_async/result_check',
             countdown=configuration.copy_job_result_check_countdown_in_sec,
             params={
-                "resultCheckRequest": jsonpickle.encode(result_check_request)}
+                "resultCheckRequest": json.dumps(result_check_request,
+                                                 cls=RequestEncoder)}
         )
         Tasks.schedule(queue_name, task)
 
@@ -58,10 +61,10 @@ class TaskCreator(object):
         task = Task(
             method='POST',
             url=post_copy_action_request.url,
-            payload=jsonpickle.encode({
+            payload=json.dumps({
                 "data": post_copy_action_request.data,
                 "jobJson": job_json
-            })
+            }, cls=RequestEncoder)
         )
         Tasks.schedule(queue_name, task)
 
