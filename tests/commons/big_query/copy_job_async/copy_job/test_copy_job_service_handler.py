@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 
 from src.commons.big_query.copy_job_async.copy_job import \
@@ -10,7 +9,7 @@ from src.commons.big_query.copy_job_async.copy_job.copy_job_service \
     import CopyJobService
 from src.commons.big_query.copy_job_async.post_copy_action_request \
     import PostCopyActionRequest
-from src.commons.encoders.json_encoder import JsonEncoder
+from src.commons.encoders.request_encoder import RequestEncoder
 
 os.environ['SERVER_SOFTWARE'] = 'Development/'
 import unittest
@@ -61,7 +60,7 @@ class TestCopyJobServiceHandler(unittest.TestCase):
                     write_disposition="WRITE_EMPTY",
                     retry_count=0,
                     post_copy_action_request=post_copy_action_request
-                ), cls=JsonEncoder)}
+                ), cls=RequestEncoder)}
         )
 
         # then
