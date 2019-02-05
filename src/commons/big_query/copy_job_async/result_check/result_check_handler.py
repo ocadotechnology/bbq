@@ -1,10 +1,13 @@
+import json
 import logging
 
-import jsonpickle
 import webapp2
 
+from src.commons.big_query.copy_job_async.result_check.result_check import \
+    ResultCheck
+from src.commons.big_query.copy_job_async.result_check.result_check_request import \
+    ResultCheckRequest
 from src.commons.config.configuration import configuration
-from src.commons.big_query.copy_job_async.result_check.result_check import ResultCheck
 
 
 class ResultCheckHandler(webapp2.RequestHandler):
@@ -20,7 +23,8 @@ class ResultCheckHandler(webapp2.RequestHandler):
 
     @staticmethod
     def __deserialize_result_check_request(request):
-        return jsonpickle.decode(request.get("resultCheckRequest"))
+        result_check_request_json = json.loads(request.get("resultCheckRequest"))
+        return ResultCheckRequest.from_json(result_check_request_json)
 
 
 app = webapp2.WSGIApplication([webapp2.Route(

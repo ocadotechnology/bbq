@@ -47,3 +47,27 @@ class ResultCheckRequest(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def to_json(self):
+        return dict(task_name_suffix=self.__task_name_suffix,
+                    copy_job_type_id=self.__copy_job_type_id,
+                    job_reference=self.__job_reference,
+                    retry_count=self.__retry_count,
+                    post_copy_action_request=self.__post_copy_action_request)
+
+    @classmethod
+    def from_json(cls, json):
+        from src.commons.big_query.big_query_job_reference import \
+            BigQueryJobReference
+        job_reference = BigQueryJobReference.from_json(json["job_reference"])
+        from src.commons.big_query.copy_job_async.post_copy_action_request import \
+            PostCopyActionRequest
+
+        post_copy_action_request = PostCopyActionRequest.from_json(json["post_copy_action_request"])
+
+        return ResultCheckRequest(
+            task_name_suffix=json["task_name_suffix"],
+            copy_job_type_id=json["copy_job_type_id"],
+            job_reference=job_reference,
+            retry_count=json["retry_count"],
+            post_copy_action_request=post_copy_action_request)
