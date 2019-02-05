@@ -7,3 +7,4 @@ lib
 node_modules
 datastore.bin
 terraform/.terraform
+terraform.tfstate.*.backup
