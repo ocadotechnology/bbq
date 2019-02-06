@@ -8,8 +8,6 @@ from src.commons.config.configuration import configuration
 from src.commons.exceptions import ParameterValidationException, \
     JsonNotParseableException
 from src.commons.handlers import validators
-from src.commons.handlers.bbq_authenticated_handler import \
-    BbqAuthenticatedHandler
 from src.commons.handlers.json_handler import JsonHandler
 from src.restore.list.backup_key_parser import BackupKeyParser
 from src.restore.list.backup_list_restore_service import \
@@ -112,17 +110,6 @@ class BackupListRestoreHandler(JsonHandler):
                 )
 
 
-class BackupListRestoreAuthenticatedHandler(BackupListRestoreHandler,
-                                            BbqAuthenticatedHandler):
-
-    def __init__(self, request=None, response=None):
-        super(BackupListRestoreHandler, self). \
-            __init__(request, response)
-
-
 app = webapp2.WSGIApplication([
     webapp2.Route('/restore/list', BackupListRestoreHandler),
-    webapp2.Route('/schedule/restore/list',
-                  BackupListRestoreAuthenticatedHandler),
-
 ], debug=configuration.debug_mode)
