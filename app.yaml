@@ -35,22 +35,10 @@ handlers:
 - url: /restore/project/.*/dataset/.*/table/.*
   script: src.restore.table.table_restore_handler.app
   secure: always
-  login: admin
-- url: /schedule/restore/project/.*/dataset/.*/table/.*
-  script: src.restore.table.table_restore_handler.app
-  secure: always
 - url: /restore/project/.*/dataset/.*
   script: src.restore.dataset.dataset_restore_handler.app
   secure: always
-  login: admin
-- url: /schedule/restore/project/.*/dataset/.*
-  script: src.restore.dataset.dataset_restore_handler.app
-  secure: always
 - url: /restore/list
-  script: src.restore.list.backup_list_restore_handler.app
-  secure: always
-  login: admin
-- url: /schedule/restore/list
   script: src.restore.list.backup_list_restore_handler.app
   secure: always
 - url: /callback/restore-finished.*
@@ -60,19 +48,11 @@ handlers:
 - url: /restore/jobs/.*
   script: src.restore.status.restoration_job_status_handler.app
   secure: always
-  login: admin
-- url: /schedule/restore/jobs/.*
-  script: src.restore.status.restoration_job_status_handler.app
-  secure: always
 - url: /restore/test
   script: src.restore.test.restore_test_handler.app
   secure: always
   login: admin
 - url: /cron/retention
-  script: src.retention.retention-routing.app
-  secure: always
-  login: admin
-- url: /retention/schedule
   script: src.retention.retention-routing.app
   secure: always
 - url: /tasks/retention/table
@@ -104,10 +84,6 @@ handlers:
   secure: always
   login: admin
 - url: /cron/backup
-  script: src.backup.organization_backup_handler.app
-  secure: always
-  login: admin
-- url: /backups/schedule
   script: src.backup.organization_backup_handler.app
   secure: always
 - url: /cron/export-datastore-to-big-query
