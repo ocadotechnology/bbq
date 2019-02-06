@@ -35,3 +35,14 @@ class BigQueryJobReference(object):
                 post_copy_action_request=copy_job_request.post_copy_action_request
             )
         )
+
+    def to_json(self):
+        return dict(project_id=self.project_id,
+                    job_id=self.job_id,
+                    location=self.location)
+
+    @classmethod
+    def from_json(cls, json):
+        return BigQueryJobReference(project_id=json["project_id"],
+                                    job_id=json["job_id"],
+                                    location=json["location"])
