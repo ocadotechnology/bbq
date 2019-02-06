@@ -4,7 +4,6 @@ from google.appengine.datastore.datastore_query import Cursor
 
 from src.commons.tasks import Tasks
 from src.backup.datastore.Table import Table
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 
 
 class OrganizationRetentionHandler(webapp2.RequestHandler):
@@ -46,13 +45,3 @@ class OrganizationRetentionHandler(webapp2.RequestHandler):
             method='GET',
             url='/tasks/retention/table',
             params=params)
-
-
-class OrganizationRetentionAuthenticatedHandler(
-        BbqAuthenticatedHandler,
-        OrganizationRetentionHandler
-):
-
-    def __init__(self, request=None, response=None):
-        super(OrganizationRetentionAuthenticatedHandler, self). \
-            __init__(request, response)
