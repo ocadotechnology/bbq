@@ -117,7 +117,7 @@ handlers:
 - url: /_ah/start
   script: src.restore.restore_ui_handler.app
   secure: always
-  login: required
+  login: admin
 - url: /favicon.ico
   static_files: static/images/favicon.ico
   upload: static/images/favicon.ico
