@@ -1,22 +1,23 @@
+import json
 import os
 import unittest
 
-import jsonpickle
 from google.appengine.api.taskqueue import UnknownQueueError
 from google.appengine.ext import testbed
 from mock import patch
 
+from src.commons.big_query.big_query_job_reference import BigQueryJobReference
+from src.commons.big_query.big_query_table import BigQueryTable
 from src.commons.big_query.copy_job_async.copy_job.copy_job_request import \
     CopyJobRequest
 from src.commons.big_query.copy_job_async.copy_job.copy_job_task_name import \
-  CopyJobTaskName
+    CopyJobTaskName
 from src.commons.big_query.copy_job_async.post_copy_action_request import \
-  PostCopyActionRequest
+    PostCopyActionRequest
 from src.commons.big_query.copy_job_async.result_check.result_check_request \
     import ResultCheckRequest
 from src.commons.big_query.copy_job_async.task_creator import TaskCreator
-from src.commons.big_query.big_query_job_reference import BigQueryJobReference
-from src.commons.big_query.big_query_table import BigQueryTable
+from src.commons.encoders.request_encoder import RequestEncoder
 from src.commons.test_utils import utils
 
 
@@ -63,7 +64,7 @@ class TestTaskCreator(unittest.TestCase):
         self.assertEqual(len(executed_tasks), 1,
                          "Should create one task in queue")
         executed_task = executed_tasks[0]
-        self.assertEqual(jsonpickle.encode(copy_job_request),
+        self.assertEqual(json.dumps(copy_job_request, cls=RequestEncoder),
                          executed_task.extract_params()['copyJobRequest'])
         self.assertEqual('POST', executed_task.method)
         self.assertEqual('task_name', executed_task.name)
@@ -131,7 +132,7 @@ class TestTaskCreator(unittest.TestCase):
         self.assertEqual(len(executed_tasks), 1,
                          "Should create one task in queue")
         executed_task = executed_tasks[0]
-        self.assertEqual(jsonpickle.encode(result_check_request),
+        self.assertEqual(json.dumps(result_check_request, cls=RequestEncoder),
                          executed_task.extract_params()['resultCheckRequest'])
         self.assertEqual('POST', executed_task.method)
         self.assertEqual(executed_task.url,
