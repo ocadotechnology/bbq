@@ -1,7 +1,6 @@
 import webapp2
 
 from src.commons.handlers.json_handler import JsonHandler
-from src.commons.handlers.bbq_authenticated_handler import BbqAuthenticatedHandler
 from src.commons.config.configuration import configuration
 from src.restore.status.restoration_job_status_service import \
     RestorationJobStatusService
@@ -20,20 +19,9 @@ class RestorationJobStatusHandler(JsonHandler):
         self._finish_with_success(restoration_job)
 
 
-class RestorationJobStatusAuthenticatedHandler(RestorationJobStatusHandler,
-                                               BbqAuthenticatedHandler):
-
-    def __init__(self, request=None, response=None):
-        super(RestorationJobStatusAuthenticatedHandler, self). \
-            __init__(request, response)
-
-
 app = webapp2.WSGIApplication([
     webapp2.Route(
         '/restore/jobs/<restoration_job_id:.*>',
         RestorationJobStatusHandler
-    ), webapp2.Route(
-        '/schedule/restore/jobs/<restoration_job_id:.*>',
-        RestorationJobStatusAuthenticatedHandler
     )
 ], debug=configuration.debug_mode)
