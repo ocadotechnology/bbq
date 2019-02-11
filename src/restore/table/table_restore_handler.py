@@ -4,8 +4,6 @@ from datetime import datetime
 from src.commons.config.configuration import configuration
 from src.commons.exceptions import ParameterValidationException
 from src.commons.handlers import validators
-from src.commons.handlers.bbq_authenticated_handler import \
-    BbqAuthenticatedHandler
 from src.commons.handlers.json_handler import JsonHandler
 from src.commons.table_reference import TableReference
 from src.restore.table.table_restore_service import TableRestoreService
@@ -62,22 +60,10 @@ class TableRestoreHandler(JsonHandler):
                 "Should be 'YYYY-mm-dd'")
 
 
-class TableRestoreAuthenticatedHandler(BbqAuthenticatedHandler,
-                                       TableRestoreHandler):
-    def __init__(self, request=None, response=None):
-        super(TableRestoreAuthenticatedHandler, self). \
-            __init__(request, response)
-
-
 app = webapp2.WSGIApplication([
     webapp2.Route(
         '/restore'
         '/project/<project_id:.*>/dataset/<dataset_id:.*>/table/<table_id:.*>',
         TableRestoreHandler
-    ),
-    webapp2.Route(
-        '/schedule/restore'
-        '/project/<project_id:.*>/dataset/<dataset_id:.*>/table/<table_id:.*>',
-        TableRestoreAuthenticatedHandler
     )
 ], debug=configuration.debug_mode)

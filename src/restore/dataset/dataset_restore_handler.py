@@ -5,8 +5,6 @@ import webapp2
 
 from src.commons.config.configuration import configuration
 from src.commons.handlers import validators
-from src.commons.handlers.bbq_authenticated_handler import \
-    BbqAuthenticatedHandler
 from src.commons.handlers.json_handler import JsonHandler
 from src.restore.dataset.dataset_restore_service import \
     DatasetRestoreService
@@ -63,19 +61,8 @@ class DatasetRestoreHandler(JsonHandler):
         return int(max_partition_days) if max_partition_days else None
 
 
-class DatasetRestoreAuthenticatedHandler(DatasetRestoreHandler,
-                                         BbqAuthenticatedHandler):
-
-    def __init__(self, request=None, response=None):
-        super(DatasetRestoreAuthenticatedHandler, self). \
-            __init__(request, response)
-
-
 app = webapp2.WSGIApplication([
     webapp2.Route(
         '/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
-        DatasetRestoreHandler),
-    webapp2.Route(
-        '/schedule/restore/project/<project_id:.*>/dataset/<dataset_id:.*>',
-        DatasetRestoreAuthenticatedHandler)
+        DatasetRestoreHandler)
 ], debug=configuration.debug_mode)

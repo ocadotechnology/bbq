@@ -47,10 +47,6 @@ class Configuration(object):
         return self.__project_config['backup_settings'].get('projects_to_skip')
 
     @property
-    def authorized_requestor_service_accounts(self):
-        return self.__project_config['project_settings'].get('authorized_requestor_service_accounts')
-
-    @property
     def restoration_daily_test_results_gcs_bucket(self):
         return self.__project_config['tests'].get('restoration_daily_test_results_gcs_bucket')
 
