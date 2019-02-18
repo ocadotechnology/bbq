@@ -39,8 +39,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch.object(BigQuery, '_create_http')
-    def test_should_create_datastore_backup_entity(self, _create_http):
+    def test_should_create_datastore_backup_entity(self, _create_http, _):
         # given
         _create_http.return_value = HttpMockSequence([
             ({'status': '200'},
@@ -87,11 +88,11 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertTrue(isinstance(backup.last_modified, datetime))
         self.assertEqual(backup.last_modified, copy_job_result.start_time)
 
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
-    def test_should_not_create_backups_entity_if_copy_job_failed(self,
-                                                                 _create_http,
-                                                                 error_reporting):
+    def test_should_not_create_backups_entity_if_copy_job_failed(
+            self, _create_http, error_reporting, _):
         # given
         _create_http.return_value = HttpMockSequence([
             ({'status': '200'},
@@ -128,9 +129,11 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertIsNone(backup)
         error_reporting.assert_called_once()
 
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
-    def test_should_not_create_backups_entity_if_backup_table_doesnt_exist(self, _create_http,error_reporting):
+    def test_should_not_create_backups_entity_if_backup_table_doesnt_exist(
+            self, _create_http, error_reporting, _):
         # given
         _create_http.return_value = HttpMockSequence([
           ({'status': '200'},
@@ -177,9 +180,10 @@ class TestAfterBackupActionHandler(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime', return_value=datetime.utcnow())
     @patch.object(BigQueryTableMetadata, 'table_size_in_bytes', return_value=123)
     @patch.object(BigQueryTableMetadata, 'has_partition_expiration', return_value=True)
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch.object(BigQuery, 'disable_partition_expiration')
     def test_should_disable_partition_expiration_if_backup_table_has_it(
-            self, disable_partition_expiration, _, _1, _2, _3, _4):
+            self, disable_partition_expiration, _, _1, _2, _3, _4, _5):
         # given
         table_entity = Table(
             project_id="source_project_id",
@@ -211,8 +215,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(response.status_int, 200)
         disable_partition_expiration.assert_called_once()
 
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch.object(BigQuery, '_create_http')
-    def test_should_return_400_for_wrong_data(self, _create_http):
+    def test_should_return_400_for_wrong_data(self, _create_http, _):
         # given
         _create_http.return_value = test_utils.create_bq_generic_mock()
 
@@ -229,8 +234,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEquals(400, response.status_int)
         self.assertEquals(response.body, expected_error)
 
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch.object(BigQuery, '_create_http')
-    def test_should_return_400_for_incomplete_data_json(self, _create_http):
+    def test_should_return_400_for_incomplete_data_json(self, _create_http, _):
         # given
         _create_http.return_value = test_utils.create_bq_generic_mock()
         payload = '{"data": {}, "jobJson": {"state": "DONE"}}'
