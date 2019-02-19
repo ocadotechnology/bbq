@@ -66,6 +66,18 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
     ```
 * (Optionally) Configure schedule time and kinds to export in [cron.yaml](./config/cron.yaml) file.
 
+### Security setup
+  Secure your application by following given steps.
+  * Restrict IAM roles for your GAE service account and Enable firewall for GAE application.
+    * GAE Editor needs to be removed manually, as it is set by default.
+    * You should follow PoLP (Principle of least privilege) during process or set up IAM's.
+      We recommend to set up following roles: **BigQuery Data Editor**, **BigQuery Job User**, **Cloud Datastore Import Export Admin**, **Cloud Datastore User**, **Storage Admin**, **BigQuery Data**.
+      You can do that via [Terraform](TERRAFORM_SETUP.md).
+      After setup go to **terraform/bbq** directory and run following command:
+      ```bash
+      terraform apply
+      ```
+  * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.       
 
 ### Advanced setup
   It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
