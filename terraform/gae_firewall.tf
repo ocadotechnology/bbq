@@ -1,3 +1,9 @@
+variable "firewall_default_rule_priority" {
+  //change to 2147483647 once https://github.com/terraform-providers/terraform-provider-google/issues/3074 will be fixed
+  default = 2147483646
+  description = "Default firewall rule priority, which is least important"
+}
+
 resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_cron" {
   provider = "google-beta"
   project = "${var.bbq_project}"
@@ -19,7 +25,7 @@ resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_task_queue" 
 resource "google_app_engine_firewall_rule" "gae_firewall_rule_deny_all" {
   provider = "google-beta"
   project = "${var.bbq_project}"
-  priority = 2147483646 //change to 2147483647 once https://github.com/terraform-providers/terraform-provider-google/issues/3074 will be fixed
+  priority = "${var.firewall_default_rule_priority}"
   action = "DENY"
   source_range = "*"
   description = "Deny all access by default"
