@@ -5,7 +5,6 @@ variable "firewall_default_rule_priority" {
 }
 
 resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_cron" {
-  provider = "google-beta"
   project = "${var.bbq_project}"
   priority = 1000
   action = "ALLOW"
@@ -14,7 +13,6 @@ resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_cron" {
 }
 
 resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_task_queue" {
-  provider = "google-beta"
   project = "${var.bbq_project}"
   priority = 1100
   action = "ALLOW"
@@ -23,7 +21,6 @@ resource "google_app_engine_firewall_rule" "gae_firewall_rule_allow_task_queue" 
 }
 
 resource "google_app_engine_firewall_rule" "gae_firewall_rule_deny_all" {
-  provider = "google-beta"
   project = "${var.bbq_project}"
   priority = "${var.firewall_default_rule_priority}"
   action = "DENY"
