@@ -48,10 +48,6 @@ handlers:
 - url: /restore/jobs/.*
   script: src.restore.status.restoration_job_status_handler.app
   secure: always
-- url: /restore/test
-  script: src.restore.test.restore_test_handler.app
-  secure: always
-  login: admin
 - url: /cron/retention
   script: src.retention.retention-routing.app
   secure: always
