@@ -21,8 +21,7 @@ class TestBigQuery(unittest.TestCase):
         patch.stopall()
         self.testbed.deactivate()
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_iterating_projects(self, _):
+    def test_iterating_projects(self):
         # given
         self._create_http.return_value = self.__create_project_list_responses()
 
@@ -32,8 +31,7 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(project_ids), 4)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_iterating_datasets(self, _):
+    def test_iterating_datasets(self):
         # given
         self._create_http.return_value = self.__create_dataset_list_responses()
 
@@ -43,8 +41,7 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(dataset_ids), 3)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_iterating_tables(self, _):
+    def test_iterating_tables(self):
         # given
         self._create_http.return_value = self.__create_tables_list_responses()
 
@@ -54,8 +51,7 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(tables_ids), 5)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_insert_job_forwarding_409_error(self, _):
+    def test_insert_job_forwarding_409_error(self):
         # given
         self._create_http.return_value = self.__create_409_response()
 
@@ -66,8 +62,7 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(context.exception.resp.status, 409)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_insert_job_forwarding_503_error(self, _):
+    def test_insert_job_forwarding_503_error(self):
         # given
         self._create_http.return_value = self.__create_503_response()
 
@@ -82,11 +77,10 @@ class TestBigQuery(unittest.TestCase):
         def func_for_test(self, project_id, dataset_id, table_id):
             pass
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     @patch('time.sleep', return_value=None)
     @patch.object(TestClass, "func_for_test")
     def test_iterating_tables_should_retry_if_gets_http_503_response_once(
-            self, func, _, _1):
+            self, func, _):
         # given
         self._create_http.return_value = self.__create_tables_list_responses_with_503()
 
@@ -96,9 +90,8 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEquals(5, func.call_count)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(
-            self, _):
+            self):
         # given
         self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
 
@@ -108,8 +101,7 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(self.count(tables_ids), 0)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_listing_table_partitions(self, _):
+    def test_listing_table_partitions(self):
         # given
         self._create_http.return_value = self.__create_table_partititions_list_responses()
         # when
@@ -124,8 +116,7 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual(partitions[0]['lastModifiedTime'],
                          '2017-03-17 14:32:19.289000')
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_should_fetch_single_result_from_random_table_query(self, _):
+    def test_should_fetch_single_result_from_random_table_query(self):
         # given
         self._create_http.return_value = self.__create_random_table_responses()
         # when
@@ -137,9 +128,8 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual('O_PRODUCT_SUPPLIER_20151127',
                          random_table.get_table_id())
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
-            self, _):
+            self):
         # given
         self._create_http.return_value = \
             self.__create_dataset_responses_with_only_one_response_for_get_dataset()
@@ -151,30 +141,26 @@ class TestBigQuery(unittest.TestCase):
         # then
         self.assertEqual(result1, result2)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_should_raise_exception_if_random_table_query_returns_no_results(
-            self, _):
+            self):
         # given
         self._create_http.return_value = self.__create_random_table_no_results_responses()
         # when then
         self.assertRaises(RandomizationError, BigQuery().fetch_random_table)
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_create_dataset_happy_path(self, _):
+    def test_create_dataset_happy_path(self):
         # given
         self._create_http.return_value = self.__create_dataset_create_responses()
         # when then
         BigQuery().create_dataset("project123", "dataset_id", "US")
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_create_dataset_do_nothing_if_dataset_already_exists(self, _):
+    def test_create_dataset_do_nothing_if_dataset_already_exists(self):
         # given
         self._create_http.return_value = self.__create_dataset_create_already_exist_responses()
         # when then
         BigQuery().create_dataset("project123", "dataset_id", "US")
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_create_dataset_do_nothing_if_access_denied(self, _):
+    def test_create_dataset_do_nothing_if_access_denied(self):
         # given
         self._create_http.return_value = self.__create_access_denied_response()
         # when then
@@ -245,8 +231,7 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_table_list_page_last.json'))
         ])
 
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_execute_query_when_executing_long_query(self, _):
+    def test_execute_query_when_executing_long_query(self):
         # given
         self._create_http.return_value = self.__execute_long_query_responses()
         # when

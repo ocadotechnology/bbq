@@ -2,6 +2,7 @@ import json
 import logging
 
 import googleapiclient.discovery
+import httplib2
 from apiclient.errors import HttpError, Error
 from oauth2client.client import GoogleCredentials
 
@@ -26,21 +27,18 @@ class DatasetNotFoundException(Exception):
 
 class BigQuery(object):
     def __init__(self):
+        self.http = self._create_http()
         self.service = googleapiclient.discovery.build(
             'bigquery',
             'v2',
-            credentials=self._create_credentials(),
-            http=self._create_http(),
+            credentials=GoogleCredentials.get_application_default(),
+            http=self.http,
             cache_discovery=self._cache_discovery()
         )
 
     @staticmethod
-    def _create_credentials():
-        return GoogleCredentials.get_application_default()
-
-    @staticmethod
     def _create_http():
-        return None
+        return httplib2.Http(timeout=60)
 
     @staticmethod
     def _cache_discovery():
