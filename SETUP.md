@@ -36,6 +36,19 @@
       gcloud app deploy --project ${BBQ_PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
       ```
       Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations). It is recommended to pick the same location as where most of your BigQuery data resides.
+1.   Secure your application by following given steps.
+     * Restrict IAM roles for your GAE service account and Enable firewall for GAE application.
+       * GAE Editor needs to be removed manually, as it is set by default.
+         ```bash
+         gcloud projects remove-iam-policy-binding ${BBQ_PROJECT_ID} --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/editor’
+         ```
+       * You should follow PoLP (Principle of least privilege) during process of set up IAM's.
+         You can do that via [Terraform](TERRAFORM_SETUP.md).
+         After setup go to **terraform/bbq** directory and run following command:
+         ```bash
+         terraform apply
+         ```
+     * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.       
 
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
@@ -66,18 +79,17 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
     ```
 * (Optionally) Configure schedule time and kinds to export in [cron.yaml](./config/cron.yaml) file.
 
-### Security setup
-  Secure your application by following given steps.
-  * Restrict IAM roles for your GAE service account and Enable firewall for GAE application.
-    * GAE Editor needs to be removed manually, as it is set by default.
-    * You should follow PoLP (Principle of least privilege) during process or set up IAM's.
-      We recommend to set up following roles: **BigQuery Data Editor**, **BigQuery Job User**, **Cloud Datastore Import Export Admin**, **Cloud Datastore User**, **Storage Admin**, **BigQuery Data**.
-      You can do that via [Terraform](TERRAFORM_SETUP.md).
-      After setup go to **terraform/bbq** directory and run following command:
-      ```bash
-      terraform apply
-      ```
-  * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.       
+### Security Layers
+
+ * **Firewall**
+   * A firewall provides identity-agnostic access control for your App Engine app.
+   Current firewall setup only allows GAE cron requests and GAE task queue requests.
+ * **IAP**
+   * Cloud [Identity-Aware Proxy](https://cloud.google.com/iap/docs/concepts-overview) (Cloud IAP) lets you manage access to GAE application.
+     Standard GAE application uses primitive roles, so it gives wider access than necessary,
+     but with IAP you can have better control of traffic in your application.  
+ * **GAE admin endpoints**
+   * Secured endpoints with admin privilege, restrict access to user which have administrator rights.
 
 ### Advanced setup
   It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
