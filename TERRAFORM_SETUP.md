@@ -6,11 +6,10 @@
       export TERRAFORM_STATE_BUCKET_ID="<your-bucket-id-to-store-terraform-state>"
       gsutil mb -p ${BBQ_PROJECT_ID} gs://${TERRAFORM_STATE_BUCKET_ID}/
       ```
-1. Export BBQ, BBQ restoration project and GCP Census project ids: 
+1. Export BBQ and BBQ restoration project ids: 
       ```bash
       export TF_VAR_bbq_project=${BBQ_PROJECT_ID}
       export TF_VAR_bbq_restoration_project=${BBQ_RESTORATION_PROJECT_ID}
-      export TF_VAR_gcp_census_project=${GCP_CENSUS_PROJECT_ID}
       ```
 1. Create a bucket to store remotely infrastructure state [Terraform](https://www.terraform.io/) by running the following commands:
       ```bash

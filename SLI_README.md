@@ -19,7 +19,11 @@ To measure SLI, please follow all the steps below:
 1. Install [GCP Census](https://github.com/ocadotechnology/gcp-census) application that periodical collects metadata about BigQuery tables. 
 1. Configure [Cloud Datastore export](./SETUP.md#cloud-datastore-export), 
 which periodically exports backup metadata and stores it in BigQuery,
-1. Install Terraform as in [terraform setup file](TERRAFORM_SETUP.md).
+1. Install and initialise Terraform as in [terraform setup file](TERRAFORM_SETUP.md).
+Additionally run following command to export census project id:
+   ```bash
+   export TF_VAR_gcp_census_project=${GCP_CENSUS_PROJECT_ID}
+   ```
 1. Create all views/tables by running following command from **terraform/sli** folder
    ```bash
    terraform apply
