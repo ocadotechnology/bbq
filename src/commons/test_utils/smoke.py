@@ -1,19 +1,27 @@
 import logging
 import os
 import time
+import httplib2
 
-from google.oauth2 import service_account
+from oauth2client import service_account
 
 
-def create_credentials(service_account_filename):
+def create_http_client(service_account_filename):
+    scopes = ['https://www.googleapis.com/auth/userinfo.email']
+    credentials = create_credentials(service_account_filename, scopes)
+    return credentials.authorize(httplib2.Http(timeout=60))
+
+
+def create_credentials(service_account_filename, scopes=''):
     key_store = get_key_store()
     key_file = key_store + service_account_filename
 
-    credentials = service_account.Credentials.from_service_account_file(key_file)
-    scoped_credentials = credentials.with_scopes(
-        ['https://www.googleapis.com/auth/cloud-platform'])
+    logging.info("Authorizing client from credentials: %s, %s",
+                 key_file, scopes)
+    credentials = service_account.ServiceAccountCredentials\
+        .from_json_keyfile_name(key_file, scopes)
     logging.info("Service account email: %s", credentials.service_account_email)
-    return scoped_credentials
+    return credentials
 
 
 def get_key_store():
