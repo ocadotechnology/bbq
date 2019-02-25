@@ -38,19 +38,19 @@
       Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations). It is recommended to pick the same location as where most of your BigQuery data resides.
 1.   Secure your application by following given steps.
      * Restrict IAM roles for your GAE service account and Enable firewall for GAE application.
-       * GAE Editor needs to be removed manually, as it is set by default.
+       * GAE default service account Editor permission needs to be removed manually.
          ```bash
          gcloud projects remove-iam-policy-binding ${BBQ_PROJECT_ID} --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/editor’
          ```
-       * You should follow PoLP (Principle of least privilege) during process of set up IAM's.
+       * You should follow PoLP (Principle of least privilege) during IAM's configuration.
          You can do that via [Terraform](TERRAFORM_SETUP.md).
          After setup go to **terraform/bbq** directory and run following command:
          ```bash
          terraform apply
          ```
          
-     * By default firewall blocked all traffic to your application.
-       To allow https traffic you need to whitelist your IP address into firewall rules.
+     * By default firewall blocks all traffic to your application.
+       To allow https traffic you need to whitelist your IP address in firewall rules.
        You can do it via [UI](https://console.cloud.google.com/appengine/firewall) or run following command:
        ```bash
         gcloud app firewall-rules create 100 --action allow --source-range 0.0.0.0/0 --description 'my ip address'
@@ -65,6 +65,8 @@
        ipconfig getifaddr en0
        ```
      * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.
+       * Add your GAE application as resource to IAP.
+       * Set up **IAP-secured Web App User** IAM to your account, so IAP will recognize your identity and allow https traffic from your account.
      
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
@@ -106,6 +108,7 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
      but with IAP you can have better control of traffic in your application.  
  * **GAE admin endpoints**
    * Secured endpoints with admin privilege, restrict access to user which have administrator rights.
+     To be able to use those endpoints you need to add your user to GCP project IAM's.
 
 ### Advanced setup
   It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
