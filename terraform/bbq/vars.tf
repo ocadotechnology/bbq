@@ -3,7 +3,7 @@ terraform {
 
   backend "gcs" {
     bucket = {}
-    prefix = "/terraform-bbq-sli.tfstate"
+    prefix = "/terraform-bbq.tfstate"
   }
 }
 
