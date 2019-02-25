@@ -48,8 +48,24 @@
          ```bash
          terraform apply
          ```
-     * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.       
-
+         
+     * By default firewall blocked all traffic to your application.
+       To allow https traffic you need to whitelist your IP address into firewall rules.
+       You can do it via [UI](https://console.cloud.google.com/appengine/firewall) or run following command:
+       ```bash
+        gcloud app firewall-rules create 100 --action allow --source-range 0.0.0.0/0 --description 'my ip address'
+       ```
+       You can get your ip address with those commands:
+       * wireless
+       ```bash
+       ipconfig getifaddr en1
+       ``` 
+       * ethernet
+       ```bash
+       ipconfig getifaddr en0
+       ```
+     * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.
+     
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
    You can also trigger the backup manually, for more details see [Usage section](README.md#usage).
