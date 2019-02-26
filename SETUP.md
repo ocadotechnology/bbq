@@ -55,7 +55,12 @@
        ```bash
         gcloud app firewall-rules create 100 --action allow --source-range ${MY_PUBLIC_IP} --description 'my public ip address'
        ```
-     * Turn on IAP (Identity-Aware Proxy) for your GAE application. All steps are described on [GAE IAP setup](https://cloud.google.com/iap/docs/app-engine-quickstart#enabling_iap) docs.
+1. Configure IAP (Identity-Aware Proxy), so that only authorised users can access BBQ.
+     * Turn on IAP for your GAE application. All steps are described on [GAE IAP setup](https://cloud.google.com/iap/docs/app-engine-quickstart#enabling_iap) docs.
+     * Grant IAP-Secured Web App User (`roles/iap.httpsResourceAccessor`) role to users, which will be using BBQ, e.g.:
+         ```bash
+         gcloud projects add-iam-policy-binding ${BBQ_PROJECT_ID} --member='user:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/iap.httpsResourceAccessor’
+         ```     
      
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
