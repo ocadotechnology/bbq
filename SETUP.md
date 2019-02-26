@@ -92,7 +92,7 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
 * (Optionally) Configure schedule time and kinds to export in [cron.yaml](./config/cron.yaml) file.
 
 ### Security Layers
-
+BBQ has configured multiple layers of security to limit access to your data.
  * **Firewall**
    * A firewall provides identity-agnostic access control for your App Engine app based on network level. Current firewall setup only allows GAE cron requests and GAE task queue requests.
    * You should whitelist all your public IPs (e.g. office IP).
