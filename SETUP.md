@@ -49,24 +49,13 @@
          terraform apply
          ```
          
-     * By default firewall blocks all traffic to your application.
-       To allow https traffic you need to whitelist your IP address in firewall rules.
+     * By default Terraform configures firewall to block all traffic to your application.
+       To get access to BBQ application you need to whitelist your public IP address in firewall rules.
        You can do it via [UI](https://console.cloud.google.com/appengine/firewall) or run following command:
        ```bash
-        gcloud app firewall-rules create 100 --action allow --source-range 0.0.0.0/0 --description 'my ip address'
+        gcloud app firewall-rules create 100 --action allow --source-range ${MY_PUBLIC_IP} --description 'my public ip address'
        ```
-       You can get your ip address with those commands:
-       * wireless
-       ```bash
-       ipconfig getifaddr en1
-       ``` 
-       * ethernet
-       ```bash
-       ipconfig getifaddr en0
-       ```
-     * Turn on [IAP](https://cloud.google.com/iap/docs/app-engine-quickstart) (Identity-Aware Proxy) for your GAE application.
-       * Add your GAE application as resource to IAP.
-       * Set up **IAP-secured Web App User** IAM to your account, so IAP will recognize your identity and allow https traffic from your account.
+     * Turn on IAP (Identity-Aware Proxy) for your GAE application. All steps are described on [GAE IAP setup](https://cloud.google.com/iap/docs/app-engine-quickstart#enabling_iap) docs.
      
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
