@@ -89,15 +89,14 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
 ### Security Layers
 
  * **Firewall**
-   * A firewall provides identity-agnostic access control for your App Engine app.
-   Current firewall setup only allows GAE cron requests and GAE task queue requests.
+   * A firewall provides identity-agnostic access control for your App Engine app based on network level. Current firewall setup only allows GAE cron requests and GAE task queue requests.
+   * You should whitelist all your public IPs (e.g. office IP).
  * **IAP**
-   * Cloud [Identity-Aware Proxy](https://cloud.google.com/iap/docs/concepts-overview) (Cloud IAP) lets you manage access to GAE application.
-     Standard GAE application uses primitive roles, so it gives wider access than necessary,
-     but with IAP you can have better control of traffic in your application.  
+   * Cloud [Identity-Aware Proxy](https://cloud.google.com/iap/docs/concepts-overview) (Cloud IAP) lets you manage access to GAE application via IAMs.
+   * You should allow all BBQ users to have IAP-Secured Web App User (`roles/iap.httpsResourceAccessor`).
  * **GAE admin endpoints**
-   * Secured endpoints with admin privilege, restrict access to user which have administrator rights.
-     To be able to use those endpoints you need to add your user to GCP project IAM's.
+   * BBQ internal endpoints are configured, so that only [admin users](https://cloud.google.com/appengine/docs/standard/python/users/adminusers) can access them. In BBQ case, it's only cron tasks and task queues.
+   * You should not change them, as those are BBQ internal endpoints. There is no need to access them as the end user.
 
 ### Advanced setup
   It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
