@@ -7,11 +7,6 @@ terraform {
   }
 }
 
-
 provider "google" {
   version = "~> 2"
-}
-
-variable "bbq_project" {
-  description = "it is needed to filter out backups from SLI"
 }
