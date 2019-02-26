@@ -1,5 +1,5 @@
 terraform {
-  required_version = "> 0.11"
+  required_version = "~> 0.11"
 
   backend "gcs" {
     bucket = {}
@@ -7,8 +7,9 @@ terraform {
   }
 }
 
+
 provider "google" {
-  version = ">= 1.18"
+  version = "~> 2"
 }
 
 variable "bbq_project" {
