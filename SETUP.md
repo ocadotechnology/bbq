@@ -36,7 +36,32 @@
       gcloud app deploy --project ${BBQ_PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
       ```
       Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations). It is recommended to pick the same location as where most of your BigQuery data resides.
-
+1.   Secure your application by following given steps.
+     * Restrict IAM roles for your GAE service account and Enable firewall for GAE application.
+       * GAE default service account Editor permission needs to be removed manually.
+         ```bash
+         gcloud projects remove-iam-policy-binding ${BBQ_PROJECT_ID} --member='serviceAccount:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/editor’
+         ```
+       * You should follow PoLP (Principle of least privilege) during IAM's configuration.
+         You can do that via [Terraform](TERRAFORM_SETUP.md).
+         After setup go to **terraform/bbq** directory and run following command:
+         ```bash
+         terraform apply
+         ```
+         
+     * By default Terraform configures firewall to block all traffic to your application.
+       To get access to BBQ application you need to whitelist your public IP address in firewall rules.
+       You can do it via [UI](https://console.cloud.google.com/appengine/firewall) or run following command:
+       ```bash
+        gcloud app firewall-rules create 100 --action allow --source-range ${MY_PUBLIC_IP} --description 'my public ip address'
+       ```
+1. Configure IAP (Identity-Aware Proxy), so that only authorised users can access BBQ.
+     * Turn on IAP for your GAE application. All steps are described on [GAE IAP setup](https://cloud.google.com/iap/docs/app-engine-quickstart#enabling_iap) docs.
+     * Grant IAP-Secured Web App User (`roles/iap.httpsResourceAccessor`) role to users, which will be using BBQ, e.g.:
+         ```bash
+         gcloud projects add-iam-policy-binding ${BBQ_PROJECT_ID} --member='user:'${BBQ_PROJECT_ID}'@appspot.gserviceaccount.com' --role='roles/iap.httpsResourceAccessor’
+         ```     
+     
 1. BBQ should be deployed and working right now. You could see it at \<your-project-id-for-BBQ-project\>.appspot.com . 
    The backup process will start at the time defined in [cron.yaml](./config/cron.yaml) file. All times are in UTC standard. 
    You can also trigger the backup manually, for more details see [Usage section](README.md#usage).
@@ -66,6 +91,17 @@ To perform backup, BBQ needs rights to read BigQuery data from the project which
     ```
 * (Optionally) Configure schedule time and kinds to export in [cron.yaml](./config/cron.yaml) file.
 
+### Security Layers
+BBQ has configured multiple layers of security to limit access to your data.
+ * **Firewall**
+   * A firewall provides identity-agnostic access control for your App Engine app based on network level. Current firewall setup only allows GAE cron requests and GAE task queue requests.
+   * You should whitelist all your public IPs (e.g. office IP).
+ * **IAP**
+   * Cloud [Identity-Aware Proxy](https://cloud.google.com/iap/docs/concepts-overview) (Cloud IAP) lets you manage access to GAE application via IAMs.
+   * You should allow all BBQ users to have IAP-Secured Web App User (`roles/iap.httpsResourceAccessor`).
+ * **GAE admin endpoints**
+   * BBQ internal endpoints are configured, so that only [admin users](https://cloud.google.com/appengine/docs/standard/python/users/adminusers) can access them. In BBQ case, it's only cron tasks and task queues.
+   * You should not change them, as those are BBQ internal endpoints. There is no need to access them as the end user.
 
 ### Advanced setup
   It is possible to precisely control which projects will be backed up using project IAMs and [config.yaml](./config/config.yaml) file.
