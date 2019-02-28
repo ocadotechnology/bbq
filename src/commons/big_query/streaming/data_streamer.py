@@ -3,7 +3,6 @@ import json
 import logging
 
 import googleapiclient.discovery
-import httplib2
 from apiclient.errors import Error
 from oauth2client.client import GoogleCredentials
 
@@ -14,18 +13,22 @@ from src.commons.error_reporting import ErrorReporting
 
 class DataStreamer(object):
 
-    @staticmethod
-    def _create_http():
-        return httplib2.Http(timeout=60)
-
     def __init__(self, project_id, dataset_id, table_id):
         self.big_query_table = BigQueryTable(project_id, dataset_id, table_id)
         self.service = googleapiclient.discovery.build(
             'bigquery',
             'v2',
-            credentials=GoogleCredentials.get_application_default(),
+            credentials=self._create_credentials(),
             http=self._create_http()
         )
+
+    @staticmethod
+    def _create_credentials():
+        return GoogleCredentials.get_application_default()
+
+    @staticmethod
+    def _create_http():
+        return None
 
     def stream_stats(self, rows):
         insert_all_data = {
