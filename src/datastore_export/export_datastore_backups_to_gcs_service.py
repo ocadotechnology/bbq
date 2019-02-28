@@ -2,7 +2,6 @@ import logging
 import time
 
 import googleapiclient.discovery
-import httplib2
 from google.appengine.api.app_identity import app_identity
 from oauth2client.client import GoogleCredentials
 
@@ -22,17 +21,20 @@ class ExportDatastoreBackupsToGCSService(object):
 
     def __init__(self):
         self.app_id = app_identity.get_application_id()
-        self.http = self.__create_http()
         self.service = googleapiclient.discovery.build(
             'datastore',
             'v1',
-            credentials=GoogleCredentials.get_application_default(),
-            http=self.http,
+            credentials=self.__create_credentials(),
+            http=self.__create_http(),
         )
 
     @staticmethod
+    def __create_credentials():
+        return GoogleCredentials.get_application_default()
+
+    @staticmethod
     def __create_http():
-        return httplib2.Http(timeout=60)
+        return None
 
     def export(self, gcs_output_url, kinds):
         body = {
