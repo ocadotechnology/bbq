@@ -125,19 +125,6 @@ class TestBigQuery(unittest.TestCase):
                          '2017-03-17 14:32:19.289000')
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_should_fetch_single_result_from_random_table_query(self, _):
-        # given
-        self._create_http.return_value = self.__create_random_table_responses()
-        # when
-        random_table = BigQuery().fetch_random_table()
-
-        # then
-        self.assertEqual('project-dev', random_table.get_project_id())
-        self.assertEqual('test_set', random_table.get_dataset_id())
-        self.assertEqual('O_PRODUCT_SUPPLIER_20151127',
-                         random_table.get_table_id())
-
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
             self, _):
         # given
@@ -150,14 +137,6 @@ class TestBigQuery(unittest.TestCase):
 
         # then
         self.assertEqual(result1, result2)
-
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_should_raise_exception_if_random_table_query_returns_no_results(
-            self, _):
-        # given
-        self._create_http.return_value = self.__create_random_table_no_results_responses()
-        # when then
-        self.assertRaises(RandomizationError, BigQuery().fetch_random_table)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_create_dataset_happy_path(self, _):
