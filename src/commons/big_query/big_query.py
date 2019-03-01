@@ -146,31 +146,6 @@ class BigQuery(object):
                " AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]" \
             .format(project_id, dataset_id, table_id)
 
-    @log_time
-    def fetch_random_table(self):
-        query_results = self.__sync_query(
-            query=self.random_table_from_project_query(),
-            use_legacy_sql=True)
-
-        if query_results and 'totalRows' in query_results \
-            and int(query_results['totalRows']) > 0:
-            results = []
-            results.extend(query_results.get('rows', []))
-            first_row = results[0]
-            project_id = first_row['f'][2]['v']
-            dataset_id = first_row['f'][1]['v']
-            table_id = first_row['f'][0]['v']
-            table_reference = TableReference(project_id, dataset_id, table_id)
-        else:
-            raise RandomizationError(
-                "No results returned from randomization query")
-        return table_reference
-
-    @staticmethod
-    def random_table_from_project_query():
-        return "SELECT tableId, datasetId, projectId FROM [{}]" \
-            .format(configuration.restoration_daily_test_random_table_view)
-
     def __sync_query(self, query, timeout=30000, use_legacy_sql=False):
         query_data = {
             'query': query,
