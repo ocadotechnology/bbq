@@ -46,10 +46,6 @@ class Configuration(object):
     def projects_to_skip(self):
         return self.__project_config['backup_settings'].get('projects_to_skip')
 
-    @property
-    def restoration_daily_test_random_table_view(self):
-        return self.__project_config['tests'].get('random_table_view')
-
 
 config_file_yaml = "config/config.yaml"
 logging.info("Loading configuration from file: '%s'", config_file_yaml)
