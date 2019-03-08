@@ -2,7 +2,6 @@ import logging
 import traceback
 
 import googleapiclient.discovery
-import httplib2
 from oauth2client.client import GoogleCredentials
 
 from src.commons.config.environment import Environment
@@ -10,20 +9,24 @@ from src.commons.decorators.retry import retry
 
 from google.appengine.api.app_identity import app_identity
 
+
 class ErrorReporting(object):
     def __init__(self):
         self.service = Environment.version_id()
-        self.http = self._create_http()
         self.logging_client = googleapiclient.discovery.build(
             'clouderrorreporting',
             'v1beta1',
-            credentials=GoogleCredentials.get_application_default(),
-            http=self.http
+            credentials=self._create_credentials(),
+            http=self._create_http()
         )
 
     @staticmethod
+    def _create_credentials():
+        return GoogleCredentials.get_application_default()
+
+    @staticmethod
     def _create_http():
-        return httplib2.Http(timeout=60)
+        return None
 
     def report(self, message, caller=None):
         if not caller:
