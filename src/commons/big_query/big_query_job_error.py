@@ -32,10 +32,13 @@ class BigQueryJobError(object):
         else:
             raise self.bq_error
 
+    def is_deadline_exceeded(self):
+        return self.bq_error.resp.status == 500 and \
+               self.full_reason.find('Deadline exceeded') != -1
+
     def __is_access_denied(self):
-        result = self.bq_error.resp.status == 403 and \
-                 self.full_reason.find('Access Denied') != -1
-        return result
+        return self.bq_error.resp.status == 403 and \
+               self.full_reason.find('Access Denied') != -1
 
     def __is_404(self):
         return self.bq_error.resp.status == 404
