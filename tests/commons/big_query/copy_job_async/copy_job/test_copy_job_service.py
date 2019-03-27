@@ -47,7 +47,7 @@ class TestCopyJobService(unittest.TestCase):
                       location='EU'))
     @patch.object(TaskCreator, 'create_copy_job_result_check')
     def test_that_post_copy_action_request_is_passed(
-        self, create_copy_job_result_check, _):
+            self, create_copy_job_result_check, _):
         # given
         post_copy_action_request = \
             PostCopyActionRequest(url='/my/url', data={'key1': 'value1'})
@@ -79,51 +79,51 @@ class TestCopyJobService(unittest.TestCase):
                 post_copy_action_request=post_copy_action_request
             )
         )
-        @patch.object(BigQuery, 'insert_job',
-                      return_value=BigQueryJobReference(
-                          project_id='test_project',
-                          job_id='job123',
-                          location='EU'))
-        @patch.object(TaskCreator, 'create_copy_job_result_check')
-        def test_that_create_and_write_disposition_are_passed_to_result_check(
+
+    @patch.object(BigQuery, 'insert_job',
+                  return_value=BigQueryJobReference(
+                      project_id='test_project',
+                      job_id='job123',
+                      location='EU'))
+    @patch.object(TaskCreator, 'create_copy_job_result_check')
+    def test_that_create_and_write_disposition_are_passed_to_result_check(
             self, create_copy_job_result_check, _):
-            # given
-            create_disposition = "SOME_CREATE_DISPOSITION"
-            write_disposition = "SOME_WRITE_DISPOSITION"
+        # given
+        create_disposition = "SOME_CREATE_DISPOSITION"
+        write_disposition = "SOME_WRITE_DISPOSITION"
 
-            # when
-            CopyJobService().run_copy_job_request(
-                CopyJobRequest(
-                    task_name_suffix='task_name_suffix',
-                    copy_job_type_id='test-process',
-                    source_big_query_table=self.example_source_bq_table,
-                    target_big_query_table=self.example_target_bq_table,
-                    create_disposition=create_disposition,
-                    write_disposition=write_disposition,
-                    retry_count=0,
-                    post_copy_action_request=None
-                )
+        # when
+        CopyJobService().run_copy_job_request(
+            CopyJobRequest(
+                task_name_suffix='task_name_suffix',
+                copy_job_type_id='test-process',
+                source_big_query_table=self.example_source_bq_table,
+                target_big_query_table=self.example_target_bq_table,
+                create_disposition=create_disposition,
+                write_disposition=write_disposition,
+                retry_count=0,
+                post_copy_action_request=None
             )
+        )
 
-            # then
-            create_copy_job_result_check.assert_called_once_with(
-                ResultCheckRequest(
-                    task_name_suffix='task_name_suffix',
-                    copy_job_type_id='test-process',
-                    job_reference=BigQueryJobReference(
-                        project_id='test_project',
-                        job_id='job123',
-                        location='EU'),
-                    retry_count=0,
-                    post_copy_action_request=None
-                )
+        # then
+        create_copy_job_result_check.assert_called_once_with(
+            ResultCheckRequest(
+                task_name_suffix='task_name_suffix',
+                copy_job_type_id='test-process',
+                job_reference=BigQueryJobReference(
+                    project_id='test_project',
+                    job_id='job123',
+                    location='EU'),
+                retry_count=0,
+                post_copy_action_request=None
             )
-
+        )
 
     @patch.object(BigQuery, 'insert_job')
     @patch('time.sleep', side_effect=lambda _: None)
     def test_that_copy_table_should_throw_error_after_exception_not_being_http_error_thrown_on_copy_job_creation(
-        self, _, insert_job):
+            self, _, insert_job):
         # given
         error_message = 'test exception'
         insert_job.side_effect = Exception(error_message)
@@ -145,10 +145,11 @@ class TestCopyJobService(unittest.TestCase):
 
     @patch.object(BigQuery, 'insert_job')
     @patch('time.sleep', side_effect=lambda _: None)
-    def test_that_copy_table_should_throw_error_after_http_error_different_than_404_thrown_on_copy_job_creation(
-        self, _, insert_job):
+    def test_that_copy_table_should_throw_unhandled_errors(self, _, insert_job):
         # given
         exception = HttpError(Mock(status=500), 'internal error')
+        exception._get_reason = Mock(return_value='internal error')
+
         insert_job.side_effect = exception
         request = CopyJobRequest(
             task_name_suffix=None,
@@ -169,9 +170,12 @@ class TestCopyJobService(unittest.TestCase):
     @patch.object(BigQuery, 'insert_job')
     @patch.object(TaskCreator, 'create_post_copy_action')
     def test_that_copy_table_should_create_correct_post_copy_action_if_404_http_error_thrown_on_copy_job_creation(
-        self, create_post_copy_action, insert_job):
+            self, create_post_copy_action, insert_job):
         # given
-        insert_job.side_effect = HttpError(Mock(status=404), 'not found')
+        error = HttpError(Mock(status=404), 'not found')
+        error._get_reason = Mock(return_value='not found')
+
+        insert_job.side_effect = error
         post_copy_action_request = PostCopyActionRequest(url='/my/url', data={'key1': 'value1'})
         request = CopyJobRequest(
             task_name_suffix='task_name_suffix',
@@ -228,7 +232,8 @@ class TestCopyJobService(unittest.TestCase):
         http_error_content = "{\"error\": " \
                              "  {\"errors\": [" \
                              "    {\"reason\": \"Access Denied\"," \
-                             "     \"message\": \"Access Denied\"" \
+                             "     \"message\": \"Access Denied\"," \
+                             "     \"location\": \"US\"" \
                              "  }]," \
                              "  \"code\": 403,\"" \
                              "  message\": \"Access Denied\"}}"
@@ -280,6 +285,77 @@ class TestCopyJobService(unittest.TestCase):
                     }
                 }
             }
+        )
+
+    @patch.object(BigQuery, 'get_job')
+    @patch.object(BigQuery, 'insert_job')
+    @patch.object(TaskCreator, 'create_copy_job_result_check')
+    def test_that_copy_table_will_try_to_wait_if_deadline_exceeded(
+            self, create_copy_job_result_check, insert_job, get_job):
+        # given
+        http_error_content = "{\"error\": " \
+                             "  {\"errors\": [" \
+                             "    {\"reason\": \"Deadline exceeded\"," \
+                             "     \"message\": \"Deadline exceeded\"," \
+                             "     \"location\": \"US\"" \
+                             "  }]," \
+                             "  \"code\": 500,\"" \
+                             "  message\": \"Deadline exceeded\"}}"
+        successful_job_json = {
+            'status': {
+                'state': 'DONE'
+            },
+            'jobReference': {
+                'projectId': self.example_target_bq_table.get_project_id(),
+                'location': 'EU',
+                'jobId': 'job123',
+            },
+            'configuration': {
+                'copy': {
+                    'sourceTable': {
+                        'projectId': self.example_source_bq_table.get_project_id(),
+                        'tableId': self.example_source_bq_table.get_table_id(),
+                        'datasetId': self.example_source_bq_table.get_dataset_id()
+                    },
+                    'destinationTable': {
+                        'projectId': self.example_target_bq_table.get_project_id(),
+                        'tableId': self.example_target_bq_table.get_table_id(),
+                        'datasetId': self.example_target_bq_table.get_dataset_id()
+                    }
+                }
+            }
+        }
+
+        insert_job.side_effect = HttpError(Mock(status=500), http_error_content)
+        get_job.return_value = successful_job_json
+
+        request = CopyJobRequest(
+            task_name_suffix='task_name_suffix',
+            copy_job_type_id='test-process',
+            source_big_query_table=self.example_source_bq_table,
+            target_big_query_table=self.example_target_bq_table,
+            create_disposition="CREATE_IF_NEEDED",
+            write_disposition="WRITE_EMPTY",
+            retry_count=0,
+            post_copy_action_request=None
+        )
+
+        # when
+        CopyJobService().run_copy_job_request(request)
+
+        # then
+        create_copy_job_result_check.assert_called_once_with(
+            ResultCheckRequest(
+                task_name_suffix='task_name_suffix',
+                copy_job_type_id='test-process',
+                job_reference=BigQueryJobReference(
+                    project_id=self.example_target_bq_table.get_project_id(),
+                    job_id='job123',
+                    location='EU'
+                ),
+                retry_count=0,
+                post_copy_action_request=None
+            )
         )
 
     @patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata')
