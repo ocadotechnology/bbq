@@ -63,8 +63,9 @@ class CopyJobService(object):
                                               source_big_query_table,
                                               target_big_query_table)
             if copy_job_error.is_deadline_exceeded():
-                return CopyJobService.__get_job_reference(
-                    job_id, target_project_id, copy_job_error.location)
+                job_json = CopyJobService.__get_job(job_id, target_project_id,
+                                                    copy_job_error.location)
+                return CopyJobService.__to_bq_job_reference(job_json)
             elif copy_job_error.should_be_retried():
                 logging.warning(copy_job_error)
                 return BigQueryJobReference(
@@ -82,16 +83,18 @@ class CopyJobService(object):
 
     @staticmethod
     @retry(HttpError, tries=6, delay=2, backoff=2)
-    def __get_job_reference(job_id, project_id, location):
+    def __get_job(job_id, project_id, location):
         job_reference = BigQueryJobReference(project_id=project_id,
                                              job_id=job_id,
                                              location=location)
-        job_json = BigQuery().get_job(job_reference)
+        return BigQuery().get_job(job_reference)
 
-        new_job_reference = job_json["jobReference"]
-        return BigQueryJobReference(new_job_reference["projectId"],
-                                    new_job_reference["jobId"],
-                                    new_job_reference["location"])
+    @staticmethod
+    def __to_bq_job_reference(job_json):
+        job_reference = job_json["jobReference"]
+        return BigQueryJobReference(job_reference["projectId"],
+                                    job_reference["jobId"],
+                                    job_reference["location"])
 
     @staticmethod
     def _create_random_job_id():
