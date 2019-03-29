@@ -235,8 +235,8 @@ class TestCopyJobService(unittest.TestCase):
                              "     \"message\": \"Access Denied\"," \
                              "     \"location\": \"US\"" \
                              "  }]," \
-                             "  \"code\": 403,\"" \
-                             "  message\": \"Access Denied\"}}"
+                             "  \"code\": 403," \
+                             "  \"message\": \"Access Denied\"}}"
         insert_job.side_effect = HttpError(Mock(status=403), http_error_content)
         post_copy_action_request = PostCopyActionRequest(url='/my/url', data={
             'key1': 'value1'})
@@ -299,8 +299,8 @@ class TestCopyJobService(unittest.TestCase):
                              "     \"message\": \"Deadline exceeded\"," \
                              "     \"location\": \"US\"" \
                              "  }]," \
-                             "  \"code\": 500,\"" \
-                             "  message\": \"Deadline exceeded\"}}"
+                             "  \"code\": 500," \
+                             "  \"message\": \"Deadline exceeded\"}}"
         successful_job_json = {
             'status': {
                 'state': 'DONE'
