@@ -1,3 +1,4 @@
+import json
 import logging
 
 from src.commons.big_query.copy_job_async.task_creator import TaskCreator
@@ -10,6 +11,7 @@ class BigQueryJobError(object):
         self.target_bq_table = target_bq_table
         self.full_reason = bq_error._get_reason()
         self.short_reason = self.__get_short_reason()
+        self.location = self.__get_location()
 
     def __str__(self):
         return "{} while creating Copy Job from {} to {}" \
@@ -32,10 +34,13 @@ class BigQueryJobError(object):
         else:
             raise self.bq_error
 
+    def is_deadline_exceeded(self):
+        return self.bq_error.resp.status == 500 and \
+               'Deadline exceeded' in self.full_reason
+
     def __is_access_denied(self):
-        result = self.bq_error.resp.status == 403 and \
-                 self.full_reason.find('Access Denied') != -1
-        return result
+        return self.bq_error.resp.status == 403 and \
+               'Access Denied' in self.full_reason
 
     def __is_404(self):
         return self.bq_error.resp.status == 404
@@ -52,6 +57,13 @@ class BigQueryJobError(object):
             return '409'
         else:
             return 'Unknown reason'
+
+    def __get_location(self):
+        try:
+            data = json.loads(self.bq_error.content)
+            return data['error']['errors'][0]['location']
+        except (ValueError, KeyError):
+            return None
 
     def __create_post_copy_job_json(self):
         return {
