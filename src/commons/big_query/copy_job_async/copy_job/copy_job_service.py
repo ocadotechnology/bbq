@@ -31,10 +31,11 @@ class CopyJobService(object):
     def __schedule(source_big_query_table, target_big_query_table, job_id,
                    create_disposition, write_disposition):
         logging.info("Scheduling job ID: " + job_id)
+        target_project_id = target_big_query_table.get_project_id()
         job_data = {
             "jobReference": {
                 "jobId": job_id,
-                "projectId": target_big_query_table.get_project_id()
+                "projectId": target_project_id
             },
             "configuration": {
                 "copy": {
@@ -44,7 +45,7 @@ class CopyJobService(object):
                         "tableId": source_big_query_table.get_table_id(),
                     },
                     "destinationTable": {
-                        "projectId": target_big_query_table.get_project_id(),
+                        "projectId": target_project_id,
                         "datasetId": target_big_query_table.get_dataset_id(),
                         "tableId": target_big_query_table.get_table_id(),
                     },
@@ -54,18 +55,21 @@ class CopyJobService(object):
             }
         }
         try:
-            job_reference = BigQuery().insert_job(
-                target_big_query_table.get_project_id(), job_data)
+            job_reference = BigQuery().insert_job(target_project_id, job_data)
             logging.info("Successfully insert: %s", job_reference)
             return job_reference
         except HttpError as bq_error:
             copy_job_error = BigQueryJobError(bq_error,
                                               source_big_query_table,
                                               target_big_query_table)
-            if copy_job_error.should_be_retried():
+            if copy_job_error.is_deadline_exceeded():
+                job_json = CopyJobService.__get_job(job_id, target_project_id,
+                                                    copy_job_error.location)
+                return CopyJobService.__to_bq_job_reference(job_json)
+            elif copy_job_error.should_be_retried():
                 logging.warning(copy_job_error)
                 return BigQueryJobReference(
-                    project_id=target_big_query_table.get_project_id(),
+                    project_id=target_project_id,
                     job_id=job_id,
                     location=BigQueryTableMetadata.get_table_by_big_query_table(
                         source_big_query_table).get_location())
@@ -76,6 +80,21 @@ class CopyJobService(object):
             logging.error("%s Exception thrown during Copy Job creation: %s",
                           type(error), error)
             raise error
+
+    @staticmethod
+    @retry(HttpError, tries=6, delay=2, backoff=2)
+    def __get_job(job_id, project_id, location):
+        job_reference = BigQueryJobReference(project_id=project_id,
+                                             job_id=job_id,
+                                             location=location)
+        return BigQuery().get_job(job_reference)
+
+    @staticmethod
+    def __to_bq_job_reference(job_json):
+        job_reference = job_json["jobReference"]
+        return BigQueryJobReference(job_reference["projectId"],
+                                    job_reference["jobId"],
+                                    job_reference["location"])
 
     @staticmethod
     def _create_random_job_id():
