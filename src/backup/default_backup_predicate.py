@@ -45,6 +45,9 @@ class DefaultBackupPredicate(AbstractBackupPredicate):
         )
         if source_table_last_modified_time > last_backup.last_modified:
             logging.info("Backup time is older than table metadata")
+            if big_query_table_metadata.is_empty() and last_backup.numBytes > 0:
+                logging.info("Source table is empty. Not empty backup exists.")
+                return True
             return False
         return True
 
