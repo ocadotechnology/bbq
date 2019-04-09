@@ -1,16 +1,17 @@
 import unittest
 from datetime import datetime
 
+from apiclient.errors import HttpError
 from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
-from mock import patch
+from mock import patch, Mock
 
-from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
+from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.table_reference import TableReference
 from src.retention.policy.filter.grace_period_after_deletion_filter import \
     GracePeriodAfterDeletionFilter
-from src.commons.table_reference import TableReference
 from tests.utils.backup_utils import create_backup
 
 
@@ -80,6 +81,55 @@ class TestGracePeriodAfterDeletionFilter(unittest.TestCase):
         )
         # then
         self.assertFalse(backups_to_retain)
+
+    is_not_parititoned_http_error_response = '''{
+                             "error": {
+                              "code": 400,
+                              "message": "Cannot read partition information from a table that is not partitioned: sit-cymes-euw1-mlservices:MarketingRecommendations_Derived_Restricted.DeliveredOrder$2420180805",
+                              "errors": [
+                               {
+                                "message": "Cannot read partition information from a table that is not partitioned: sit-cymes-euw1-mlservices:MarketingRecommendations_Derived_Restricted.DeliveredOrder$2420180805",
+                                "domain": "global",
+                                "reason": "invalid"
+                               }
+                              ],
+                              "status": "INVALID_ARGUMENT"
+                             }
+                            } '''
+
+
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
+                  side_effect=HttpError(Mock(status=400), is_not_parititoned_http_error_response))
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2015, 7, 01)))
+    @freeze_time("2017-08-20")
+    def test_should_delete_old_backups_if_source_partitioned_table_is_gone_for_long_and_new_table_with_the_same_name_is_not_partitioned(self, _, _1):  # nopep8 pylint: disable=C0301
+        # given
+        partitioned_reference = TableReference('example-project-id', 'example-dataset-id',
+                                   'example-table-id', 'example-partition-id')
+        b1 = create_backup(datetime(2015, 06, 01))
+        # when
+        backups_to_retain = self.under_test.filter(
+            backups=[b1],
+            table_reference=partitioned_reference
+        )
+        # then
+        self.assertFalse(backups_to_retain)
+
+
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference',
+                  side_effect=HttpError(Mock(status=400), is_not_parititoned_http_error_response))
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2015, 7, 01)))
+    @freeze_time("2017-08-20")
+    def test_should_raise_exception_if_source_non_partitioned_table_is_gone_for_long_and_new_table_with_the_same_name_is_not_partitioned(self, _, _1):  # nopep8 pylint: disable=C0301
+        # given
+        non_partitioned_reference = TableReference('example-project-id', 'example-dataset-id',
+                                   'example-table-id')
+        b1 = create_backup(datetime(2015, 06, 01))
+
+        # when &then
+        self.assertRaises(HttpError, self.under_test.filter, [b1],
+                          non_partitioned_reference)
+
 
     @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
