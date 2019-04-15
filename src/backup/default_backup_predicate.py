@@ -11,19 +11,20 @@ class DefaultBackupPredicate(AbstractBackupPredicate):
         if not self._is_possible_to_copy_table(big_query_table_metadata):
             return False
 
-        if self.__table_has_up_to_date_backup(big_query_table_metadata, table_entity):
+        last_backup = self.__get_last_table_backup_if_any(table_entity)
+
+        if not last_backup:
+            return True
+
+        if big_query_table_metadata.is_empty() and last_backup.numBytes > 0:
+            logging.info("Source table is empty. Not empty backup exists.")
+            return False
+
+        if self.__is_table_backup_up_to_date(big_query_table_metadata, last_backup):
             logging.info('Backup is up to date')
             return False
 
         return True
-
-    def __table_has_up_to_date_backup(self, big_query_table_metadata, table_entity):
-        last_backup = self.__get_last_table_backup_if_any(table_entity)
-        if not last_backup:
-            return False
-
-        return self.__is_table_backup_up_to_date(big_query_table_metadata,
-                                                 last_backup)
 
     def __get_last_table_backup_if_any(self, table_entity):
         if table_entity is None:
@@ -45,9 +46,6 @@ class DefaultBackupPredicate(AbstractBackupPredicate):
         )
         if source_table_last_modified_time > last_backup.last_modified:
             logging.info("Backup time is older than table metadata")
-            if big_query_table_metadata.is_empty() and last_backup.numBytes > 0:
-                logging.info("Source table is empty. Not empty backup exists.")
-                return True
             return False
         return True
 
