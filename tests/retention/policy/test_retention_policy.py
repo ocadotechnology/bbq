@@ -8,16 +8,16 @@ from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.table_reference import TableReference
-from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
+from src.retention.policy.retention_policy import RetentionPolicy
 from tests.utils.backup_utils import create_backup_daily_sequence, create_backup
 
 
-class TestFifo10UpTo7Months(unittest.TestCase):
+class TestRetentionPolicy(unittest.TestCase):
     def setUp(self):
         patch('googleapiclient.discovery.build').start()
         patch('oauth2client.client.GoogleCredentials.get_application_default') \
             .start()
-        self.under_test = Fifo10UpTo7Months()
+        self.under_test = RetentionPolicy()
 
     def tearDown(self):
         patch.stopall()
