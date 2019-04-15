@@ -84,6 +84,7 @@ class TestFifo10UpTo7Months(unittest.TestCase):
         #given
         reference = TableReference('example-project-id', 'example-dataset-id',
                                    'example-table-id')
+
         first_5_backups = create_backup_daily_sequence(
             5,
             start_date=datetime(2017, 6, 1, 12)
@@ -107,6 +108,44 @@ class TestFifo10UpTo7Months(unittest.TestCase):
             self.under_test.get_backups_eligible_for_deletion(
                 backups=list(backups),
                 table_reference=reference)
+        #then
+        self.sortAndAssertListEqual(
+            backups_expected_for_deletion,
+            eligible_for_deletion
+        )
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2017, 8, 19)))
+    @freeze_time("2017-08-20")
+    def test_should_delete_many_today_duplicates_and_11th_young_version_after_deduplication_and_retain_old_backup(
+            self, _1, _2, _3):
+        #given
+        reference = TableReference('example-project-id', 'example-dataset-id',
+                                   'example-table-id')
+
+        young_backups = create_backup_daily_sequence(10,
+                                                     start_date=datetime(2017,
+                                                                         8, 1))
+        newest_duplicated_backup = create_backup(datetime(2017, 8, 19, 10))
+
+        today_duplicated_backups = [newest_duplicated_backup,
+                                    create_backup(datetime(2017, 8, 19, 9)),
+                                    create_backup(datetime(2017, 8, 19, 8)),
+                                    create_backup(datetime(2017, 8, 19, 7))]
+
+        old_backup = create_backup(datetime(2016, 8, 19, 10))
+
+        backups = list(
+            young_backups + today_duplicated_backups + [old_backup]
+        )
+        backups_expected_for_deletion = list([young_backups[9]] + today_duplicated_backups[1:])
+
+        #when
+        eligible_for_deletion = \
+            self.under_test.get_backups_eligible_for_deletion(
+                backups=list(backups),
+                table_reference=reference)
+
         #then
         self.sortAndAssertListEqual(
             backups_expected_for_deletion,
