@@ -55,7 +55,7 @@ class TestDefaultBackupPredicate(unittest.TestCase):
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 15, 00))
-    def test_should_return_true_if_table_is_empty(self, _, _1):
+    def test_should_return_true_if_table_is_empty_and_there_is_no_backup(self, _, _1):
         # given
         predicate = DefaultBackupPredicate()
         # when
@@ -172,3 +172,24 @@ class TestDefaultBackupPredicate(unittest.TestCase):
         self.assertFalse(result, "ShouldBackupPredicate should return FALSE "
                                  "if table was changed after last backup was made,"
                                  "but source table is empty and bbq has not empty last backup")
+
+    @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
+    @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
+                  return_value=datetime(2018, 11, 13, 17, 00))
+    def test_should_return_true_if_changed_table_is_empty_and_last_backup_is_also_empty(self, _1, _2):  # nopep8 pylint: disable=C0301
+        # given
+        backup = Backup(
+            parent=self.table.key,
+            last_modified=datetime(2016, 11, 13, 15, 00),
+            numBytes=0
+        )
+        backup.put()
+        predicate = DefaultBackupPredicate()
+
+        # when
+        result = predicate.test(self.big_query_table_metadata, self.table)
+
+        # then
+        self.assertTrue(result, "ShouldBackupPredicate should return True "
+                                 "if table was changed after last backup was made,"
+                                 "but source table is empty and bbq has also empty last backup")
