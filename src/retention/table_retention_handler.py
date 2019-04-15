@@ -2,7 +2,7 @@ import logging
 
 import webapp2
 
-from src.retention.policy.fifo_10_up_to_7_months import Fifo10UpTo7Months
+from src.retention.policy.retention_policy import RetentionPolicy
 from src.retention.table_retention import TableRetention
 from src.commons.table_reference import TableReference
 
@@ -10,7 +10,7 @@ from src.commons.table_reference import TableReference
 class TableRetentionHandler(webapp2.RequestHandler):
     def __init__(self, request=None, response=None):
         super(TableRetentionHandler, self).__init__(request, response)
-        self.table_retention = TableRetention(Fifo10UpTo7Months())
+        self.table_retention = TableRetention(RetentionPolicy())
 
     def get(self):
         project_id = self.request.get('projectId')
