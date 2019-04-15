@@ -10,7 +10,7 @@ from src.retention.policy.filter.only_one_version_above_7_months_filter import \
     OnlyOneVersionAbove7MonthsFilter
 
 
-class Fifo10UpTo7Months(object):
+class RetentionPolicy(object):
     def __init__(self):
         self.filters = [MostRecentDailyBackupFilter(),
                         TenYoungBackupVersionsFilter(),
