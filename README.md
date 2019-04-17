@@ -119,14 +119,13 @@ There's 10,000 [copy jobs per project per day limit](https://cloud.google.com/bi
 Note that partitions are represented as individual tables in backup storage. If you try to restore dataset with 10 tables with 500 partitions each, it will require 5000 copy jobs which is half of your daily quota.
 ## Retention process  
 
-Every day retention process scans all backups to find and delete backups matching specific criteria within given source table/partition:
-* if there are multiple backups per day, the most recent is retained. Multiple backups per day are created in rare cases (e.g. when task queue task is executed more than one time),
-* if there are more than 10 backups for given table/partition, the 10 most recent are retained,
-* if all backups are older than 7 months, then most recent is retained,
-* if there are backups younger than 7 months, then all others are deleted, 
-* if source table is deleted, then the last backup is deleted after 7 months.
+Every day retention process scans all backups to find and delete backups matching specific criteria for given source table/partition:
+* if there are multiple backups per day, the most recent one is retained. Multiple backups per day are created in rare cases (e.g. when task queue task is executed more than one time),
+* for backups younger than 7 months, the 10 most recent ones are retained,
+* for backups older than 7 months, single most recent backup is retained,
+* if source table is deleted, then the last backup is deleted after 7 months after deletion.
  
-### Example of 10 versions retention
+### Example of 10 versions retention for backups younger than 7 months
 ![Retention process](docs/images/bbq_retention_process_10_versions.gif)
 
 ### Example of 7 months old backup deletion and source deletion grace period 
