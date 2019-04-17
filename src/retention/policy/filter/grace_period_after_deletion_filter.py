@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from dateutil.relativedelta import relativedelta
+from apiclient.errors import HttpError
 
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 
@@ -37,8 +38,8 @@ class GracePeriodAfterDeletionFilter(object):
 
         if self.__source_table_exists(table_reference):
             logging.info("Table %s was last seen on %s "
-                         "but it looks like it still exists in BigQuery.",
-                         table_reference, source_table_last_seen)
+                        "but it looks like it still exists in BigQuery.",
+                        table_reference, source_table_last_seen)
             return True
 
         logging.info(
@@ -48,4 +49,15 @@ class GracePeriodAfterDeletionFilter(object):
         return False
 
     def __source_table_exists(self, table_reference):
-        return BigQueryTableMetadata.get_table_by_reference(table_reference).table_exists()
+        try:
+            return BigQueryTableMetadata.get_table_by_reference(
+                table_reference).table_exists()
+        except HttpError as error:
+            if self.__is_getting_partition_from_non_partitioned_error(table_reference, error):
+                return False
+            raise error
+
+    @staticmethod
+    def __is_getting_partition_from_non_partitioned_error(table_reference, error):
+        return table_reference.is_partition() \
+               and "Cannot read partition information from a table that is not partitioned" in error.content
