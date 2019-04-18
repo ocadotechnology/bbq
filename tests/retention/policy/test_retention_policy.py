@@ -400,6 +400,30 @@ class TestRetentionPolicy(unittest.TestCase):
             eligible_for_deletion
         )
 
+    @patch.object(BigQueryTableMetadata, 'table_exists', return_value=False)
+    @patch.object(BigQueryTableMetadata, 'get_table_by_reference', return_value=BigQueryTableMetadata(None))
+    @patch.object(Backup, 'get_table', return_value=Table(last_checked=datetime(2017, 8, 1)))
+    @freeze_time("2017-08-20")
+    def test_should_not_remove_any_backups_if_source_table_was_deleted_less_than_seven_months_ago(self, _, _1, _2):  # nopep8 pylint: disable=C0301
+        # given
+        reference = TableReference('example-project-id', 'example-dataset-id',
+                                   'example-table-id')
+        young_backup = create_backup(datetime(2017, 8, 1))
+        old_backup = create_backup(datetime(2016, 1, 17))
+
+        backups = [young_backup, old_backup]
+        backups_expected_for_deletion = []
+
+        # when
+        eligible_for_deletion = self.under_test \
+            .get_backups_eligible_for_deletion(backups=list(backups),
+                                               table_reference=reference)
+        # then
+        self.sortAndAssertListEqual(
+            backups_expected_for_deletion,
+            eligible_for_deletion
+        )
+
     @freeze_time("2017-08-20")
     def test_should_remove_above_last_10_young_backups(self):
         #given
