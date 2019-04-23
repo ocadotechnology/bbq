@@ -1,17 +1,17 @@
 resource "google_bigquery_table" "census_data_4_days_ago_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_backup_creation_latency_views_dataset}"
-  table_id = "census_data_4_days_ago"
+  dataset_id = "${google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id}"table_id = "census_data_4_days_ago"
+  description = "All tables and partitions seen by GCP Census 4 days ago"
 
   view {
     query = <<EOF
             #legacySQL
               -- Shows all tables and partitions seen by census 4 days ago
             SELECT * FROM (
-              SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime
+              SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, numRows
               FROM (
                 SELECT
-                  projectId, datasetId, tableId, creationTime, lastModifiedTime, 'None' AS partitionId,
+                  projectId, datasetId, tableId, creationTime, lastModifiedTime, 'None' AS partitionId, numRows,
                   ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
                 FROM
                   [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
@@ -21,10 +21,10 @@ resource "google_bigquery_table" "census_data_4_days_ago_view" {
               )
               WHERE rownum = 1
             ), (
-              SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime
+              SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, numRows
               FROM (
                 SELECT
-                  projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime,
+                  projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, numRows,
                     ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId, partitionId ORDER BY snapshotTime DESC) AS rownum
                   FROM
                     [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
@@ -36,15 +36,13 @@ resource "google_bigquery_table" "census_data_4_days_ago_view" {
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.SLI_backup_creation_latency_views_dataset"]
 }
 
 
 resource "google_bigquery_table" "SLI_4_days_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_backup_creation_latency_views_dataset}"
-  table_id = "SLI_4_days"
+  dataset_id = "${google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id}"table_id = "SLI_4_days"
+  description = "All tables and partitions which backups potentially violate 4 days latency"
 
   view {
     query = <<EOF
@@ -59,12 +57,12 @@ resource "google_bigquery_table" "SLI_4_days_view" {
             IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
             IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
           FROM
-            [${local.SLI_views_destination_project}.${var.SLI_backup_creation_latency_views_dataset}.census_data_4_days_ago] AS census
+            [${google_bigquery_table.census_data_4_days_ago_view.id}] as census
           LEFT JOIN (
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
             FROM
-              [${local.datastore_export_project}.${var.datastore_export_views_dataset}.last_available_backup_for_every_table_entity]
+              [${google_bigquery_table.last_available_backup_for_every_table_entity_view.id}]
           ) AS last_backups
           ON
             census.projectId=last_backups.source_project_id AND
@@ -75,11 +73,10 @@ resource "google_bigquery_table" "SLI_4_days_view" {
             projectId != "${var.bbq_project}"
             AND projectId != "${var.bbq_restoration_project}"
             AND partitionId != "__UNPARTITIONED__"
+            AND census.numRows != 0
             AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -4 , "DAY"))
             AND IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) < lastModifiedTime
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.census_data_4_days_ago_view", "google_bigquery_table.last_available_backup_for_every_table_entity_view"]
 }
