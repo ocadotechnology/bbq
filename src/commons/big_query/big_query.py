@@ -127,6 +127,7 @@ class BigQuery(object):
         return results
 
     @log_time
+    @google_http_error_retry(tries=6, delay=2, backoff=2)
     def list_table_partitions(self, project_id, dataset_id, table_id):
         results = self.execute_query(
             self.create_partition_query(project_id, dataset_id, table_id))
