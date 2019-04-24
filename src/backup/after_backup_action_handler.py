@@ -42,8 +42,10 @@ class AfterBackupActionHandler(JsonHandler):
         try:
             self.__process(request_body_json)
             self._finish_with_success()
-        except (CopyJobError, BackupNotExistsError), e:
-            ErrorReporting().report(e.message)
+        except CopyJobError, e:
+            self._finish_with_error(500, e.message)
+        except BackupNotExistsError, e:
+            self._finish_with_error(404, e.message)
 
     def __process(self, request_body_json):
         copy_job_results = CopyJobResult(request_body_json.get('jobJson'))

@@ -89,10 +89,9 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         self.assertEqual(backup.last_modified, copy_job_result.start_time)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
-    @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
     def test_should_not_create_backups_entity_if_copy_job_failed(
-            self, _create_http, error_reporting, _):
+            self, _create_http, _):
         # given
         _create_http.return_value = HttpMockSequence([
             ({'status': '200'},
@@ -121,19 +120,17 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         # when
         response = self.under_test.post(
             '/callback/backup-created/project/dataset/table',
-            params=payload)
+            params=payload, expect_errors=True)
         backup = table_entity.last_backup
 
         # then
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 500)
         self.assertIsNone(backup)
-        error_reporting.assert_called_once()
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
-    @patch('src.backup.after_backup_action_handler.ErrorReporting')
     @patch.object(BigQuery, '_create_http')
     def test_should_not_create_backups_entity_if_backup_table_doesnt_exist(
-            self, _create_http, error_reporting, _):
+            self, _create_http, _):
         # given
         _create_http.return_value = HttpMockSequence([
           ({'status': '200'},
@@ -166,13 +163,12 @@ class TestAfterBackupActionHandler(unittest.TestCase):
         # when
         response = self.under_test.post(
             '/callback/backup-created/project/dataset/table',
-            params=payload)
+            params=payload, expect_errors=True)
         backup = table_entity.last_backup
 
         # then
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 404)
         self.assertIsNone(backup)
-        error_reporting.assert_called_once()
 
     @patch('src.commons.big_query.big_query.BigQuery.__init__', Mock(return_value=None))
     @patch.object(BigQueryTableMetadata, 'get_table_by_big_query_table', return_value=BigQueryTableMetadata(None))
