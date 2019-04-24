@@ -22,6 +22,14 @@ class DatastoreTableGetRetriableException(Exception):
     pass
 
 
+class CopyJobError(Exception):
+    pass
+
+
+class BackupNotExistsError(Exception):
+    pass
+
+
 class AfterBackupActionHandler(JsonHandler):
     def __init__(self, request=None, response=None):
         super(AfterBackupActionHandler, self).__init__(request, response)
@@ -30,8 +38,12 @@ class AfterBackupActionHandler(JsonHandler):
     def post(self, **_):
         request_body_json = JsonRequestHelper.parse_request_body(self.request.body)
         self.__validate(request_body_json)
-        self.__process(request_body_json)
-        self._finish_with_success()
+
+        try:
+            self.__process(request_body_json)
+            self._finish_with_success()
+        except (CopyJobError, BackupNotExistsError), e:
+            ErrorReporting().report(e.message)
 
     def __process(self, request_body_json):
         copy_job_results = CopyJobResult(request_body_json.get('jobJson'))
@@ -43,8 +55,7 @@ class AfterBackupActionHandler(JsonHandler):
                             "has not been done. " \
                 .format(copy_job_results.error_message,
                         data["sourceBqTable"], data["targetBqTable"])
-            ErrorReporting().report(error_message)
-            return
+            raise CopyJobError(error_message)
 
         backup_table_metadata = BigQueryTableMetadata.get_table_by_big_query_table(
             copy_job_results.target_bq_table
@@ -57,10 +68,9 @@ class AfterBackupActionHandler(JsonHandler):
                 self.__disable_partition_expiration(
                     TableReference.from_bq_table(copy_job_results.target_bq_table))
         else:
-            pass
-            ErrorReporting().report(
-                "Backup table {0} not exist. Backup entity is not created".format(
-                    copy_job_results.target_bq_table))
+            error_message = "Backup table {0} not exist. Backup entity is not" \
+                            " created".format(copy_job_results.target_bq_table)
+            raise BackupNotExistsError(error_message)
 
     def __disable_partition_expiration(self, backup_table_reference):
         self.BQ.disable_partition_expiration(
