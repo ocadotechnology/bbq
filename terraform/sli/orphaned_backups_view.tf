@@ -26,19 +26,46 @@ resource "google_bigquery_table" "orphaned_backups" {
 
   view {
     query = <<EOF
-          SELECT tableId, datasetId, projectId
-          FROM
-            [${var.gcp_census_project}:bigquery_view.table_metadata_deduplicated_aggregated]
-          WHERE
-            projectId = "${var.bbq_project}"
-          AND
-            tableId LIKE "20%"
-          AND
-            lastModifiedTime < DATE_ADD(CURRENT_DATE(), -7, "DAY")
-          AND
-            tableId NOT IN (SELECT backup_table_id
-          FROM
-            [${var.bbq_project}:datastore_export_views_legacy.all_backups])
+
+          SELECT
+            tableId,
+            datasetId,
+            projectId
+          FROM (
+            SELECT
+              tableId,
+              datasetId,
+              projectId
+            FROM
+              [${var.gcp_census_project}:bigquery_view.table_metadata_deduplicated_aggregated]
+            WHERE
+              projectId = "${var.bbq_project}"
+              AND tableId LIKE "20%"
+              AND lastModifiedTime < DATE_ADD(CURRENT_DATE(), -7, "DAY")
+              AND tableId IN (
+              SELECT
+                backup_table_id
+              FROM
+                [${var.bbq_project}:datastore_export_views_legacy.all_backups]
+              WHERE
+                backup_deleted IS NOT NULL
+                AND backup_deleted < DATE_ADD(CURRENT_DATE(), -7, "DAY"))),
+            (
+            SELECT
+              tableId,
+              datasetId,
+              projectId
+            FROM
+              [${var.gcp_census_project}:bigquery_view.table_metadata_deduplicated_aggregated]
+            WHERE
+              projectId = "${var.bbq_project}"
+              AND tableId LIKE "20%"
+              AND lastModifiedTime < DATE_ADD(CURRENT_DATE(), -7, "DAY")
+              AND tableId NOT IN (
+              SELECT
+                backup_table_id
+              FROM
+                [${var.bbq_project}:datastore_export_views_legacy.all_backups]))
         EOF
     use_legacy_sql = true
   }
