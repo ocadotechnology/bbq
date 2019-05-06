@@ -27,19 +27,16 @@ When data is slowly streamed to BigQuery partitioned table, then that data might
 #### Result
 * Part of new data is not backed up
 
-## Backing up empty partition just after expiration
+## Backing up empty partition
 
-Due to asynchronous nature of scheduling backup for partition it is possible that: 
-1. Backup scheduler queries for partition will get given partition. 
-2. Partition is removed.
-3. Backup of partition task is run because it is scheduled before partition removal. 
-4. Google returns information 200 during `table.get`, but partition is empty (0 bytes) - if `lastModifiedTime` is newer than lastBackup (very rare case as `lastModifiedTime` of empty partition is currently time of last modification whole table metadata(eg. description etc.)) then backup will be performed.
-5. The newest version of backup is empty, the second newest has proper data.
+Due to asynchronous nature of scheduling backup for table/partition it is possible that: 
+1. Source data is modified and backup is scheduled for given table/partition
+1. Between scheduling copy-job task and this task execution, the data is deleted manually or by partition expiration
+1. The newest version of backup is empty, the second newest has proper data.
 
 #### Prerequisites
-* Partitioned table with partition expiration set
-* Partition expires between listing partitions and running task for backup
-* Whole table (metadata, other partitions) are updated in meantime
+* Backup is scheduled for given table/partition, i.e. `lastModifiedTime` is modified
+* Between scheduling copy-job task and this task execution, the data is deleted manually or by partition expiration
 
 #### Result
-* Backup for given partition (if exists) will be deleted after 7 months, as only the most recent empty backup will be retained 
+* Backup for given table/partition (if exists) will be deleted after 7 months, as only the most recent empty backup will be retained 
