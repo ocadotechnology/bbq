@@ -124,7 +124,8 @@ Every day retention process scans all backups to find and delete backups matchin
 * if there are multiple backups per day, the most recent one is retained. Multiple backups per day are created in rare cases (e.g. when task queue task is executed more than one time),
 * for backups younger than 7 months, the 10 most recent ones are retained,
 * for backups older than 7 months, single most recent backup is retained,
-* if source table is deleted, then the last backup is deleted after 7 months after deletion.
+* if source table is deleted, then the last backup is deleted after 7 months after deletion,
+* one month after deletion of last backup, datastore entities for table and backups are deleted
  
 ### Example of 10 versions retention for backups younger than 7 months
 ![Retention process](docs/images/bbq_retention_process_10_versions.gif)

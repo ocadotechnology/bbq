@@ -58,9 +58,16 @@ class Backup(ndb.Model):
     # nopep8 pylint: disable=C0121
     @classmethod
     @retry(Exception, tries=5, delay=1, backoff=2)
-    def get_all_backups_sorted(cls, ancestor_key):
+    def get_all_not_deleted_backups_sorted(cls, ancestor_key):
         return Backup.query(ancestor=ancestor_key) \
             .filter(ndb.GenericProperty('deleted') == None) \
+            .order(-Backup.created) \
+            .fetch()
+
+    @classmethod
+    @retry(Exception, tries=5, delay=1, backoff=2)
+    def get_all_backups_sorted(cls, ancestor_key):
+        return Backup.query(ancestor=ancestor_key) \
             .order(-Backup.created) \
             .fetch()
 

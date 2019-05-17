@@ -5,10 +5,10 @@ from dateutil.relativedelta import relativedelta
 from apiclient.errors import HttpError
 
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.config.configuration import configuration
 
 
 class GracePeriodAfterDeletionFilter(object):
-    GRACE_PERIOD_AFTER_DELETION_IN_MONTHS = 7
 
     def filter(self, backups, table_reference):
         if self.__should_keep_backups(backups, table_reference):
@@ -18,7 +18,7 @@ class GracePeriodAfterDeletionFilter(object):
 
     def __should_keep_backups(self, backups, table_reference):
         age_threshold_date = datetime.date.today() - relativedelta(
-            months=self.GRACE_PERIOD_AFTER_DELETION_IN_MONTHS)
+            months=configuration.grace_period_after_source_table_deletion_in_months)
         old_backups = [b for b in backups
                        if b.created.date() < age_threshold_date]
 

@@ -1,6 +1,7 @@
 import datetime
 import unittest
 
+from freezegun import freeze_time
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 from mock import patch, Mock
@@ -164,3 +165,89 @@ class TestTableRetention(unittest.TestCase):
 
         # then
         delete_table.assert_not_called()
+
+    @freeze_time("2019-05-16")
+    def test_should_delete_both_table_and_backups_entities_if_table_not_exist_for_a_long_time_and_any_not_deleted_backup_exists(
+            self):
+        # given
+        table = Table(
+            project_id='example-proj-name',
+            dataset_id='example-dataset-name',
+            table_id='example-table-name',
+            last_checked=datetime.datetime(2017, 2, 1, 16, 30)
+        )
+        table.put()
+        reference = TableReference.from_table_entity(table)
+        backup1 = backup_utils.create_backup(
+            datetime.datetime(2017, 2, 1, 16, 30), table, table_id="backup1")
+        backup1.deleted = datetime.datetime(2017, 3, 1, 16, 30)
+        backup2 = backup_utils.create_backup(
+            datetime.datetime(2017, 2, 2, 16, 30), table, table_id="backup2")
+        backup2.deleted = datetime.datetime(2017, 3, 1, 16, 30)
+        ndb.put_multi([backup1, backup2])
+        self.policy.get_backups_eligible_for_deletion = Mock(return_value=[])
+
+        # when
+        self.under_test.perform_retention(reference, table.key.urlsafe())
+
+        # then
+        self.assertTrue(table.key.get() is None)
+        self.assertTrue(Backup.get_by_key(backup1.key) is None)
+        self.assertTrue(Backup.get_by_key(backup2.key) is None)
+
+    @freeze_time("2019-05-16")
+    def test_should_not_delete_table_and_backups_entities_if_table_not_exist_for_less_than_threshold_value_and_backups_are_already_deleted(
+            self):
+        # given
+        table = Table(
+            project_id='example-proj-name',
+            dataset_id='example-dataset-name',
+            table_id='example-table-name',
+            last_checked=datetime.datetime(2019, 2, 1, 16, 30)
+        )
+        table.put()
+        reference = TableReference.from_table_entity(table)
+        backup1 = backup_utils.create_backup(
+            datetime.datetime(2019, 2, 1, 16, 30), table, table_id="backup1")
+        backup1.deleted = datetime.datetime(2017, 3, 1, 16, 30)
+        backup2 = backup_utils.create_backup(
+            datetime.datetime(2019, 2, 2, 16, 30), table, table_id="backup2")
+        backup2.deleted = datetime.datetime(2017, 3, 1, 16, 30)
+        ndb.put_multi([backup1, backup2])
+        self.policy.get_backups_eligible_for_deletion = Mock(return_value=[])
+
+        # when
+        self.under_test.perform_retention(reference, table.key.urlsafe())
+
+        # then
+        self.assertTrue(table.key.get() is not None)
+        self.assertTrue(Backup.get_by_key(backup1.key) is not None)
+        self.assertTrue(Backup.get_by_key(backup2.key) is not None)
+
+    @freeze_time("2019-05-16")
+    def test_should_not_delete_table_and_backups_entities_if_table_not_exist_for_more_than_threshold_value_and_backups_are_not_deleted_yet(
+            self):
+        # given
+        table = Table(
+            project_id='example-proj-name',
+            dataset_id='example-dataset-name',
+            table_id='example-table-name',
+            last_checked=datetime.datetime(2017, 2, 1, 16, 30)
+        )
+        table.put()
+        reference = TableReference.from_table_entity(table)
+        backup1 = backup_utils.create_backup(
+            datetime.datetime(2019, 2, 1, 16, 30), table, table_id="backup1")
+        backup1.deleted = datetime.datetime(2017, 3, 1, 16, 30)
+        backup2 = backup_utils.create_backup(
+            datetime.datetime(2019, 2, 2, 16, 30), table, table_id="backup2")
+        ndb.put_multi([backup1, backup2])
+        self.policy.get_backups_eligible_for_deletion = Mock(return_value=[])
+
+        # when
+        self.under_test.perform_retention(reference, table.key.urlsafe())
+
+        # then
+        self.assertTrue(table.key.get() is not None)
+        self.assertTrue(Backup.get_by_key(backup1.key) is not None)
+        self.assertTrue(Backup.get_by_key(backup2.key) is not None)

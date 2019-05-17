@@ -28,12 +28,12 @@ class TestBackup(unittest.TestCase):
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         backup = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
@@ -43,7 +43,7 @@ class TestBackup(unittest.TestCase):
         backup_to_check = Backup.get_by_key(backup.key)
         self.assertEqual(backup_to_check.deleted, None)
         self.assertEqual(
-            backup_to_check.created, datetime(2017, 02, 1, 16, 30))
+            backup_to_check.created, datetime(2017, 2, 1, 16, 30))
 
     def test_should_retrieve_table_using_backup(self):
         # given
@@ -51,13 +51,13 @@ class TestBackup(unittest.TestCase):
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         table.put()
         backup = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
@@ -68,7 +68,7 @@ class TestBackup(unittest.TestCase):
         table_entity = Table.get_table_from_backup(backup_entity)
         self.assertEqual(table_entity, table)
 
-    @freeze_time("2017-02-03 16:30:00")
+    @freeze_time("2017-2-3 16:30:00")
     def test_deleting_backup_is_adding_current_timestamp_in_deleted_field(
             self
         ):
@@ -77,12 +77,12 @@ class TestBackup(unittest.TestCase):
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         backup = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
@@ -92,21 +92,21 @@ class TestBackup(unittest.TestCase):
         Backup.mark_backup_deleted(backup.key)
         # then
         deleted_backup = Backup.get_by_key(backup.key)
-        self.assertEqual(deleted_backup.deleted, datetime(2017, 02, 3, 16, 30))
+        self.assertEqual(deleted_backup.deleted, datetime(2017, 2, 3, 16, 30))
 
-    def test_that_get_all_backups_sorted_will_return_only_these_with_null_deleted_column(self):# nopep8 pylint: disable=C0301, W0613
+    def test_that_get_all_not_deleted_backups_sorted_will_return_only_these_with_null_deleted_column(self):# nopep8 pylint: disable=C0301, W0613
         # given
         table = Table(
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         table.put()
         backup1 = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='backup_dataset',
             table_id='backup1',
             numBytes=1234,
@@ -114,19 +114,53 @@ class TestBackup(unittest.TestCase):
         backup1.put()
         backup2 = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='backup_dataset',
             table_id='backup2',
             numBytes=1234,
-            deleted=datetime(2017, 02, 10, 16, 30)
+            deleted=datetime(2017, 2, 10, 16, 30)
         )
         backup2.put()
         # when
-        existing_backups = Backup.get_all_backups_sorted(table.key)
+        existing_backups = Backup.get_all_not_deleted_backups_sorted(table.key)
         # then
         self.assertTrue(backup1 in existing_backups)
         self.assertTrue(backup2 not in existing_backups)
+
+    def test_that_get_all_backups_sorted_will_return_also_these_with_non_null_deleted_column(self):# nopep8 pylint: disable=C0301, W0613
+        # given
+        table = Table(
+            project_id='example-proj-name',
+            dataset_id='example-dataset-name',
+            table_id='example-table-name',
+            last_checked=datetime(2017, 2, 1, 16, 30)
+        )
+        table.put()
+        backup1 = Backup(
+            parent=table.key,
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
+            dataset_id='backup_dataset',
+            table_id='backup1',
+            numBytes=1234,
+        )
+        backup1.put()
+        backup2 = Backup(
+            parent=table.key,
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
+            dataset_id='backup_dataset',
+            table_id='backup2',
+            numBytes=1234,
+            deleted=datetime(2017, 2, 10, 16, 30)
+        )
+        backup2.put()
+        # when
+        all_backups = Backup.get_all_backups_sorted(table.key)
+        # then
+        self.assertTrue(backup1 in all_backups)
+        self.assertTrue(backup2 in all_backups)
 
     def test_should_sort_backups_by_create_time_desc(self):
         # given
@@ -161,21 +195,21 @@ class TestBackup(unittest.TestCase):
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         table.put()
         backup_one = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
         )
         backup_two = Backup(
             parent=table.key,
-            last_modified=datetime(2018, 03, 2, 00, 00),
-            created=datetime(2018, 03, 2, 00, 00),
+            last_modified=datetime(2018, 3, 2, 00, 00),
+            created=datetime(2018, 3, 2, 00, 00),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
@@ -196,21 +230,21 @@ class TestBackup(unittest.TestCase):
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id='example-table-name',
-            last_checked=datetime(2017, 02, 1, 16, 30)
+            last_checked=datetime(2017, 2, 1, 16, 30)
         )
         table.put()
         backup_one = Backup(
             parent=table.key,
-            last_modified=datetime(2017, 02, 1, 16, 30),
-            created=datetime(2017, 02, 1, 16, 30),
+            last_modified=datetime(2017, 2, 1, 16, 30),
+            created=datetime(2017, 2, 1, 16, 30),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234
         )
         backup_two = Backup(
             parent=table.key,
-            last_modified=datetime(2018, 03, 2, 00, 00),
-            created=datetime(2018, 03, 2, 00, 00),
+            last_modified=datetime(2018, 3, 2, 00, 00),
+            created=datetime(2018, 3, 2, 00, 00),
             dataset_id='targetDatasetId',
             table_id='targetTableId',
             numBytes=1234

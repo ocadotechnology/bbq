@@ -25,6 +25,12 @@ class TestConfiguration(unittest.TestCase):
     def test_should_be_able_to_read__custom_project_list(self):
         self.__is_list_and_each_item_instance_of(self.configuration.projects_to_skip, str)
 
+    def test_should_be_able_to_read_grace_period_after_source_table_deletion_in_months(self):
+        self.__instance_of(self.configuration.grace_period_after_source_table_deletion_in_months, int)
+
+    def test_should_be_able_to_read_young_old_generation_threshold_in_months(self):
+        self.__instance_of(self.configuration.young_old_generation_threshold_in_months, int)
+
     def __instance_of(self, obj, expected_type):
         self.assertTrue(isinstance(obj, expected_type))
 
