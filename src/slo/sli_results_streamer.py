@@ -8,7 +8,7 @@ class SLIResultsStreamer(object):
     def __init__(self,
                  table_id,
                  dataset_id="SLI_history",
-                 project_id=configuration.backup_project_id
+                 project_id=configuration.metadata_storage_project_id
                  ):
         self.data_streamer = DataStreamer(project_id=project_id, dataset_id=dataset_id, table_id=table_id)
 

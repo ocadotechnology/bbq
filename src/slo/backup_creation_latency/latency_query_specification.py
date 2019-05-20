@@ -9,9 +9,11 @@ class LatencyQuerySpecification(object):
 
     def query_string(self):
         projects_to_skip = tuple(configuration.projects_to_skip)
-        return \
-            "SELECT * FROM [{}:SLI_backup_creation_latency_views.SLI_{}_days] WHERE projectId NOT IN {}" \
-                .format(configuration.backup_project_id, self.x_days, projects_to_skip)
+        return "SELECT * FROM " \
+               "[{}:SLI_backup_creation_latency_views.SLI_{}_days] " \
+               "WHERE projectId NOT IN {}"\
+            .format(configuration.metadata_storage_project_id,
+                    self.x_days, projects_to_skip)
 
     def format_query_results(self, results, snapshot_time):
         formatted_results = [{"snapshotTime": snapshot_time,

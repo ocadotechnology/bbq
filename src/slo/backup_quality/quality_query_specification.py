@@ -4,13 +4,15 @@ from src.commons.table_reference import TableReference
 
 class QualityQuerySpecification(object):
 
-    def query_string(self):
+    @staticmethod
+    def query_string():
         projects_to_skip = tuple(configuration.projects_to_skip)
-        return \
-            "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality] WHERE source_project_id NOT IN {}"\
-              .format(configuration.backup_project_id, projects_to_skip)
+        return "SELECT * FROM [{}:SLI_backup_quality_views.SLI_quality] " \
+               "WHERE source_project_id NOT IN {}"\
+            .format(configuration.metadata_storage_project_id, projects_to_skip)
 
-    def format_query_results(self, results, snapshot_time):
+    @staticmethod
+    def format_query_results(results, snapshot_time):
         formatted_results = [{"snapshotTime": snapshot_time,
                               "projectId": result['f'][0]['v'],
                               "datasetId": result['f'][1]['v'],
@@ -36,4 +38,3 @@ class QualityQuerySpecification(object):
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
                               partition_id=partition_id)
-
