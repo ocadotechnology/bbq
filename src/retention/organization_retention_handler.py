@@ -8,7 +8,7 @@ from src.backup.datastore.Table import Table
 
 class OrganizationRetentionHandler(webapp2.RequestHandler):
 
-    QUERY_PAGE_SIZE = 5000
+    QUERY_PAGE_SIZE = 2500
 
     def get(self):
         cursor = Cursor(urlsafe=self.request.get('cursor'))
