@@ -7,7 +7,7 @@ variable "bbq_restoration_project" {
 }
 
 variable "bbq_metadata_project" {
-  description = "storage project for bbq metadatas"
+  description = "storage project for bbq metadata"
 }
 
 variable "gcp_census_project" {
@@ -27,6 +27,7 @@ variable "datastore_export_project" {
 locals {
   datastore_export_project = "${var.datastore_export_project != "" ? var.datastore_export_project : var.bbq_metadata_project}"
   SLI_views_destination_project = "${var.SLI_views_destination_project != "" ? var.SLI_views_destination_project : var.bbq_metadata_project}"
+  one_year_in_ms = 31536000000
 }
 
 variable "datastore_export_dataset" {
