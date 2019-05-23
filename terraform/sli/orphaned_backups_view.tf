@@ -1,5 +1,5 @@
 resource "google_bigquery_dataset" "orphaned_backups_dataset" {
-  project = "${var.bbq_project}"
+  project = "${var.bbq_metadata_project}"
   dataset_id = "${var.orhpaned_backups_views_dataset}"
   location = "${var.SLI_views_location}"
 
@@ -17,10 +17,12 @@ resource "google_bigquery_dataset" "orphaned_backups_dataset" {
     role   = "OWNER"
     special_group = "projectOwners"
   }
+
+  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }
 
 resource "google_bigquery_table" "orphaned_backups" {
-  project = "${var.bbq_project}"
+  project = "${var.bbq_metadata_project}"
   dataset_id = "${var.orhpaned_backups_views_dataset}"
   table_id = "orphaned_backups_view"
 
@@ -46,7 +48,7 @@ resource "google_bigquery_table" "orphaned_backups" {
               SELECT
                 backup_table_id
               FROM
-                [${var.bbq_project}:datastore_export_views_legacy.all_backups]
+                [${var.bbq_metadata_project}:datastore_export_views_legacy.all_backups]
               WHERE
                 backup_deleted IS NOT NULL
                 AND backup_deleted < DATE_ADD(CURRENT_DATE(), -7, "DAY"))),
@@ -65,7 +67,7 @@ resource "google_bigquery_table" "orphaned_backups" {
               SELECT
                 backup_table_id
               FROM
-                [${var.bbq_project}:datastore_export_views_legacy.all_backups]))
+                [${var.bbq_metadata_project}:datastore_export_views_legacy.all_backups]))
         EOF
     use_legacy_sql = true
   }

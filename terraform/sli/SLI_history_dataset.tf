@@ -17,6 +17,8 @@ resource "google_bigquery_dataset" "SLI_history_dataset" {
     role   = "READER"
     special_group = "projectReaders"
   }
+
+  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }
 
 resource "google_bigquery_table" "SLI_backup_creation_latency" {

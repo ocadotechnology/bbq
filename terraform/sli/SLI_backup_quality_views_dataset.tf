@@ -18,4 +18,6 @@ resource "google_bigquery_dataset" "SLI_backup_quality_views_dataset" {
     role   = "OWNER"
     special_group = "projectOwners"
   }
+
+  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }

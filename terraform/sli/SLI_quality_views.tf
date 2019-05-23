@@ -55,7 +55,7 @@ resource "google_bigquery_table" "last_backup_in_census" {
               census.numBytes AS backup_num_bytes,
               census.numRows AS backup_num_rows
             FROM
-              [${var.bbq_project}.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
+              [${var.bbq_metadata_project}.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
             AS last_backup
             LEFT OUTER JOIN (
               SELECT datasetId, tableId, lastModifiedTime, numBytes, numRows
