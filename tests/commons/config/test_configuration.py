@@ -16,6 +16,9 @@ class TestConfiguration(unittest.TestCase):
     def test_should_be_able_to_read__backup_project_id(self):
         self.__instance_of(self.configuration.backup_project_id, str)
 
+    def test_should_be_able_to_read__metadata_storage_project_id(self):
+        self.__instance_of(self.configuration.metadata_storage_project_id, str)
+
     def test_should_be_able_to_read__default_restoration_project_id(self):
         self.__instance_of(self.configuration.default_restoration_project_id, str)
 

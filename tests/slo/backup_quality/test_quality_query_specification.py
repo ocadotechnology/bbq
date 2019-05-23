@@ -12,4 +12,4 @@ class TestQualityQuerySpecification(TestCase):
         quality_query_spec = QualityQuerySpecification()
         query = quality_query_spec.query_string()
         self.assertEqual(query,
-                         "SELECT * FROM [BBQ-project-id:SLI_backup_quality_views.SLI_quality] WHERE source_project_id NOT IN ('BBQ-project-id', '123')")
+                         "SELECT * FROM [BBQ-metadata-project-id:SLI_backup_quality_views.SLI_quality] WHERE source_project_id NOT IN ('BBQ-project-id', '123')")

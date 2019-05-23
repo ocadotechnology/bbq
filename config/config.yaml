@@ -22,5 +22,12 @@ project_settings:
   backup_project_id: 'BBQ-project-id'
   debug_mode: False
 
+  # metadata_storage_project_id -
+  # The main purpose of this project is to separate BBQ backups
+  #   that should be immutable and invisible for developers without any particular reason
+  # from metadata such as datastore exports, SLI views etc.
+  #   that are used and constantly modified by developers.
+  metadata_storage_project_id: 'BBQ-metadata-project-id'
+
   # default_restoration_project_id - project into which data will be restored by default during restoration process
   # default_restoration_project_id: 'default-restoration-storage-project-id'

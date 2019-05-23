@@ -26,6 +26,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency" {
 
   time_partitioning {
     type = "DAY"
+    expiration_ms = "${local.one_year_in_ms}"
   }
 
   schema= "${file("${path.module}/SLI_backup_creation_latency_filtered_table_schema.json")}"
@@ -75,6 +76,7 @@ resource "google_bigquery_table" "SLI_backup_quality" {
 
   time_partitioning {
     type = "DAY"
+    expiration_ms = "${local.one_year_in_ms}"
   }
 
   schema= "${file("${path.module}/SLI_backup_quality_filtered_table_schema.json")}"

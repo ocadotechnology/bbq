@@ -16,6 +16,7 @@ PERIOD = 60
 class LoadDatastoreBackupsToBigQueryException(Exception):
     pass
 
+
 class LoadDatastoreBackupsToBigQueryService(object):
 
     def __init__(self, date):
@@ -25,7 +26,7 @@ class LoadDatastoreBackupsToBigQueryService(object):
 
     def load(self, source_uri, kinds):
         self.big_query.create_dataset(
-            configuration.backup_project_id,
+            configuration.metadata_storage_project_id,
             DATASET_ID, self.location
         )
 
@@ -52,7 +53,7 @@ class LoadDatastoreBackupsToBigQueryService(object):
                         ".export_metadata".format(source_uri, kind, kind)
                     ],
                     "destinationTable": {
-                        "projectId": configuration.backup_project_id,
+                        "projectId": configuration.metadata_storage_project_id,
                         "datasetId": DATASET_ID,
                         "tableId": kind + "_" + self.date
                     }
@@ -84,8 +85,7 @@ class LoadDatastoreBackupsToBigQueryService(object):
             result = self.big_query.get_job(load_job)
             if 'errors' in result['status']:
                 raise LoadDatastoreBackupsToBigQueryException(
-                    "Export from GCS to BQ failed, job reference: {}"
-                        .format(load_job)
+                    "Export from GCS to BQ failed, job reference: {}".format(load_job)
                 )
             if result['status']['state'] == 'DONE':
                 return
