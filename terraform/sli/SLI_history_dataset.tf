@@ -34,7 +34,7 @@ resource "google_bigquery_table" "SLI_backup_creation_latency" {
 
 resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_creation_latency_view"
 
   view {
@@ -78,7 +78,7 @@ resource "google_bigquery_table" "SLI_backup_quality" {
 
 resource "google_bigquery_table" "SLI_backup_quality_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.id}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_quality_view"
 
   view {
