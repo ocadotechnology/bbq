@@ -65,7 +65,7 @@ resource "google_bigquery_table" "orphaned_backups" {
               SELECT
                 backup_table_id
               FROM
-                [${google_bigquery_table.all_backups_view.id}]
+                [${google_bigquery_table.all_backups_view.id}]))
         EOF
     use_legacy_sql = true
   }
