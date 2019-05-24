@@ -1,6 +1,6 @@
 resource "google_bigquery_table" "tables_not_modified_since_3_days" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_backup_quality_views_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
   table_id = "tables_not_modified_since_3_days"
 
   view {
@@ -29,13 +29,11 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset"]
 }
 
 resource "google_bigquery_table" "last_backup_in_census" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_backup_quality_views_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
   table_id = "last_backup_in_census"
 
   view {
@@ -55,7 +53,7 @@ resource "google_bigquery_table" "last_backup_in_census" {
               census.numBytes AS backup_num_bytes,
               census.numRows AS backup_num_rows
             FROM
-              [${var.bbq_project}.datastore_export_views_legacy.last_available_backup_for_every_table_entity]
+              [${google_bigquery_table.last_available_backup_for_every_table_entity_view.id}]
             AS last_backup
             LEFT OUTER JOIN (
               SELECT datasetId, tableId, lastModifiedTime, numBytes, numRows
@@ -66,13 +64,11 @@ resource "google_bigquery_table" "last_backup_in_census" {
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset", "google_bigquery_table.last_available_backup_for_every_table_entity_view"]
 }
 
 resource "google_bigquery_table" "SLI_quality" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_backup_quality_views_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
   table_id = "SLI_quality"
 
   view {
@@ -95,7 +91,7 @@ resource "google_bigquery_table" "SLI_quality" {
               source_table.numRows AS source_num_rows,
               last_backup_in_census.backup_num_rows AS backup_num_rows
             FROM
-              [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.tables_not_modified_since_3_days] AS source_table
+              [${google_bigquery_table.tables_not_modified_since_3_days.id}] AS source_table
             LEFT JOIN (
               SELECT
                 source_project_id,
@@ -110,7 +106,7 @@ resource "google_bigquery_table" "SLI_quality" {
                 backup_entity_num_bytes,
                 backup_num_rows
               FROM
-                [${local.SLI_views_destination_project}.${var.SLI_backup_quality_views_dataset}.last_backup_in_census] ) AS last_backup_in_census
+                [${google_bigquery_table.last_backup_in_census.id}] ) AS last_backup_in_census
             ON
               source_table.projectId=last_backup_in_census.source_project_id
               AND source_table.datasetId=last_backup_in_census.source_dataset_id
@@ -127,6 +123,4 @@ resource "google_bigquery_table" "SLI_quality" {
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.SLI_backup_quality_views_dataset", "google_bigquery_table.last_backup_in_census"]
 }

@@ -21,7 +21,7 @@ resource "google_bigquery_dataset" "SLI_history_dataset" {
 
 resource "google_bigquery_table" "SLI_backup_creation_latency" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_creation_latency"
 
   time_partitioning {
@@ -30,13 +30,11 @@ resource "google_bigquery_table" "SLI_backup_creation_latency" {
   }
 
   schema= "${file("${path.module}/SLI_backup_creation_latency_filtered_table_schema.json")}"
-
-  depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
 }
 
 resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_creation_latency_view"
 
   view {
@@ -46,14 +44,12 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_view" {
           FROM (
             SELECT snapshotTime, projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, backupCreated, backupLastModified, xDays,
             DENSE_RANK() OVER (PARTITION BY xDays ORDER BY snapshotTime DESC ) AS newestSnapshotRank
-            FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency]
+            FROM [${google_bigquery_table.SLI_backup_creation_latency.id}]
             WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
           ) WHERE newestSnapshotRank=1 and projectId!='SNAPSHOT_MARKER'
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.SLI_backup_creation_latency"]
 }
 
 resource "google_bigquery_table" "SLI_backup_creation_latency_by_count_view" {
@@ -62,16 +58,14 @@ resource "google_bigquery_table" "SLI_backup_creation_latency_by_count_view" {
   table_id = "SLI_backup_creation_latency_by_count_view"
 
   view {
-    query = "SELECT INTEGER(xDays) as xDays, count(*) as count FROM [${var.SLI_history_dataset}.SLI_backup_creation_latency_view] GROUP BY xDays"
+    query = "SELECT INTEGER(xDays) as xDays, count(*) as count FROM [${google_bigquery_table.SLI_backup_creation_latency_view.id}] GROUP BY xDays"
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.SLI_backup_creation_latency_view"]
 }
 
 resource "google_bigquery_table" "SLI_backup_quality" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_quality"
 
   time_partitioning {
@@ -80,13 +74,11 @@ resource "google_bigquery_table" "SLI_backup_quality" {
   }
 
   schema= "${file("${path.module}/SLI_backup_quality_filtered_table_schema.json")}"
-
-  depends_on = ["google_bigquery_dataset.SLI_history_dataset"]
 }
 
 resource "google_bigquery_table" "SLI_backup_quality_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_quality_view"
 
   view {
@@ -96,27 +88,23 @@ resource "google_bigquery_table" "SLI_backup_quality_view" {
           FROM (
             SELECT snapshotTime, projectId, datasetId, tableId, partitionId, backupDatasetId, backupTableId, lastModifiedTime, backupLastModifiedTime, backupEntityLastModifiedTime, numBytes, backupNumBytes, backupEntityNumBytes, numRows, backupNumRows,
             DENSE_RANK() OVER (ORDER BY snapshotTime DESC ) AS newestSnapshotRank
-            FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_quality]
+            FROM [${google_bigquery_table.SLI_backup_quality.id}]
             WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))
           ) WHERE newestSnapshotRank=1 and projectId!='SNAPSHOT_MARKER'
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.SLI_backup_quality"]
 }
 
 resource "google_bigquery_table" "SLI_backup_latency_last_snapshot_time_view" {
   project = "${local.SLI_views_destination_project}"
-  dataset_id = "${var.SLI_history_dataset}"
+  dataset_id = "${google_bigquery_dataset.SLI_history_dataset.dataset_id}"
   table_id = "SLI_backup_latency_last_snapshot_time"
 
   view {
-    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_creation_latency] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
+    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${google_bigquery_table.SLI_backup_creation_latency.id}] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.SLI_backup_creation_latency"]
 }
 
 resource "google_bigquery_table" "SLI_backup_quality_last_snapshot_time_view" {
@@ -125,9 +113,7 @@ resource "google_bigquery_table" "SLI_backup_quality_last_snapshot_time_view" {
   table_id = "SLI_backup_quality_last_snapshot_time"
 
   view {
-    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${local.SLI_views_destination_project}:${var.SLI_history_dataset}.SLI_backup_quality] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
+    query = "SELECT MAX(snapshotTime) as snapshotTime FROM [${google_bigquery_table.SLI_backup_quality.id}] WHERE _PARTITIONTIME=TIMESTAMP(UTC_USEC_TO_DAY(CURRENT_TIMESTAMP()))"
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.SLI_backup_quality"]
 }
