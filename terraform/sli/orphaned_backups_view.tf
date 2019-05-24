@@ -17,8 +17,6 @@ resource "google_bigquery_dataset" "orphaned_backups_dataset" {
     role   = "OWNER"
     special_group = "projectOwners"
   }
-
-  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }
 
 resource "google_bigquery_table" "orphaned_backups" {
@@ -48,7 +46,7 @@ resource "google_bigquery_table" "orphaned_backups" {
               SELECT
                 backup_table_id
               FROM
-                [${var.bbq_metadata_project}:datastore_export_views_legacy.all_backups]
+                [${google_bigquery_table.all_backups_view.id}]
               WHERE
                 backup_deleted IS NOT NULL
                 AND backup_deleted < DATE_ADD(CURRENT_DATE(), -7, "DAY"))),
@@ -67,10 +65,8 @@ resource "google_bigquery_table" "orphaned_backups" {
               SELECT
                 backup_table_id
               FROM
-                [${var.bbq_metadata_project}:datastore_export_views_legacy.all_backups]))
+                [${google_bigquery_table.all_backups_view.id}]
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.orphaned_backups_dataset"]
 }

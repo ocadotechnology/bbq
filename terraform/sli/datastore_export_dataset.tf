@@ -20,19 +20,15 @@ resource "google_bigquery_dataset" "datastore_export_dataset" {
 }
 
 resource "google_bigquery_table" "datastore_export_backup_kind_table" {
-  dataset_id = "${var.datastore_export_dataset}"
   project = "${local.datastore_export_project}"
+  dataset_id = "${google_bigquery_dataset.datastore_export_dataset.dataset_id}"
   table_id = "Backup_"
   schema= "${file("${path.module}/datastore_export_backup_kind_table_schema.json")}"
-
-  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }
 
 resource "google_bigquery_table" "datastore_export_table_kind_table" {
-  dataset_id = "${var.datastore_export_dataset}"
   project = "${local.datastore_export_project}"
+  dataset_id = "${google_bigquery_dataset.datastore_export_dataset.dataset_id}"
   table_id = "Table_"
   schema= "${file("${path.module}/datastore_export_table_kind_table_schema.json")}"
-
-  depends_on = ["google_bigquery_dataset.datastore_export_dataset"]
 }

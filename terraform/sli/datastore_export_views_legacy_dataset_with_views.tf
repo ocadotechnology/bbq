@@ -34,13 +34,13 @@ resource "google_bigquery_table" "last_table_view" {
           last_checked,
           __key__.id AS id
         FROM
-          TABLE_QUERY( [${local.datastore_export_project}:${var.datastore_export_dataset}],
-            'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 6) = "Table_")' )
+          TABLE_QUERY( [${google_bigquery_dataset.datastore_export_dataset.id}],
+            'table_id=(SELECT MAX(table_id)
+                       FROM [${google_bigquery_dataset.datastore_export_dataset.id}.__TABLES__]
+                       WHERE LEFT(table_id, 6) = "Table_")' )
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_dataset.datastore_export_views_legacy_view"]
 }
 
 resource "google_bigquery_table" "last_backup_view" {
@@ -70,8 +70,10 @@ resource "google_bigquery_table" "last_backup_view" {
               NTH(2, SPLIT(__key__.path, ',')) AS parent_id,
               TO_BASE64(BYTES(__key__.path)) AS key
             FROM
-              TABLE_QUERY( [${local.datastore_export_project}:${var.datastore_export_dataset}],
-                'table_id=(SELECT MAX(table_id) FROM [${local.datastore_export_project}:${var.datastore_export_dataset}.__TABLES__] WHERE LEFT(table_id, 7) = "Backup_")' ) AS last_table
+              TABLE_QUERY( [${google_bigquery_dataset.datastore_export_dataset.id}],
+                'table_id=(SELECT MAX(table_id)
+                           FROM [${google_bigquery_dataset.datastore_export_dataset.id}.__TABLES__]
+                           WHERE LEFT(table_id, 7) = "Backup_")' ) AS last_table
             )
         EOF
     use_legacy_sql = true
@@ -101,14 +103,12 @@ resource "google_bigquery_table" "all_backups_view" {
               b.table_id as backup_table_id,
               b.dataset_id as backup_dataset_id,
               b.key AS backupBqKey
-            FROM [${var.datastore_export_views_dataset}.last_backup] AS b
-            JOIN [${var.datastore_export_views_dataset}.last_table] AS t
+            FROM [${google_bigquery_table.last_backup_view.id}] AS b
+            JOIN [${google_bigquery_table.last_table_view.id}] AS t
             ON b.parent_id = t.id
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.last_backup_view", "google_bigquery_table.last_table_view"]
 }
 
 resource "google_bigquery_table" "last_available_backup_for_every_table_entity_view" {
@@ -120,13 +120,11 @@ resource "google_bigquery_table" "last_available_backup_for_every_table_entity_v
     query = <<EOF
           SELECT * FROM (
             SELECT *, row_number() OVER (PARTITION BY table_entity_id order by backup_created DESC) as rownum
-            FROM [${var.datastore_export_views_dataset}.all_backups]
+            FROM [${google_bigquery_table.all_backups_view.id}]
             WHERE backup_deleted IS NULL
           )
           WHERE rownum=1
         EOF
     use_legacy_sql = true
   }
-
-  depends_on = ["google_bigquery_table.all_backups_view"]
 }
