@@ -4,7 +4,7 @@ from src.retention.policy.filter.utils.backup_age_divider import \
     BackupAgeDivider
 
 
-class OnlyOneVersionAbove7MonthsFilter(object):
+class OnlyOneVersionForOldBackupFilter(object):
 
     def filter(self, backups, table_reference):
         sorted_backups = Backup.sort_backups_by_create_time_desc(backups)

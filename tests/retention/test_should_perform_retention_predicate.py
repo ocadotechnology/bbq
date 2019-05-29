@@ -31,7 +31,7 @@ class TestShouldPerformRetentionPredicate(unittest.TestCase):
         # then
         self.assertEqual(True, result)
 
-    def test_should_return_false_for_empy_list(self):
+    def test_should_return_false_for_empty_list(self):
         # given
         empty_list = []
 
@@ -47,7 +47,7 @@ class TestShouldPerformRetentionPredicate(unittest.TestCase):
             self, report, _):
         # given
         backups = \
-            self.__create_backups_with_part_of_referecing_same_table_in_bq()
+            self.__create_backups_with_part_of_referencing_same_table_in_bq()
 
         # when
         result = ShouldPerformRetentionPredicate.test(backups)
@@ -66,7 +66,7 @@ class TestShouldPerformRetentionPredicate(unittest.TestCase):
         return [backup_1, backup_2, backup_3, backup_4]
 
     @staticmethod
-    def __create_backups_with_part_of_referecing_same_table_in_bq():
+    def __create_backups_with_part_of_referencing_same_table_in_bq():
         backup_1 = Backup(table_id='table_id_1', dataset_id='dataset_id_1')
         backup_2 = Backup(table_id='table_id_2', dataset_id='dataset_id_1')
         backup_3 = Backup(table_id='table_id_3', dataset_id='dataset_id_1')

@@ -5,18 +5,19 @@ from freezegun import freeze_time
 
 from mock import patch
 from src.backup.datastore.Backup import Backup
-from src.retention.policy.filter.only_one_version_above_7_months_filter import \
-    OnlyOneVersionAbove7MonthsFilter
+
 from src.commons.table_reference import TableReference
+from src.retention.policy.filter.only_one_version_old_backup_filter import \
+    OnlyOneVersionForOldBackupFilter
 from tests.utils.backup_utils import create_backup
 
 
-class TestOnlyOneVersionAbove7MonthsFilter(unittest.TestCase):
+class TestOnlyOneVersionForOldBackupFilter(unittest.TestCase):
     def setUp(self):
         patch('googleapiclient.discovery.build').start()
         patch('oauth2client.client.GoogleCredentials.get_application_default')\
             .start()
-        self.under_test = OnlyOneVersionAbove7MonthsFilter()
+        self.under_test = OnlyOneVersionForOldBackupFilter()
 
     def tearDown(self):
         patch.stopall()
