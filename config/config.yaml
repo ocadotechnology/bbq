@@ -34,7 +34,9 @@ project_settings:
 
 retention_settings:
 
-  # young_old_generation_threshold_in_months - number of months from above retention process will left only one backup older than
+  # young_old_generation_threshold_in_months - for all backups older than this number of months,
+  # retention process will delete all backups except the most recent one.
+  # This doesn't affect backups younger than this threshold
   young_old_generation_threshold_in_months: 7
 
   # grace_period_after_source_table_deletion_in_months - number of months since deletion of source table after retention will remove last backup for given table
