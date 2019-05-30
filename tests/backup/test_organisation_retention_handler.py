@@ -2,9 +2,12 @@ import datetime
 import unittest
 
 import webapp2
+from dateutil.relativedelta import relativedelta
 from google.appengine.ext import testbed
 
 import webtest
+
+from src.commons.config.configuration import configuration
 from src.commons.test_utils import utils
 from mock import patch
 from src.backup.datastore.Table import Table
@@ -27,7 +30,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_should_schedul_retention_with_empty_datastore(self):
+    def test_should_schedule_retention_with_empty_datastore(self):
         # given
         # when
         self.under_test.get('/cron/retention')
@@ -73,12 +76,49 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
                          '&tableKey='),
                         msg='Actual url: {}'.format(tasks[0].url))
 
+    def test_should_schedule_only_recently_seen_tables(self):
+        # given
+        self._create_table_entity('recently_seen_partitioned_table', '20170605')
+        self._create_table_entity('recently_seen_not_partitioned_table')
+        self._create_table_entity('not_seen_since_threshold_date_table', last_checked= datetime.datetime.now() - relativedelta(
+            months=(configuration.grace_period_after_source_table_deletion_in_months + 2)))
+
+        # when
+        self.under_test.get('/cron/retention')
+
+        # then
+        tasks = self.taskqueue_stub.get_filtered_tasks()
+        self.assertEqual(len(tasks), 2)
+        self.assertTrue(tasks[0].url.startswith
+                        ('/tasks/retention/table'
+                         '?projectId=example-proj-name'
+                         '&partitionId=20170605'
+                         '&tableId=recently_seen_partitioned_table'
+                         '&datasetId=example-dataset-name'
+                         '&tableKey='),
+                        msg='Actual url: {}'.format(tasks[0].url))
+        self.assertTrue(tasks[1].url.startswith
+                        ('/tasks/retention/table'
+                         '?projectId=example-proj-name'
+                         '&tableId=recently_seen_not_partitioned_table'
+                         '&datasetId=example-dataset-name'
+                         '&tableKey='),
+                        msg='Actual url: {}'.format(tasks[1].url))
+
     def test_should_schedule_using_cursor(self):
         # given
         self._create_table_entity('non_partitioned_table1')
         self._create_table_entity('non_partitioned_table2')
 
-        _, cursor, _1 = Table.query().fetch_page(page_size=1)
+        age_threshold_datetime = datetime.datetime.now() - relativedelta(
+            months=(configuration.grace_period_after_source_table_deletion_in_months + 1))
+
+        _, cursor, _1 = Table.query() \
+            .filter(Table.last_checked >= age_threshold_datetime) \
+            .order(Table.last_checked, Table.key) \
+            .fetch_page(
+            page_size=1,
+        )
 
         # when
         self.under_test.get(
@@ -110,12 +150,12 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
                         msg='Actual url: {}'.format(tasks[0].url))
 
     @staticmethod
-    def _create_table_entity(table_id, partition_id=None):
+    def _create_table_entity(table_id, partition_id=None, last_checked=datetime.datetime.now()):
         non_partitioned_table = Table(
             project_id='example-proj-name',
             dataset_id='example-dataset-name',
             table_id=table_id,
             partition_id=partition_id,
-            last_checked=datetime.datetime(2017, 02, 1, 16, 30)
+            last_checked=last_checked
         )
         non_partitioned_table.put()

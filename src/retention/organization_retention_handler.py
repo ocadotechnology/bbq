@@ -1,9 +1,13 @@
+import datetime
+
 import webapp2
+from dateutil.relativedelta import relativedelta
 from google.appengine.api.taskqueue import Task
 from google.appengine.datastore.datastore_query import Cursor
 
-from src.commons.tasks import Tasks
 from src.backup.datastore.Table import Table
+from src.commons.config.configuration import configuration
+from src.commons.tasks import Tasks
 
 
 class OrganizationRetentionHandler(webapp2.RequestHandler):
@@ -16,7 +20,10 @@ class OrganizationRetentionHandler(webapp2.RequestHandler):
 
     @classmethod
     def __schedule_retention_starting_from_cursor(cls, table_cursor):
-        results, next_cursor, more = Table.query().fetch_page(
+        results, next_cursor, more = Table.query() \
+            .filter(OrganizationRetentionHandler.table_with_backup()) \
+            .order(Table.last_checked, Table.key) \
+            .fetch_page(
             page_size=cls.QUERY_PAGE_SIZE,
             start_cursor=table_cursor
         )
@@ -32,6 +39,13 @@ class OrganizationRetentionHandler(webapp2.RequestHandler):
                 })
 
             Tasks.schedule(queue_name='table-retention-scheduler', tasks=[task])
+
+    @staticmethod
+    def table_with_backup():
+        age_threshold_datetime = datetime.datetime.today() - relativedelta(
+            months=(configuration.grace_period_after_source_table_deletion_in_months + 1))
+
+        return Table.last_checked >= age_threshold_datetime
 
     @staticmethod
     def __create_table_retention_task(table):
