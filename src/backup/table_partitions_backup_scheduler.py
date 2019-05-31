@@ -16,9 +16,9 @@ class TablePartitionsBackupScheduler(object):
         if not partitions:
             logging.info("Table %s doesn't contain any partitions",
                          self.table_reference)
-        for partition in partitions:
-            TaskCreator.create_task_for_partition_backup(
-                self.table_reference.get_project_id(),
-                self.table_reference.get_dataset_id(),
-                self.table_reference.get_table_id(),
-                partition['partitionId'])
+
+        TaskCreator.schedule_tasks_for_partition_backup(
+            self.table_reference.get_project_id(),
+            self.table_reference.get_dataset_id(),
+            self.table_reference.get_table_id(),
+            [partition['partitionId'] for partition in partitions])

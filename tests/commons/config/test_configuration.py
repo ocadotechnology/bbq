@@ -10,9 +10,6 @@ class TestConfiguration(unittest.TestCase):
     def test_should_be_able_to_read__copy_job_result_check_countdown_in_sec(self):
         self.__instance_of(self.configuration.copy_job_result_check_countdown_in_sec, int)
 
-    def test_should_be_able_to_read__backup_worker_max_countdown_in_sec(self):
-        self.__instance_of(self.configuration.backup_worker_max_countdown_in_sec, int)
-
     def test_should_be_able_to_read__backup_project_id(self):
         self.__instance_of(self.configuration.backup_project_id, str)
 

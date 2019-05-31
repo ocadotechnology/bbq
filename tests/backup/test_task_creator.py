@@ -23,12 +23,12 @@ class TestTaskCreator(unittest.TestCase):
 
     @patch.object(request_correlation_id, 'get',
                   return_value='correlation-id')
-    def test_creating_task_in_taskqueue(self, _):
+    def test_should_schedule_single_partition_task_if_only_one(self, _):
         # when
-        TaskCreator.create_task_for_partition_backup("test-project",
+        TaskCreator.schedule_tasks_for_partition_backup("test-project",
                                                      "test-dataset",
                                                      "test-table",
-                                                     "20170330")
+                                                     ["20170330"])
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks(
             queue_names='backup-worker')
@@ -36,3 +36,32 @@ class TestTaskCreator(unittest.TestCase):
         header_value = tasks[0].headers[
             request_correlation_id.HEADER_NAME]
         self.assertEqual(header_value, 'correlation-id')
+
+    @patch.object(request_correlation_id, 'get',
+                  return_value='correlation-id')
+    def test_should_schedule_two_partition_task_if_two_partitions(self, _):
+        # when
+        TaskCreator.schedule_tasks_for_partition_backup("test-project",
+                                                        "test-dataset",
+                                                        "test-table",
+                                                        ["20170330", "20170130"])
+        # then
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names='backup-worker')
+        self.assertEqual(len(tasks), 2, "Should create two task in queue")
+        header_value = tasks[0].headers[
+            request_correlation_id.HEADER_NAME]
+        self.assertEqual(header_value, 'correlation-id')
+
+    @patch.object(request_correlation_id, 'get',
+                  return_value='correlation-id')
+    def test_should_not_schedule_any_task_if_any_partition(self, _):
+        # when
+        TaskCreator.schedule_tasks_for_partition_backup("test-project",
+                                                        "test-dataset",
+                                                        "test-table",
+                                                        [])
+        # then
+        tasks = self.taskqueue_stub.get_filtered_tasks(
+            queue_names='backup-worker')
+        self.assertEqual(len(tasks), 0, "Should not create any task in queue")
