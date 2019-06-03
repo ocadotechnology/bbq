@@ -1,26 +1,20 @@
 import datetime
 import unittest
 
-import webapp2
 from dateutil.relativedelta import relativedelta
 from google.appengine.ext import testbed
+from mock import patch
 
-import webtest
-
+from src.backup.datastore.Table import Table
 from src.commons.config.configuration import configuration
 from src.commons.test_utils import utils
-from mock import patch
-from src.backup.datastore.Table import Table
-from src.retention.organization_retention_handler import \
-    OrganizationRetentionHandler
+from src.retention.organization_retention import OrganizationRetention
 
 
-class TestOrganizationRetentionHandler(unittest.TestCase):
+class TestOrganizationRetention(unittest.TestCase):
 
     def setUp(self):
-        app = webapp2.WSGIApplication(
-            [('/cron/retention', OrganizationRetentionHandler)])
-        self.under_test = webtest.TestApp(app)
+
         self.testbed = testbed.Testbed()
         self.testbed.activate()
         self.testbed.init_memcache_stub()
@@ -33,7 +27,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
     def test_should_schedule_retention_with_empty_datastore(self):
         # given
         # when
-        self.under_test.get('/cron/retention')
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(None)
 
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks()
@@ -44,7 +38,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
         self._create_table_entity('non_partitioned_table')
 
         # when
-        self.under_test.get('/cron/retention')
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(None)
 
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks()
@@ -62,7 +56,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
         self._create_table_entity('partitioned_table', '20170605')
 
         # when
-        self.under_test.get('/cron/retention')
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(None)
 
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks()
@@ -84,7 +78,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
             months=(configuration.grace_period_after_source_table_deletion_in_months + 2)))
 
         # when
-        self.under_test.get('/cron/retention')
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(None)
 
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks()
@@ -110,7 +104,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
         self._create_table_entity('non_partitioned_table1')
         self._create_table_entity('non_partitioned_table2')
 
-        age_threshold_datetime = datetime.datetime.now() - relativedelta(
+        age_threshold_datetime = datetime.datetime.today() - relativedelta(
             months=(configuration.grace_period_after_source_table_deletion_in_months + 1))
 
         _, cursor, _1 = Table.query() \
@@ -121,8 +115,7 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
         )
 
         # when
-        self.under_test.get(
-            '/cron/retention?cursor={}'.format(cursor.urlsafe()))
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(cursor)
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks()
         self.assertEqual(len(tasks), 1)
@@ -132,14 +125,14 @@ class TestOrganizationRetentionHandler(unittest.TestCase):
                         msg='Actual url: {}'.format(tasks[0].url))
 
     @patch('src.retention.organization_retention_handler.'
-           'OrganizationRetentionHandler.QUERY_PAGE_SIZE', 3)
+           'OrganizationRetention.QUERY_PAGE_SIZE', 3)
     def test_should_schedule_retention_task_at_the_end(self):
         # given
         for i in range(0, 6):
             self._create_table_entity('non_partitioned_table_{}'.format(i))
 
         # when
-        self.under_test.get('/cron/retention')
+        OrganizationRetention.schedule_retention_tasks_starting_from_cursor(None)
 
         # then
         tasks = self.taskqueue_stub.get_filtered_tasks(
