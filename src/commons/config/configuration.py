@@ -50,6 +50,18 @@ class Configuration(object):
     def projects_to_skip(self):
         return self.__project_config['backup_settings'].get('projects_to_skip')
 
+    @property
+    def grace_period_after_source_table_deletion_in_months(self):
+        property = self.__project_config['retention_settings'].get(
+            'grace_period_after_source_table_deletion_in_months')
+        assert property >= 1
+        return property
+
+    @property
+    def young_old_generation_threshold_in_months(self):
+        property = self.__project_config['retention_settings'].get('young_old_generation_threshold_in_months')
+        assert property >= 1
+        return property
 
 config_file_yaml = "config/config.yaml"
 logging.info("Loading configuration from file: '%s'", config_file_yaml)

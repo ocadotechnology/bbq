@@ -4,17 +4,17 @@ from src.retention.policy.filter.grace_period_after_deletion_filter import \
     GracePeriodAfterDeletionFilter
 from src.retention.policy.filter.most_recent_daily_backup_filter import \
     MostRecentDailyBackupFilter
+from src.retention.policy.filter.only_one_version_old_backup_filter import \
+    OnlyOneVersionForOldBackupFilter
 from src.retention.policy.filter.ten_young_backup_versions_filter import \
     TenYoungBackupVersionsFilter
-from src.retention.policy.filter.only_one_version_above_7_months_filter import \
-    OnlyOneVersionAbove7MonthsFilter
 
 
 class RetentionPolicy(object):
     def __init__(self):
         self.filters = [MostRecentDailyBackupFilter(),
                         TenYoungBackupVersionsFilter(),
-                        OnlyOneVersionAbove7MonthsFilter(),
+                        OnlyOneVersionForOldBackupFilter(),
                         GracePeriodAfterDeletionFilter()]
 
     def get_backups_eligible_for_deletion(self, backups, table_reference):
