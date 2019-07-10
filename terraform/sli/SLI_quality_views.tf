@@ -1,6 +1,6 @@
 resource "google_bigquery_table" "tables_not_modified_since_3_days" {
-  project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
+  project = local.SLI_views_destination_project
+  dataset_id = google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id
   table_id = "tables_not_modified_since_3_days"
 
   view {
@@ -32,8 +32,8 @@ resource "google_bigquery_table" "tables_not_modified_since_3_days" {
 }
 
 resource "google_bigquery_table" "last_backup_in_census" {
-  project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
+  project = local.SLI_views_destination_project
+  dataset_id = google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id
   table_id = "last_backup_in_census"
 
   view {
@@ -67,8 +67,8 @@ resource "google_bigquery_table" "last_backup_in_census" {
 }
 
 resource "google_bigquery_table" "SLI_quality" {
-  project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id}"
+  project = local.SLI_views_destination_project
+  dataset_id = google_bigquery_dataset.SLI_backup_quality_views_dataset.dataset_id
   table_id = "SLI_quality"
 
   view {

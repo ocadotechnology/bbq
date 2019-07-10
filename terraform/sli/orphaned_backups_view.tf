@@ -1,27 +1,29 @@
 resource "google_bigquery_dataset" "orphaned_backups_dataset" {
-  project = "${var.bbq_metadata_project}"
-  dataset_id = "${var.orhpaned_backups_views_dataset}"
-  location = "${var.SLI_views_location}"
+  project = var.bbq_metadata_project
+  dataset_id = var.orhpaned_backups_views_dataset
+  location = var.SLI_views_location
 
-  labels {"bbq_metadata"=""}
+  labels = {
+    "bbq_metadata" = ""
+  }
 
   access {
-    role   = "WRITER"
+    role = "WRITER"
     special_group = "projectWriters"
   }
   access {
-    role   = "WRITER"
+    role = "WRITER"
     special_group = "projectReaders"
   }
   access {
-    role   = "OWNER"
+    role = "OWNER"
     special_group = "projectOwners"
   }
 }
 
 resource "google_bigquery_table" "orphaned_backups" {
-  project = "${var.bbq_metadata_project}"
-  dataset_id = "${var.orhpaned_backups_views_dataset}"
+  project = var.bbq_metadata_project
+  dataset_id = var.orhpaned_backups_views_dataset
   table_id = "orphaned_backups_view"
 
   view {

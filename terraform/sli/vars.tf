@@ -16,28 +16,28 @@ variable "gcp_census_project" {
 
 variable "SLI_views_destination_project" {
   description = "all SLI views will be created in this project"
-  default = ""
+  default     = ""
 }
 
 variable "datastore_export_project" {
   description = "project where datastore export tables can be get from (also datastore export views will be stored here)"
-  default = ""
+  default     = ""
 }
 
 locals {
-  datastore_export_project = "${var.datastore_export_project != "" ? var.datastore_export_project : var.bbq_metadata_project}"
-  SLI_views_destination_project = "${var.SLI_views_destination_project != "" ? var.SLI_views_destination_project : var.bbq_metadata_project}"
-  one_year_in_ms = 31536000000
+  datastore_export_project      = var.datastore_export_project != "" ? var.datastore_export_project : var.bbq_metadata_project
+  SLI_views_destination_project = var.SLI_views_destination_project != "" ? var.SLI_views_destination_project : var.bbq_metadata_project
+  one_year_in_ms                = 31536000000
 }
 
 variable "datastore_export_dataset" {
   description = "dataset in project {local.datastore_export_project} where datastore export tables can be get from"
-  default = "datastore_export"
+  default     = "datastore_export"
 }
 
 variable "datastore_export_views_dataset" {
   description = "datastore export views will be stored here"
-  default = "datastore_export_views_legacy"
+  default     = "datastore_export_views_legacy"
 }
 
 variable "SLI_backup_creation_latency_views_dataset" {

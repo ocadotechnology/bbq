@@ -1,6 +1,7 @@
 resource "google_bigquery_table" "census_data_4_days_ago_view" {
-  project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id}"table_id = "census_data_4_days_ago"
+  project = local.SLI_views_destination_project
+  dataset_id = google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id
+  table_id = "census_data_4_days_ago"
   description = "All tables and partitions seen by GCP Census 4 days ago"
 
   view {
@@ -38,10 +39,10 @@ resource "google_bigquery_table" "census_data_4_days_ago_view" {
   }
 }
 
-
 resource "google_bigquery_table" "SLI_4_days_view" {
-  project = "${local.SLI_views_destination_project}"
-  dataset_id = "${google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id}"table_id = "SLI_4_days"
+  project = local.SLI_views_destination_project
+  dataset_id = google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id
+  table_id = "SLI_4_days"
   description = "All tables and partitions which backups potentially violate 4 days latency"
 
   view {

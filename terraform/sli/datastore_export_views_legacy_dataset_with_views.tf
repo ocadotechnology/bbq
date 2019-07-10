@@ -1,27 +1,29 @@
 resource "google_bigquery_dataset" "datastore_export_views_legacy_view" {
-  dataset_id = "${var.datastore_export_views_dataset}"
-  project = "${local.datastore_export_project}"
-  location = "${var.SLI_views_location}"
+  dataset_id = var.datastore_export_views_dataset
+  project = local.datastore_export_project
+  location = var.SLI_views_location
 
-  labels {"bbq_metadata"=""}
+  labels = {
+    "bbq_metadata" = ""
+  }
 
   access {
-    role   = "WRITER"
+    role = "WRITER"
     special_group = "projectWriters"
   }
   access {
-    role   = "OWNER"
+    role = "OWNER"
     special_group = "projectOwners"
   }
   access {
-    role   = "READER"
+    role = "READER"
     special_group = "projectReaders"
   }
 }
 
 resource "google_bigquery_table" "last_table_view" {
-  project = "${local.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_dataset}"
+  project = local.datastore_export_project
+  dataset_id = var.datastore_export_views_dataset
   table_id = "last_table"
 
   view {
@@ -44,8 +46,8 @@ resource "google_bigquery_table" "last_table_view" {
 }
 
 resource "google_bigquery_table" "last_backup_view" {
-  project = "${local.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_dataset}"
+  project = local.datastore_export_project
+  dataset_id = var.datastore_export_views_dataset
   table_id = "last_backup"
 
   view {
@@ -79,12 +81,13 @@ resource "google_bigquery_table" "last_backup_view" {
     use_legacy_sql = true
   }
 
-  depends_on = ["google_bigquery_dataset.datastore_export_views_legacy_view"]
+  depends_on = [
+    google_bigquery_dataset.datastore_export_views_legacy_view]
 }
 
 resource "google_bigquery_table" "all_backups_view" {
-  project = "${local.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_dataset}"
+  project = local.datastore_export_project
+  dataset_id = var.datastore_export_views_dataset
   table_id = "all_backups"
 
   view {
@@ -112,8 +115,8 @@ resource "google_bigquery_table" "all_backups_view" {
 }
 
 resource "google_bigquery_table" "last_available_backup_for_every_table_entity_view" {
-  project = "${local.datastore_export_project}"
-  dataset_id = "${var.datastore_export_views_dataset}"
+  project = local.datastore_export_project
+  dataset_id = var.datastore_export_views_dataset
   table_id = "last_available_backup_for_every_table_entity"
 
   view {
