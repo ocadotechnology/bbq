@@ -27,10 +27,6 @@ class Configuration(object):
         return self.__project_config['copy_jobs'].get('copy_job_result_check_countdown_in_sec')
 
     @property
-    def backup_worker_max_countdown_in_sec(self):
-        return self.__project_config['backup_settings'].get('backup_worker_max_countdown_in_sec')
-
-    @property
     def backup_settings_custom_project_list(self):
         return self.__project_config['backup_settings'].get('custom_project_list')
 

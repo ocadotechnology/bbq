@@ -23,8 +23,8 @@ class TestTablePartitionsBackupScheduler(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    @patch.object(TaskCreator, 'create_task_for_partition_backup')
-    def test_schedule(self, create_task_for_partition_backup):
+    @patch.object(TaskCreator, 'schedule_tasks_for_partition_backup')
+    def test_schedule(self, schedule_tasks_for_partition_backup):
         # given
         project_id = "test-project"
         dataset_id = "test-dataset"
@@ -47,7 +47,7 @@ class TestTablePartitionsBackupScheduler(unittest.TestCase):
         TablePartitionsBackupScheduler(table_reference, big_query).start()
 
         # then
-        create_task_for_partition_backup.assert_has_calls([
-            call(project_id, dataset_id, table_id, partition_id_1),
-            call(project_id, dataset_id, table_id, partition_id_2)
+        schedule_tasks_for_partition_backup.assert_has_calls([
+            call(project_id, dataset_id, table_id,
+                 [partition_id_1, partition_id_2])
         ])

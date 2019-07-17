@@ -2,8 +2,6 @@ copy_jobs:
   copy_job_result_check_countdown_in_sec: 5
 
 backup_settings:
-  backup_worker_max_countdown_in_sec: 0
-
   # custom_project_list - list of projects to backup. If empty, BBQ will backup everything
   # it has read (BigQuery Data Viewer) access to. If list is provided you still need to grant
   # BigQuery Data Viewer role for BBQ service account for each mentioned projects.
@@ -41,3 +39,5 @@ retention_settings:
 
   # grace_period_after_source_table_deletion_in_months - number of months since deletion of source table after retention will remove last backup for given table
   grace_period_after_source_table_deletion_in_months: 7
+
+
