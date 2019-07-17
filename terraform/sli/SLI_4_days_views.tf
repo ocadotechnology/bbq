@@ -31,7 +31,7 @@ resource "google_bigquery_table" "census_data_4_days_ago_view" {
                   FROM
                     [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
                   WHERE
-                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -7, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -2, "DAY"))
+                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -7, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -2, "DAY"))
                     AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -4, "DAY"))
               )
               WHERE rownum = 1
