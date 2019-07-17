@@ -16,9 +16,10 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
                   ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
                 FROM
                   [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
-                WHERE
-                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -5, "DAY"))
-                  AND timePartitioning.type IS NULL AND type='TABLE'
+                  WHERE
+                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -3, "DAY"))
+                    AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -5, "DAY"))
+                    AND timePartitioning.type IS NULL AND type='TABLE'
               )
               WHERE rownum = 1
             ), (
@@ -30,7 +31,8 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
                   FROM
                     [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
                   WHERE
-                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(CURRENT_DATE(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(CURRENT_DATE(), -5, "DAY"))
+                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -3, "DAY"))
+                    AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -5, "DAY"))
               )
               WHERE rownum = 1
             )
