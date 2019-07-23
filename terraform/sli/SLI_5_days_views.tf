@@ -1,13 +1,13 @@
-resource "google_bigquery_table" "census_data_5_days_ago_view" {
+resource "google_bigquery_table" "data_modified_4_days_ago_view" {
   project = local.SLI_views_destination_project
   dataset_id = google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id
-  table_id = "census_data_5_days_ago"
-  description = "All tables and partitions seen by GCP Census 5 days ago"
+  table_id = "data_modified_4_days_ago"
+  description = "All tables which have modifications before 4 days ago"
 
   view {
     query = <<EOF
             #legacySQL
-              -- Shows all tables and partitions seen by census 5 days ago
+              --  Shows all tables which have modifications before 4 days ago
             SELECT * FROM (
               SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, numRows
               FROM (
@@ -16,10 +16,10 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
                   ROW_NUMBER() OVER (PARTITION BY projectId, datasetId, tableId ORDER BY snapshotTime DESC) AS rownum
                 FROM
                   [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
-                  WHERE
-                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -3, "DAY"))
-                    AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -5, "DAY"))
-                    AND timePartitioning.type IS NULL AND type='TABLE'
+                WHERE
+                   _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -7, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -2, "DAY"))
+                  AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -4, "DAY"))
+                  AND timePartitioning.type IS NULL AND type='TABLE'
               )
               WHERE rownum = 1
             ), (
@@ -31,8 +31,8 @@ resource "google_bigquery_table" "census_data_5_days_ago_view" {
                   FROM
                     [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
                   WHERE
-                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -8, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -3, "DAY"))
-                    AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -5, "DAY"))
+                    _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -7, "DAY")) AND TIMESTAMP(DATE_ADD(NOW(), -2, "DAY"))
+                    AND lastModifiedTime <= TIMESTAMP(DATE_ADD(NOW(), -4, "DAY"))
               )
               WHERE rownum = 1
             )
@@ -60,7 +60,7 @@ resource "google_bigquery_table" "SLI_5_days_view" {
             IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
             IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
           FROM
-            [${google_bigquery_table.census_data_5_days_ago_view.id}] as census
+            [${google_bigquery_table.data_modified_4_days_ago_view.id}] as census
           LEFT JOIN (
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id
@@ -76,8 +76,8 @@ resource "google_bigquery_table" "SLI_5_days_view" {
             projectId != "${var.bbq_project}"
             AND projectId != "${var.bbq_restoration_project}"
             AND partitionId != "__UNPARTITIONED__"
-            AND numRows != 0
-            AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -5 , "DAY"))
+            AND census.numRows != 0
+            AND IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) < TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP(), -4 , "DAY"))
             AND IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) < lastModifiedTime
         EOF
     use_legacy_sql = true
