@@ -1,13 +1,13 @@
-resource "google_bigquery_table" "census_data_0_days_ago_view" {
+resource "google_bigquery_table" "data_modified_0_days_ago_view" {
   project = local.SLI_views_destination_project
   dataset_id = google_bigquery_dataset.SLI_backup_creation_latency_views_dataset.dataset_id
-  table_id = "census_data_0_days_ago"
-  description = "All tables and partitions seen by GCP Census 0 days ago"
+  table_id = "data_modified_0_days_ago"
+  description = "All tables which have modifications before 0 days ago"
 
   view {
     query = <<EOF
             #legacySQL
-              -- Shows all tables and partitions seen by census now
+              --  Shows all tables which have modifications before 0 days ago
             SELECT * FROM (
               SELECT projectId, datasetId, tableId, partitionId, creationTime, lastModifiedTime, numRows
               FROM (
@@ -60,7 +60,7 @@ resource "google_bigquery_table" "SLI_0_days_view" {
             IFNULL(last_backups.backup_created, MSEC_TO_TIMESTAMP(0)) as backup_created,
             IFNULL(last_backups.backup_last_modified, MSEC_TO_TIMESTAMP(0)) as backup_last_modified
           FROM
-            [${google_bigquery_table.census_data_0_days_ago_view.id}] as census
+            [${google_bigquery_table.data_modified_0_days_ago_view.id}] as census
           LEFT JOIN (
             SELECT
               backup_created, backup_last_modified, source_project_id, source_dataset_id, source_table_id, source_partition_id

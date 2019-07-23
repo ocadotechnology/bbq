@@ -18,7 +18,7 @@ class SLIMainHandler(webapp2.RequestHandler):
             Tasks.create(method='POST',
                          url='/sli/latency_for_x_days',
                          params={'x_days': x_days})
-            for x_days in [3, 4, 5, 7]
+            for x_days in [4, 5, 7]
         ]
         tasks.append(
             Tasks.create(
