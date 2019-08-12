@@ -17,7 +17,7 @@ resource "google_bigquery_table" "data_modified_0_days_ago_view" {
                 FROM
                   [${var.gcp_census_project}.bigquery.table_metadata_v1_0]
                 WHERE
-                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -3, "DAY")) AND NOW()
+                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -2, "DAY")) AND NOW()
                   AND lastModifiedTime <= NOW()
                   AND timePartitioning.type IS NULL AND type='TABLE'
               )
@@ -31,7 +31,7 @@ resource "google_bigquery_table" "data_modified_0_days_ago_view" {
                   FROM
                     [${var.gcp_census_project}.bigquery.partition_metadata_v1_0]
                   WHERE
-                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -3, "DAY")) AND NOW()
+                  _PARTITIONTIME BETWEEN TIMESTAMP(DATE_ADD(NOW(), -2, "DAY")) AND NOW()
                   AND lastModifiedTime <= NOW()
               )
               WHERE rownum = 1
