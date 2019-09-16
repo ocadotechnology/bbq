@@ -57,12 +57,14 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
             predicate.test(self.big_query_table_metadata, self.table)
 
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
-    def test_should_raise_ParameterValidationException_if_table_is_empty(self, _):
+    def test_should_return_true_if_table_is_empty(self, _):
         # given
         predicate = OnDemandBackupPredicate()
-        # when-then
-        with self.assertRaises(ParameterValidationException):
-            predicate.test(self.big_query_table_metadata, self.table)
+        # when
+        result = predicate.test(self.big_query_table_metadata, self.table)
+        # then
+        self.assertTrue(result, "OnDemandBackupPredicate should return TRUE "
+                                "if table is empty")
 
     @patch.object(BigQueryTableMetadata, 'table_exists',
                   return_value=False)

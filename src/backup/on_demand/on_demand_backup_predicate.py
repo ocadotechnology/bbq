@@ -15,6 +15,9 @@ class OnDemandBackupPredicate(AbstractBackupPredicate):
             else:
                 raise ParameterValidationException(table_validation_message)
 
+        if big_query_table_metadata.is_daily_partitioned() and not big_query_table_metadata.is_partition():
+            raise ParameterValidationException("Partition id is required for partitioned table in on-demand mode")
+
         logging.info("Performing on-demand backup for %s."
                      "It is performed without checking "
                      "if table already has up to date backup",

@@ -1,6 +1,5 @@
 import logging
 from abc import abstractmethod
-from src.commons.exceptions import ParameterValidationException, NotFoundException
 
 
 class AbstractBackupPredicate(object):
@@ -22,6 +21,6 @@ class AbstractBackupPredicate(object):
             return False, "This table is external or view type"
         if big_query_table_metadata.is_empty():
             logging.info('This table is empty')
-            return False, "This table is empty"
+            return True, "This table is empty"
 
         return True, "This table is valid"
