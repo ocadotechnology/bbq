@@ -8,15 +8,16 @@ from src.commons.exceptions import ParameterValidationException, NotFoundExcepti
 class OnDemandBackupPredicate(AbstractBackupPredicate):
 
     def test(self, big_query_table_metadata, table_entity):
+        if big_query_table_metadata.is_daily_partitioned() and not big_query_table_metadata.is_partition():
+            raise ParameterValidationException("Partition id is required for partitioned table in on-demand mode")
+
         table_validation_status, table_validation_message = self._is_possible_to_copy_table(big_query_table_metadata)
+
         if not table_validation_status:
             if table_validation_message == "Table not found":
                 raise NotFoundException(table_validation_message)
             else:
                 raise ParameterValidationException(table_validation_message)
-
-        if big_query_table_metadata.is_daily_partitioned() and not big_query_table_metadata.is_partition():
-            raise ParameterValidationException("Partition id is required for partitioned table in on-demand mode")
 
         logging.info("Performing on-demand backup for %s."
                      "It is performed without checking "
