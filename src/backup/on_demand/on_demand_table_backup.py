@@ -1,6 +1,6 @@
 from src.backup.backup_process import BackupProcess
 from src.backup.on_demand.on_demand_backup_predicate import \
-  OnDemandBackupPredicate
+    OnDemandBackupPredicate
 from src.commons.big_query.big_query import BigQuery
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
 from src.commons.exceptions import ParameterValidationException
@@ -15,9 +15,6 @@ class OnDemandTableBackup(object):
     @staticmethod
     def start(table_reference):
         big_query_table_metadata = BigQueryTableMetadata.get_table_by_reference(table_reference)
-
-        if big_query_table_metadata.is_daily_partitioned() and not big_query_table_metadata.is_partition():
-            raise ParameterValidationException("Partition id is required for partitioned table in on-demand mode")
 
         BackupProcess(table_reference=table_reference,
                       big_query=BigQuery(),

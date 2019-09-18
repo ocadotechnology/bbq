@@ -28,7 +28,7 @@ class TestOnDemandTableBackupHandler(unittest.TestCase):
 
     @patch.object(OnDemandTableBackup, 'start')
     def test_on_demand_request_for_partitioned_table_is_properly_parsed(
-        self, on_demand_table_backup_start):
+            self, on_demand_table_backup_start):
         # given
         table_reference = TableReference('example-proj-name',
                                          'example-dataset-name',
@@ -48,11 +48,11 @@ class TestOnDemandTableBackupHandler(unittest.TestCase):
 
     @patch.object(OnDemandTableBackup, 'start')
     def test_on_demand_request_for_non_partitioned_table_is_properly_parsed(
-        self, on_demand_table_backup_start):
+            self, on_demand_table_backup_start):
         # given
         table_reference = TableReference('example-proj-name',
-                                           'example-dataset-name',
-                                           'example-table-name')
+                                         'example-dataset-name',
+                                         'example-table-name')
         url = '/tasks/backups/on_demand/table/{}/{}/{}'.format(
             table_reference.get_project_id(),
             table_reference.get_dataset_id(),
@@ -65,19 +65,19 @@ class TestOnDemandTableBackupHandler(unittest.TestCase):
         on_demand_table_backup_start.assert_called_with(table_reference)
 
     @patch.object(OnDemandTableBackup, 'start', side_effect=ParameterValidationException("error msg"))
-    def test_on_demand_request_for_partitioned_but_without_passing_partition_should_casue_400(
-        self, on_demand_table_backup_start):
-      # given
-      table_reference = TableReference('example-proj-name',
-                                       'example-dataset-name',
-                                       'example-table-name')
-      url = '/tasks/backups/on_demand/table/{}/{}/{}'.format(
-          table_reference.get_project_id(),
-          table_reference.get_dataset_id(),
-          table_reference.get_table_id())
+    def test_should_return_400_if_parameter_validation_exception(
+            self, on_demand_table_backup_start):
+        # given
+        table_reference = TableReference('example-proj-name',
+                                         'example-dataset-name',
+                                         'example-table-name')
+        url = '/tasks/backups/on_demand/table/{}/{}/{}'.format(
+            table_reference.get_project_id(),
+            table_reference.get_dataset_id(),
+            table_reference.get_table_id())
 
-      # when
-      response = self.under_test.get(url, expect_errors=True)
+        # when
+        response = self.under_test.get(url, expect_errors=True)
 
-      # then
-      self.assertEquals(400, response.status_int)
+        # then
+        self.assertEquals(400, response.status_int)

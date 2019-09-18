@@ -10,6 +10,7 @@ from src.backup.datastore.Table import Table
 from src.backup.on_demand.on_demand_backup_predicate import \
     OnDemandBackupPredicate
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+from src.commons.exceptions import ParameterValidationException, NotFoundException
 
 
 class TestOnDemandBackupPredicate(unittest.TestCase):
@@ -48,14 +49,30 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
         patch.stopall()
 
     @patch.object(BigQueryTableMetadata, 'is_schema_defined', return_value=False)
-    def test_should_return_false_if_schema_is_not_defined(self, _):
+    def test_should_raise_ParameterValidationException_if_schema_is_not_defined(self, _):
         # given
         predicate = OnDemandBackupPredicate()
-        # when
-        result = predicate.test(self.big_query_table_metadata, self.table)
-        # then
-        self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
-                                "if table has no schema")
+        # when-then
+        with self.assertRaises(ParameterValidationException):
+            predicate.test(self.big_query_table_metadata, self.table)
+
+    @patch.object(BigQueryTableMetadata, 'table_exists',
+                  return_value=False)
+    def test_should_raise_NotFoundException_if_table_not_exist_anymore(self, _):
+        # given
+        predicate = OnDemandBackupPredicate()
+        # when-then
+        with self.assertRaises(NotFoundException):
+            predicate.test(self.big_query_table_metadata, self.table)
+
+    @patch.object(BigQueryTableMetadata, 'is_external_or_view_type',
+                  return_value=True)
+    def test_should_raise_ParameterValidationException_if_table_is_external_or_view_type(self, _):
+        # given
+        predicate = OnDemandBackupPredicate()
+        # when-then
+        with self.assertRaises(ParameterValidationException):
+            predicate.test(self.big_query_table_metadata, self.table)
 
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     def test_should_return_true_if_table_is_empty(self, _):
@@ -64,30 +81,8 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
         # when
         result = predicate.test(self.big_query_table_metadata, self.table)
         # then
-        self.assertTrue(result, "OnDemandShouldBackupPredicate should return TRUE "
+        self.assertTrue(result, "OnDemandBackupPredicate should return TRUE "
                                 "if table is empty")
-
-    @patch.object(BigQueryTableMetadata, 'table_exists',
-                  return_value=False)
-    def test_should_return_false_if_table_not_exist_anymore(self, _):
-        # given
-        predicate = OnDemandBackupPredicate()
-        # when
-        result = predicate.test(self.big_query_table_metadata, self.table)
-        # then
-        self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
-                                 "if table not exists")
-
-    @patch.object(BigQueryTableMetadata, 'is_external_or_view_type',
-                  return_value=True)
-    def test_should_return_false_if_table_is_external_or_view_type(self, _):
-        # given
-        predicate = OnDemandBackupPredicate()
-        # when
-        result = predicate.test(self.big_query_table_metadata, self.table)
-        # then
-        self.assertFalse(result, "OnDemandShouldBackupPredicate should return FALSE "
-                                 "if object is table or external type")
 
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 15, 00))
@@ -119,7 +114,8 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
 
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 15, 00))
-    def test_should_return_true_if_table_was_changed_at_the_same_time_when_last_backup(self, _):    # nopep8 pylint: disable=C0301
+    def test_should_return_true_if_table_was_changed_at_the_same_time_when_last_backup(self,
+                                                                                       _):  # nopep8 pylint: disable=C0301
         # given
         backup = Backup(
             parent=self.table.key,
@@ -132,8 +128,8 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
         result = predicate.test(self.big_query_table_metadata, self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return False "
-                                 "if table was change at the same time when "
-                                 "last backup was made")
+                                "if table was change at the same time when "
+                                "last backup was made")
 
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 14, 00))
@@ -150,5 +146,5 @@ class TestOnDemandBackupPredicate(unittest.TestCase):
         result = predicate.test(self.big_query_table_metadata, self.table)
         # then
         self.assertTrue(result, "OnDemandShouldBackupPredicate should return FALSE "
-                                 "if table was changed before "
-                                 "last backup was made")
+                                "if table was changed before "
+                                "last backup was made")

@@ -2,13 +2,15 @@ import logging
 
 from src.backup.abstract_backup_predicate import \
     AbstractBackupPredicate
+from src.commons.exceptions import ParameterValidationException, NotFoundException
 
 
 class DefaultBackupPredicate(AbstractBackupPredicate):
     TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 
     def test(self, big_query_table_metadata, table_entity):
-        if not self._is_possible_to_copy_table(big_query_table_metadata):
+        table_validation_status, table_validation_message = self._is_possible_to_copy_table(big_query_table_metadata)
+        if not table_validation_status:
             return False
 
         last_backup = self.__get_last_table_backup_if_any(table_entity)
