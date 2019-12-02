@@ -2,7 +2,6 @@ import logging
 
 from src.backup.abstract_backup_predicate import \
     AbstractBackupPredicate
-from src.commons.exceptions import ParameterValidationException, NotFoundException
 
 
 class DefaultBackupPredicate(AbstractBackupPredicate):
@@ -49,6 +48,14 @@ class DefaultBackupPredicate(AbstractBackupPredicate):
         if source_table_last_modified_time > last_backup.last_modified:
             logging.info("Backup time is older than table metadata")
             return False
+
+        source_table_num_bytes = big_query_table_metadata.table_size_in_bytes()
+        if source_table_num_bytes != last_backup.numBytes:
+            logging.info("Backup size is different than source. "
+                         "Source: '%s', backup: '%s'",
+                         source_table_num_bytes, last_backup.numBytes)
+            return False
+
         return True
 
     def __format_timestamp(self, datetime):
