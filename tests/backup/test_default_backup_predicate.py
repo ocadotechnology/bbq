@@ -1,11 +1,9 @@
 import unittest
-
 from datetime import datetime
-
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
+from mock import patch
 
-from mock import patch, Mock
 from src.backup.datastore.Backup import Backup
 from src.backup.datastore.Table import Table
 from src.backup.default_backup_predicate import DefaultBackupPredicate
@@ -114,9 +112,11 @@ class TestDefaultBackupPredicate(unittest.TestCase):
         self.assertTrue(result, "ShouldBackupPredicate should return TRUE "
                                 "if table was changed after last backup")
 
+    @patch.object(BigQueryTableMetadata, 'table_size_in_bytes',
+                  return_value=123)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 15, 00))
-    def test_should_return_false_if_table_was_changed_at_the_same_time_when_last_backup(self, _):    # nopep8 pylint: disable=C0301
+    def test_should_return_false_if_table_was_changed_at_the_same_time_when_last_backup(self, _1, _2):    # nopep8 pylint: disable=C0301
         # given
         backup = Backup(
             parent=self.table.key,
@@ -133,9 +133,11 @@ class TestDefaultBackupPredicate(unittest.TestCase):
                                  "if table was change at the same time when "
                                  "last backup was made")
 
+    @patch.object(BigQueryTableMetadata, 'table_size_in_bytes',
+                  return_value=123)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
                   return_value=datetime(2016, 11, 13, 14, 00))
-    def test_should_return_false_if_table_was_changed_before_last_backup(self, _):  # nopep8 pylint: disable=C0301
+    def test_should_return_false_if_table_was_changed_before_last_backup(self, _1,_2):  # nopep8 pylint: disable=C0301
         # given
         backup = Backup(
             parent=self.table.key,
@@ -151,6 +153,28 @@ class TestDefaultBackupPredicate(unittest.TestCase):
         self.assertFalse(result, "ShouldBackupPredicate should return FALSE "
                                  "if table was changed before "
                                  "last backup was made")
+
+    @patch.object(BigQueryTableMetadata, 'table_size_in_bytes',
+                  return_value=123456)
+    @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
+                  return_value=datetime(2016, 11, 13, 14, 00))
+    def test_should_return_true_if_table_was_changed_before_last_backup_but_table_size_is_different(self, _1,_2):  # nopep8 pylint: disable=C0301
+        # given
+        backup = Backup(
+            parent=self.table.key,
+            last_modified=datetime(2016, 11, 13, 15, 00),
+            numBytes=123
+        )
+        backup.put()
+        predicate = DefaultBackupPredicate()
+
+        # when
+        result = predicate.test(self.big_query_table_metadata, self.table)
+        # then
+        self.assertTrue(result, "ShouldBackupPredicate should return TRUE "
+                                "if table was changed before "
+                                "last backup was made but "
+                                "backup has different size than source table")
 
     @patch.object(BigQueryTableMetadata, 'is_empty', return_value=True)
     @patch.object(BigQueryTableMetadata, 'get_last_modified_datetime',
