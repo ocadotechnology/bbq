@@ -1,10 +1,3 @@
-resource "google_project_iam_binding" "project_editor_iams" {
-  project = var.bbq_project
-  role = "roles/editor"
-
-  members = [] // no editors!
-}
-
 resource "google_project_iam_member" "project_indexadmin_iam" {
   project = var.bbq_project
   role = "roles/datastore.importExportAdmin"
