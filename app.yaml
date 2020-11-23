@@ -4,7 +4,7 @@ threadsafe: true
 
 instance_class: B4
 basic_scaling:
-  max_instances: 50
+  max_instances: 25
   idle_timeout: 10m
 
 builtins:
