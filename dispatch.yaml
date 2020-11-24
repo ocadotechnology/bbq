@@ -1,0 +1,9 @@
+dispatch:
+  - url: "*/restore/*"
+    service: restore-service
+
+  - url: "*/callback/restore-finished*"
+    service: restore-service
+
+  - url: "*/_ah/queue/deferred*"
+    service: restore-service

@@ -33,7 +33,7 @@
 
 1. Command below deploys App Engine application:
       ```bash
-      gcloud app deploy --project ${BBQ_PROJECT_ID} app.yaml config/cron.yaml config/queue.yaml config/index.yaml
+      gcloud app deploy --project ${BBQ_PROJECT_ID} app.yaml restore-service.yaml config/cron.yaml config/queue.yaml config/index.yaml dispatch.yaml -q      
       ```
       Note: If it is your first App Engine deploy, App Engine needs to be initialised and you will need to choose [region/location](https://cloud.google.com/appengine/docs/locations). It is recommended to pick the same location as where most of your BigQuery data resides.
 1.   Secure your application by following given steps.
