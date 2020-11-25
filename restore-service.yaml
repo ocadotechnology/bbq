@@ -1,0 +1,51 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+service: restore-service
+
+instance_class: B4
+basic_scaling:
+  max_instances: 25
+  idle_timeout: 10m
+
+builtins:
+# Deferred is required to use google.appengine.ext.deferred.
+- deferred: on
+
+libraries:
+- name: ssl
+  version: 2.7.11
+
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- google_appengine.*
+- gitlab-bbq
+- docs
+- tests
+- src/slo
+
+handlers:
+- url: /_ah/queue/deferred
+  script: google.appengine.ext.deferred.deferred.application
+  secure: always
+  login: admin
+- url: /restore/project/.*/dataset/.*/table/.*
+  script: src.restore.table.table_restore_handler.app
+  secure: always
+- url: /restore/project/.*/dataset/.*
+  script: src.restore.dataset.dataset_restore_handler.app
+  secure: always
+- url: /restore/list
+  script: src.restore.list.backup_list_restore_handler.app
+  secure: always
+- url: /callback/restore-finished.*
+  script: src.restore.after_restore_action_handler.app
+  secure: always
+  login: admin
+- url: /restore/jobs/.*
+  script: src.restore.status.restoration_job_status_handler.app
+  secure: always
