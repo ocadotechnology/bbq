@@ -68,11 +68,6 @@ class BigQuery(object):
                     yield dataset['datasetReference']['datasetId']
             request = self.service.datasets().list_next(request, datasets)
 
-    @retry(HttpError, tries=3, delay=2, backoff=2)
-    def for_each_table(self, project_id, dataset_id, func):
-        for table_id in self.list_table_ids(project_id, dataset_id):
-            func(project_id, dataset_id, table_id)
-
     def list_table_ids(self, project_id, dataset_id):
         request = self.service.tables().list(
             projectId=project_id, datasetId=dataset_id
@@ -86,7 +81,6 @@ class BigQuery(object):
                                  dataset_id)
                     return
                 raise ex
-
             if 'tables' in tables:
                 for table in tables['tables']:
                     if 'tableReference' not in table:
@@ -100,13 +94,6 @@ class BigQuery(object):
                     yield table['tableReference']['tableId']
             request = self.service.tables().list_next(request, tables)
 
-    @retry(Error, tries=3, delay=2, backoff=2)
-    def list_tables(self, project_id, dataset_id, page_token=None,
-        max_results=1000):
-        return self.service.tables().list(
-            projectId=project_id, datasetId=dataset_id,
-            maxResults=max_results, pageToken=page_token
-        ).execute()
 
     def execute_query(self, query, use_legacy_sql=True):
         query_job = self.__sync_query(query=query, use_legacy_sql=use_legacy_sql)
