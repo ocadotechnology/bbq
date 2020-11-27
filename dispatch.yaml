@@ -1,9 +1,15 @@
 dispatch:
   - url: "*/restore/*"
-    service: restore-service
+    service: backend-service
 
   - url: "*/callback/restore-finished*"
-    service: restore-service
+    service: backend-service
 
   - url: "*/_ah/queue/deferred*"
-    service: restore-service
+    service: backend-service
+
+  - url: "*/tasks/backups/dataset*"
+    service: backend-service
+
+  - url: "*/cron/export-datastore-to-big-query*"
+    service: backend-service
