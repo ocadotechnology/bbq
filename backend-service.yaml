@@ -1,7 +1,7 @@
 runtime: python27
 api_version: 1
 threadsafe: true
-service: restore-service
+service: backend-service
 
 instance_class: B4
 basic_scaling:
@@ -49,3 +49,11 @@ handlers:
 - url: /restore/jobs/.*
   script: src.restore.status.restoration_job_status_handler.app
   secure: always
+- url: /tasks/backups/dataset
+  script: src.backup.dataset_backup_handler.app
+  secure: always
+  login: admin
+- url: /cron/export-datastore-to-big-query
+  script: src.datastore_export.export_datastore_to_big_query_handler.app
+  secure: always
+  login: admin
