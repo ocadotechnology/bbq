@@ -1,6 +1,10 @@
+import urllib2
+import uuid
+
 import webapp2
 
 from src.backup.table_backup import TableBackup
+from src.commons import request_correlation_id
 from src.commons.config.configuration import configuration
 from src.commons.table_reference import TableReference
 from src.commons.tasks import Tasks
@@ -17,7 +21,7 @@ class TableBackupHandler(webapp2.RequestHandler):
 
     def get(self, project_id, dataset_id, table_id, partition_id=None): # nopep8 pylint: disable=R0201
         table_reference = TableReference(project_id, dataset_id,
-                                         table_id, partition_id)
+                                         urllib2.unquote(table_id), partition_id)
         TableBackup.start(table_reference)
 
 

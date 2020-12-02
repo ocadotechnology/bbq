@@ -32,6 +32,25 @@ handlers:
   script: src.retention.retention-routing.app
   secure: always
   login: admin
+- url: /cron/backup
+  script: src.backup.scheduler.organization.organization_backup_scheduler_handler.app
+  secure: always
+- url: /tasks/schedulebackup/organization.*
+  script: src.backup.scheduler.organization.organization_backup_scheduler_handler.app
+  secure: always
+  login: admin
+- url: /tasks/schedulebackup/project
+  script: src.backup.scheduler.project.project_backup_scheduler_handler.app
+  secure: always
+  login: admin
+- url: /tasks/schedulebackup/dataset
+  script: src.backup.scheduler.dataset.dataset_backup_scheduler_handler.app
+  secure: always
+  login: admin
+- url: /tasks/schedulebackup/partitionedtable
+  script: src.backup.scheduler.partitioned_table.partitioned_table_backup_scheduler_handler.app
+  secure: always
+  login: admin
 - url: /tasks/backups/table.*
   script: src.backup.table_backup_handler.app
   secure: always
@@ -39,10 +58,6 @@ handlers:
 - url: /tasks/backups/on_demand/table.*
   script: src.backup.on_demand.on_demand_table_backup_handler.app
   secure: always
-- url: /tasks/backups/dataset
-  script: src.backup.dataset_backup_handler.app
-  secure: always
-  login: admin
 - url: /callback/backup-created.*
   script: src.backup.after_backup_action_handler.app
   secure: always
@@ -55,9 +70,6 @@ handlers:
   script: src.commons.big_query.copy_job_async.result_check.result_check_handler.app
   secure: always
   login: admin
-- url: /cron/backup
-  script: src.backup.organization_backup_handler.app
-  secure: always
 - url: /_ah/start
   script: src.restore.restore_ui_handler.app
   secure: always

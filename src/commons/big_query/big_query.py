@@ -11,7 +11,7 @@ from src.commons.config.configuration import configuration
 from src.commons.decorators.cached import cached
 from src.commons.decorators.google_http_error_retry import \
     google_http_error_retry
-from src.commons.decorators.log_time import log_time, measure_time_and_log
+from src.commons.decorators.log_time import log_time
 from src.commons.decorators.retry import retry
 from src.commons.table_reference import TableReference
 
@@ -46,57 +46,54 @@ class BigQuery(object):
     def _cache_discovery():
         return True
 
-    def list_project_ids(self):
-        request = self.service.projects().list()
-        while request is not None:
-            with measure_time_and_log('Request for projects list'):
-                projects = request.execute()
+    @retry(Error, tries=3, delay=2, backoff=1)
+    def list_project_ids(self, page_token=None, max_results=1000):
+        projects_list_result = self.service.projects().list(
+            maxResults=max_results,
+            pageToken=page_token
+        ).execute()
+        project_ids = [project['projectReference']['projectId']
+                       for project in projects_list_result.get('projects', [])]
 
-            for project in projects['projects']:
-                yield project['projectReference']['projectId']
+        return project_ids, projects_list_result.get('nextPageToken')
 
-            request = self.service.projects().list_next(request, projects)
+    @retry(Error, tries=3, delay=2, backoff=2)
+    def list_dataset_ids(self, project_id, page_token=None, max_results=1000):
+        datasets_list_result = self.service.datasets().list(
+            projectId=project_id,
+            maxResults=max_results,
+            pageToken=page_token
+        ).execute()
 
-    def list_dataset_ids(self, project_id):
-        request = self.service.datasets().list(projectId=project_id)
-        while request is not None:
-            with measure_time_and_log('Request for dataset table list'):
-                datasets = request.execute(num_retries=5)
+        dataset_ids = [dataset['datasetReference']['datasetId']
+                       for dataset in datasets_list_result.get('datasets', [])]
 
-            if 'datasets' in datasets:
-                for dataset in datasets['datasets']:
-                    yield dataset['datasetReference']['datasetId']
-            request = self.service.datasets().list_next(request, datasets)
+        return dataset_ids, datasets_list_result.get('nextPageToken')
 
-    def list_table_ids(self, project_id, dataset_id):
-        request = self.service.tables().list(
-            projectId=project_id, datasetId=dataset_id
-        )
-        while request is not None:
-            try:
-                tables = request.execute()
-            except HttpError as ex:
-                if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
-                    logging.info("Dataset '%s:%s' is not found", project_id,
-                                 dataset_id)
-                    return
-                raise ex
-            if 'tables' in tables:
-                for table in tables['tables']:
-                    if 'tableReference' not in table:
-                        logging.info('tableReference not in table,  '
-                                     'table= "%s"',
-                                     json.dumps(table))
-                    if 'tableId' not in table['tableReference']:
-                        logging.info('tableId not in table reference, '
-                                     'tableReference = "%s"',
-                                     json.dumps(table["tableReference"]))
-                    yield table['tableReference']['tableId']
-            request = self.service.tables().list_next(request, tables)
+    @retry(Error, tries=3, delay=2, backoff=2)
+    def list_table_ids(self, project_id, dataset_id, page_token=None,
+        max_results=1000):
+        try:
+            tables_list_result = self.service.tables().list(
+                projectId=project_id,
+                datasetId=dataset_id,
+                maxResults=max_results,
+                pageToken=page_token
+            ).execute()
+        except HttpError as ex:
+            if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
+                logging.info("Dataset '%s:%s' is not found", project_id,
+                             dataset_id)
+                return
 
+        tables_ids = [table['tableReference']['tableId']
+                      for table in tables_list_result.get('tables', [])]
+
+        return tables_ids, tables_list_result.get('nextPageToken')
 
     def execute_query(self, query, use_legacy_sql=True):
-        query_job = self.__sync_query(query=query, use_legacy_sql=use_legacy_sql)
+        query_job = self.__sync_query(query=query,
+                                      use_legacy_sql=use_legacy_sql)
         results = []
         page_token = None
 
@@ -129,9 +126,9 @@ class BigQuery(object):
 
     @staticmethod
     def create_partition_query(project_id, dataset_id, table_id):
-        return "SELECT partition_id, FORMAT_UTC_USEC(creation_time*1000) AS " \
-               "creation_time, FORMAT_UTC_USEC(last_modified_time*1000)" \
-               " AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]" \
+        return u'SELECT partition_id, FORMAT_UTC_USEC(creation_time*1000) AS ' \
+               u'creation_time, FORMAT_UTC_USEC(last_modified_time*1000)' \
+               u' AS last_modified FROM [{0}:{1}.{2}$__PARTITIONS_SUMMARY__]' \
             .format(project_id, dataset_id, table_id)
 
     def __sync_query(self, query, timeout=30000, use_legacy_sql=False):
@@ -146,10 +143,13 @@ class BigQuery(object):
 
     @google_http_error_retry(tries=6, delay=2, backoff=2)
     def get_table(self, project_id, dataset_id, table_id, log_table=True):
-        logging.info("getting table %s", BigQueryTable(project_id, dataset_id, table_id))
+        logging.info(u'Getting table %s',
+                     BigQueryTable(project_id, dataset_id, table_id))
         try:
             table = self.service.tables().get(
-                projectId=project_id, datasetId=dataset_id, tableId=table_id
+                projectId=project_id, datasetId=dataset_id,
+                tableId=table_id if isinstance(table_id,
+                                               str) else table_id.encode('utf8')
             ).execute(num_retries=3)
 
             if log_table and table:
@@ -170,7 +170,7 @@ class BigQuery(object):
         table_copy = table.copy()
         if 'schema' in table_copy:
             del table_copy['schema']
-        logging.info("Table: " + json.dumps(table_copy))
+        logging.info(u'Table: ' + json.dumps(table_copy))
 
     @google_http_error_retry(tries=6, delay=2, backoff=2)
     def get_dataset(self, project_id, dataset_id):
@@ -213,7 +213,8 @@ class BigQuery(object):
 
     @retry(Error, tries=3, delay=2, backoff=2)
     def create_table(self, projectId, datasetId, body):
-        table = BigQueryTable(projectId, datasetId, body.get("tableReference").get("tableId"))
+        table = BigQueryTable(projectId, datasetId,
+                              body.get("tableReference").get("tableId"))
 
         logging.info("Creating table %s", table)
         logging.info("BODY: %s", json.dumps(body))
@@ -274,11 +275,13 @@ class BigQuery(object):
     @retry(Error, tries=6, delay=2, backoff=2)
     def delete_table(self, table_reference):
         try:
-            logging.info("Deleting table '%s'", table_reference)
+            logging.info(u"Deleting table '%s'", table_reference)
+            table_id = table_reference.get_table_id()
             self.service.tables().delete(
                 datasetId=table_reference.get_dataset_id(),
                 projectId=table_reference.get_project_id(),
-                tableId=table_reference.get_table_id()).execute()
+                tableId=table_id if isinstance(table_id, str)
+                                 else table_id.encode('utf8')).execute()
         except HttpError as ex:
             if ex.resp.status == 404:
                 raise TableNotFoundException("Table '{}' Not Found".format(
@@ -298,7 +301,7 @@ class BigQuery(object):
 
     @retry(HttpError, tries=6, delay=2, backoff=2)
     def disable_partition_expiration(self, project_id, dataset_id, table_id):
-        logging.info("Disabling partition expiration for table %s:%s.%s",
+        logging.info(u"Disabling partition expiration for table %s:%s.%s",
                      project_id, dataset_id, table_id)
         table_data = {
             "timePartitioning": {

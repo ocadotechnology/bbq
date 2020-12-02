@@ -59,7 +59,7 @@ class Tasks(object):
             cls.__add_single_batch(queue, task_batch)
             task_count += len(task_batch)
         if task_count > 0:
-            logging.info("Scheduled %d tasks in max %d batches",
+            logging.info("Scheduled %d tasks. (Batch size: %s)",
                          task_count, page_size)
 
     @classmethod
@@ -68,7 +68,7 @@ class Tasks(object):
         if task_batch:
             try:
                 queue.add(task_batch)
-                logging.info("Scheduled %d tasks", len(task_batch))
+                logging.info("Scheduled batch of %d tasks", len(task_batch))
             except (DuplicateTaskNameError,
                     TaskAlreadyExistsError,
                     TombstonedTaskError) as ex:

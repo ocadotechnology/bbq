@@ -1,11 +1,11 @@
 import unittest
 
+from apiclient.errors import HttpError
 from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
-from apiclient.errors import HttpError
 from mock import patch
 
-from src.commons.big_query.big_query import BigQuery, RandomizationError
+from src.commons.big_query.big_query import BigQuery
 from tests.test_utils import content
 
 
@@ -25,34 +25,59 @@ class TestBigQuery(unittest.TestCase):
     def test_iterating_projects(self, _):
         # given
         self._create_http.return_value = self.__create_project_list_responses()
-
+        bq = BigQuery()
         # when
-        project_ids = BigQuery().list_project_ids()
+        project_ids, next_page_token = bq.list_project_ids()
 
         # then
-        self.assertEqual(self.count(project_ids), 4)
+        self.assertEqual(self.count(project_ids), 3)
+        self.assertEqual(next_page_token, '3')
+
+        # when (next_page_token)
+        project_ids, next_page_token = bq.list_project_ids(
+            page_token=next_page_token)
+        # then
+        self.assertEqual(self.count(project_ids), 1)
+        self.assertEqual(next_page_token, None)
+
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_iterating_datasets(self, _):
         # given
         self._create_http.return_value = self.__create_dataset_list_responses()
-
+        bq = BigQuery()
         # when
-        dataset_ids = BigQuery().list_dataset_ids("project123")
+        dataset_ids, next_page_token = bq.list_dataset_ids("project123")
 
         # then
-        self.assertEqual(self.count(dataset_ids), 3)
+        self.assertEqual(self.count(dataset_ids), 2)
+        self.assertEqual(next_page_token, 'FMLMpsxvgM')
+
+        # when
+        dataset_ids, next_page_token = bq.list_dataset_ids("project123", page_token=next_page_token)
+
+        # then
+        self.assertEqual(self.count(dataset_ids), 1)
+        self.assertEqual(next_page_token, None)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_iterating_tables(self, _):
         # given
         self._create_http.return_value = self.__create_tables_list_responses()
-
+        bq = BigQuery()
         # when
-        tables_ids = BigQuery().list_table_ids("project1233", "dataset_id")
+        tables_ids, next_page_token = bq.list_table_ids("project1233", "dataset_id")
 
         # then
-        self.assertEqual(self.count(tables_ids), 5)
+        self.assertEqual(self.count(tables_ids), 4)
+        self.assertEqual(next_page_token, 'table_id_5')
+
+        # when
+        tables_ids, next_page_token = bq.list_table_ids("project1233", "dataset_id", page_token=next_page_token)
+
+        # then
+        self.assertEqual(self.count(tables_ids), 1)
+        self.assertEqual(next_page_token, None)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_insert_job_forwarding_409_error(self, _):
@@ -85,10 +110,11 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
 
         # when
-        tables_ids = BigQuery().list_table_ids("projectid", "dataset_id")
+        tables_ids, next_page_token = BigQuery().list_table_ids("projectid", "dataset_id")
 
         # then
         self.assertEqual(self.count(tables_ids), 0)
+        self.assertEqual(next_page_token, None)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_listing_table_partitions(self, _):

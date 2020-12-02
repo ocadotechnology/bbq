@@ -9,3 +9,8 @@ def get():
         return request.headers[HEADER_NAME]
     else:
         return None
+
+
+def set_correlation_id(correlation_id):
+    request = webapp2.get_request()
+    request.headers[HEADER_NAME] = correlation_id
