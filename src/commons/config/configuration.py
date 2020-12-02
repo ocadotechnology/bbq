@@ -62,3 +62,4 @@ class Configuration(object):
 config_file_yaml = "config/config.yaml"
 logging.info("Loading configuration from file: '%s'", config_file_yaml)
 configuration = Configuration(config_file_yaml)
+logging.getLogger().setLevel("DEBUG" if configuration.debug_mode else "INFO")

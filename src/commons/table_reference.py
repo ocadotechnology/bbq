@@ -1,4 +1,5 @@
 import re
+
 from src.commons.big_query.big_query_table import BigQueryTable
 
 
@@ -6,16 +7,19 @@ class TableReference(object):
     def __init__(self, project_id, dataset_id, table_id, partition_id=None):
         self.project_id = project_id
         self.dataset_id = dataset_id
-        self.table_id = table_id
+        self.table_id = table_id if isinstance(table_id, unicode) else str(
+            table_id).decode('utf8')
         self.partition_id = partition_id
 
     @staticmethod
     def from_table_entity(table):
         return TableReference(table.project_id, table.dataset_id,
                               table.table_id, table.partition_id)
+
     @staticmethod
     def from_bq_table(bq_table):
-        table_id, partition_id = BigQueryTable.split_table_and_partition_id(bq_table.table_id)
+        table_id, partition_id = BigQueryTable.split_table_and_partition_id(
+            bq_table.table_id)
         return TableReference(project_id=bq_table.project_id,
                               dataset_id=bq_table.dataset_id,
                               table_id=table_id,
@@ -41,7 +45,7 @@ class TableReference(object):
             message = "Full table path name ({0}) doesn't match " \
                       "following regexp: {1}. Human readable pattern is " \
                       "PROJECT_ID:DATASETID.TABLE_ID or " \
-                      "PROJECT_ID:DATASETID.TABLE_ID$20180314"\
+                      "PROJECT_ID:DATASETID.TABLE_ID$20180314" \
                 .format(string, regexp)
             raise Exception(message)
 
@@ -71,13 +75,16 @@ class TableReference(object):
         return self.table_id + ('$' + self.partition_id
                                 if self.is_partition() else '')
 
-    def __str__(self):
+    def __unicode__(self):
         if self.is_partition():
-            return '{0}:{1}.{2}${3}'.format(self.project_id, self.dataset_id,
-                                            self.table_id, self.partition_id)
+            return u'{0}:{1}.{2}${3}'.format(self.project_id, self.dataset_id,
+                                             self.table_id, self.partition_id)
         else:
-            return '{0}:{1}.{2}'.format(self.project_id, self.dataset_id,
-                                        self.table_id)
+            return u'{0}:{1}.{2}'.format(self.project_id, self.dataset_id,
+                                         self.table_id)
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     def __repr__(self):
         return self.__str__()

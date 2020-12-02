@@ -2,7 +2,7 @@ class BigQueryTable(object):
     def __init__(self, project_id, dataset_id, table_id):
         self.project_id = project_id
         self.dataset_id = dataset_id
-        self.table_id = table_id
+        self.table_id = table_id if isinstance(table_id, unicode) else str(table_id).decode('utf8')
 
     def get_project_id(self):
         return self.project_id
@@ -13,9 +13,12 @@ class BigQueryTable(object):
     def get_table_id(self):
         return self.table_id
 
+    def __unicode__(self):
+        return u'{0}:{1}.{2}'.format(self.project_id, self.dataset_id,
+                                     self.table_id)
+
     def __str__(self):
-        return '{0}:{1}.{2}'.format(self.project_id, self.dataset_id,
-                                    self.table_id)
+        return unicode(self).encode('utf-8')
 
     def __repr__(self):
         return self.__str__()

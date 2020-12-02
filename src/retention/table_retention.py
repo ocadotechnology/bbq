@@ -40,22 +40,22 @@ class TableRetention(object):
                                              backup.table_id)
 
             self.big_query_service.delete_table(table_reference)
-            logging.debug("Table %s deleted from BigQuery. "
-                          "Updating datastore. Retention policy used: '%s'",
+            logging.debug(u"Table %s deleted from BigQuery. "
+                          u"Updating datastore. Retention policy used: '%s'",
                           table_reference,
                           type(self.policy).__name__)
             Backup.mark_backup_deleted(backup.key)
         except TableNotFoundException:
             Backup.mark_backup_deleted(backup.key)
             logging.warning(
-                "Table '%s' was not found. But we updated datastore anyway",
+                u"Table '%s' was not found. But we updated datastore anyway",
                 backup.table_id)
         except HttpError as ex:
-            error_message = "Unexpected HttpError occurred while deleting " \
-                            "table '{}', error: {}: {}"\
+            error_message = u"Unexpected HttpError occurred while deleting " \
+                            u"table '{}', error: {}: {}"\
                 .format(backup.table_id, type(ex), ex)
             logging.exception(error_message)
         except Exception as ex:
-            error_message = "Could not delete backup '{}' error: {}: {}"\
+            error_message = u"Could not delete backup '{}' error: {}: {}"\
                 .format(backup.table_id, type(ex), ex)
             logging.exception(error_message)

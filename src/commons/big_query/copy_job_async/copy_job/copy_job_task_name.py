@@ -1,4 +1,5 @@
 import logging
+import unicodedata
 
 from datetime import datetime
 
@@ -19,13 +20,15 @@ class CopyJobTaskName(object):
     # it's not unique and the same backup may be created more than once.
     def create(self):
         logging.info("INFO:  %s", self.__copy_job_request)
-        task_name = '_'.join([
+        task_name = unicodedata.normalize("NFKD", u'_'.join([
             datetime.utcnow().strftime("%Y-%m-%d"),
-            str(self.__copy_job_request.source_big_query_table),
+            unicode(self.__copy_job_request.source_big_query_table),
             str(self.__copy_job_request.retry_count),
             str(self.__copy_job_request.task_name_suffix)
-        ])\
-            .replace('$', '_')\
-            .replace('.', '_')\
-            .replace(':', '_')
+        ]) \
+                                          .replace('$', '_') \
+                                          .replace('.', '_') \
+                                          .replace(':', '_') \
+                                          .replace(' ', '_')).encode('ascii',
+                                                                     'ignore')
         return task_name if len(task_name) <= 500 else None

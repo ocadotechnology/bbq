@@ -1,18 +1,17 @@
 import logging
 
 import webapp2
-from apiclient.errors import HttpError
 
-from src.backup.task_creator import TaskCreator
+from src.backup.scheduler.dataset.dataset_backup_scheduler import \
+    DatasetBackupScheduler
 from src.commons.big_query.big_query import BigQuery
 from src.commons.config.configuration import configuration
-from src.commons.decorators.retry import retry
 from src.commons.tasks import Tasks
 
 
-class DatasetBackupHandler(webapp2.RequestHandler):
+class DatasetBackupSchedulerHandler(webapp2.RequestHandler):
     def __init__(self, request=None, response=None):
-        super(DatasetBackupHandler, self).__init__(request, response)
+        super(DatasetBackupSchedulerHandler, self).__init__(request, response)
 
         self.BQ = BigQuery()
 
@@ -24,17 +23,15 @@ class DatasetBackupHandler(webapp2.RequestHandler):
     def post(self):
         project_id = self.request.get('projectId')
         dataset_id = self.request.get('datasetId')
-        self._schedule_backup_tasks(project_id, dataset_id)
+        page_token = self.request.get('pageToken', None)
 
-    @retry(HttpError, tries=3, delay=2, backoff=2)
-    def _schedule_backup_tasks(self, project_id, dataset_id):
-        logging.info("Backing up dataset: '%s:%s' ", project_id, dataset_id)
-        TaskCreator.schedule_tasks_for_tables_backup(
-            project_id,
-            dataset_id,
-            self.BQ.list_table_ids(project_id, dataset_id))
+        logging.info(u'Dataset Backup Scheduler task for %s:%s, page_token: %s',
+                     project_id, dataset_id, page_token)
+        DatasetBackupScheduler().schedule_backup(project_id=project_id,
+                                                 dataset_id=dataset_id,
+                                                 page_token=page_token)
 
 
 app = webapp2.WSGIApplication([
-    ('/tasks/backups/dataset', DatasetBackupHandler)
+    ('/tasks/schedulebackup/dataset', DatasetBackupSchedulerHandler)
 ], debug=configuration.debug_mode)
