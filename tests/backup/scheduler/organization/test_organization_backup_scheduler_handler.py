@@ -41,6 +41,6 @@ class TestOrganizationBackupSchedulerHandler(unittest.TestCase):
     def test_that_organization_backup_scheduler_parse_arguments_correctly(self,
         scheduler):
         # when
-        self.under_test.get(url='cron_backup')
+        self.under_test.get(url='/cron/backup')
         # then
         scheduler.called_only_once_with()
