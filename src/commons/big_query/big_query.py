@@ -73,6 +73,7 @@ class BigQuery(object):
     @retry(Error, tries=3, delay=2, backoff=2)
     def list_table_ids(self, project_id, dataset_id, page_token=None,
         max_results=1000):
+        tables_list_result = {}
         try:
             tables_list_result = self.service.tables().list(
                 projectId=project_id,
@@ -82,9 +83,11 @@ class BigQuery(object):
             ).execute()
         except HttpError as ex:
             if ex.resp.status == 404 and 'Not found: Dataset' in ex.content:
-                logging.info("Dataset '%s:%s' is not found", project_id,
-                             dataset_id)
-                return
+                logging.warning('Dataset \'%s:%s\' is not found', project_id,
+                                dataset_id)
+                # TODO consider throwing DatasetNotFoundException instead
+                return [], None
+            raise ex
 
         tables_ids = [table['tableReference']['tableId']
                       for table in tables_list_result.get('tables', [])]
@@ -113,9 +116,15 @@ class BigQuery(object):
     @log_time
     @google_http_error_retry(tries=6, delay=2, backoff=2)
     def list_table_partitions(self, project_id, dataset_id, table_id):
-        results = self.execute_query(
-            self.create_partition_query(project_id, dataset_id, table_id))
-
+        results = []
+        try:
+            results = self.execute_query(
+                self.create_partition_query(project_id, dataset_id, table_id))
+        except HttpError as ex:
+            if ex.resp.status == 404 and 'Not found: Table' in ex.content:
+                raise TableNotFoundException(u'Table {}:{}.{} not found'.
+                                             format(project_id, dataset_id,
+                                                    table_id))
         partitions = [
             {'partitionId': _partition['f'][0]['v'],
              'creationTime': _partition['f'][1]['v'],
@@ -281,7 +290,7 @@ class BigQuery(object):
                 datasetId=table_reference.get_dataset_id(),
                 projectId=table_reference.get_project_id(),
                 tableId=table_id if isinstance(table_id, str)
-                                 else table_id.encode('utf8')).execute()
+                else table_id.encode('utf8')).execute()
         except HttpError as ex:
             if ex.resp.status == 404:
                 raise TableNotFoundException("Table '{}' Not Found".format(

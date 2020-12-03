@@ -7,6 +7,7 @@ from mock import patch, Mock
 from src.backup.scheduler.partitioned_table.partitioned_table_backup_scheduler import \
     PartitionedTableBackupScheduler
 from src.commons import request_correlation_id
+from src.commons.big_query.big_query import TableNotFoundException
 from src.commons.test_utils import utils
 
 
@@ -15,13 +16,7 @@ class TestPartitionedTableBackupScheduler(unittest.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_taskqueue_stub(
-            root_path=os.path.join(os.path.dirname(__file__), 'resources'))
         self.task_queue_stub = utils.init_testbed_queue_stub(self.testbed)
-        ndb.get_context().clear_cache()
 
     def tearDown(self):
         self.testbed.deactivate()
@@ -51,3 +46,20 @@ class TestPartitionedTableBackupScheduler(unittest.TestCase):
                          '/tasks/backups/table/test-project-id/dataset_1/table_id/' + partition_id_1)
         self.assertEqual(tasks[1].url,
                          '/tasks/backups/table/test-project-id/dataset_1/table_id/' + partition_id_2)
+
+    @patch.object(request_correlation_id, 'get', return_value='correlation-id')
+    @patch('src.commons.big_query.big_query.BigQuery.list_table_partitions')
+    def test_partitioned_table_backup_scheduler_should_not_create_backup_tasks_when_table_not_found_exception(
+        self, list_table_partitions, _1):
+        # given
+        list_table_partitions.side_effect = TableNotFoundException("Table X:Y.Z not found")
+
+        # when
+        PartitionedTableBackupScheduler().schedule_backup(
+            project_id='test-project-id',
+            dataset_id='dataset_1', table_id='table_id')
+
+        # then
+        tasks = self.task_queue_stub.get_filtered_tasks(
+            queue_names='backup-worker')
+        self.assertEqual(len(tasks), 0)

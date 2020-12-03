@@ -1,7 +1,7 @@
 import logging
 
 from src.backup.scheduler.task_creator import TaskCreator
-from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery, TableNotFoundException
 from src.commons.tasks import Tasks
 
 
@@ -11,10 +11,15 @@ class PartitionedTableBackupScheduler(object):
         self.big_query = BigQuery()
 
     def schedule_backup(self, project_id, dataset_id, table_id):
-        partitions = self.big_query.list_table_partitions(
+        try:
+            partitions = self.big_query.list_table_partitions(
             project_id=project_id,
             dataset_id=dataset_id,
             table_id=table_id)
+        except TableNotFoundException as ex:
+            logging.warning(ex.message)
+            return
+
         partition_ids_to_backup = [partition['partitionId'] for partition in
                                    partitions]
         if not partition_ids_to_backup:

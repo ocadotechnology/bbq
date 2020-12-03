@@ -21,7 +21,6 @@ class TestProjectBackupSchedulerHandler(unittest.TestCase):
         self.under_test = webtest.TestApp(app)
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.init_memcache_stub()
 
     def tearDown(self):
         self.testbed.deactivate()

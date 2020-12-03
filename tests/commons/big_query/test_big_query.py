@@ -5,7 +5,7 @@ from apiclient.http import HttpMockSequence
 from google.appengine.ext import testbed
 from mock import patch
 
-from src.commons.big_query.big_query import BigQuery
+from src.commons.big_query.big_query import BigQuery, TableNotFoundException
 from tests.test_utils import content
 
 
@@ -40,7 +40,6 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual(self.count(project_ids), 1)
         self.assertEqual(next_page_token, None)
 
-
     @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_iterating_datasets(self, _):
         # given
@@ -54,7 +53,8 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual(next_page_token, 'FMLMpsxvgM')
 
         # when
-        dataset_ids, next_page_token = bq.list_dataset_ids("project123", page_token=next_page_token)
+        dataset_ids, next_page_token = bq.list_dataset_ids("project123",
+                                                           page_token=next_page_token)
 
         # then
         self.assertEqual(self.count(dataset_ids), 1)
@@ -66,17 +66,57 @@ class TestBigQuery(unittest.TestCase):
         self._create_http.return_value = self.__create_tables_list_responses()
         bq = BigQuery()
         # when
-        tables_ids, next_page_token = bq.list_table_ids("project1233", "dataset_id")
+        tables_ids, next_page_token = bq.list_table_ids("project1233",
+                                                        "dataset_id")
 
         # then
         self.assertEqual(self.count(tables_ids), 4)
         self.assertEqual(next_page_token, 'table_id_5')
 
         # when
-        tables_ids, next_page_token = bq.list_table_ids("project1233", "dataset_id", page_token=next_page_token)
+        tables_ids, next_page_token = bq.list_table_ids("project1233",
+                                                        "dataset_id",
+                                                        page_token=next_page_token)
 
         # then
         self.assertEqual(self.count(tables_ids), 1)
+        self.assertEqual(next_page_token, None)
+
+    @patch('time.sleep', side_effect=lambda _: None)
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
+    def test_iterating_tables_retries_if_503_returned(self, _1, _2):
+        # given
+        self._create_http.return_value = self.__create_tables_list_responses_with_503()
+        bq = BigQuery()
+        # when
+        tables_ids, next_page_token = bq.list_table_ids("project1233",
+                                                        "dataset_id")
+
+        # then
+        self.assertEqual(self.count(tables_ids), 4)
+        self.assertEqual(next_page_token, 'table_id_5')
+
+        # when
+        tables_ids, next_page_token = bq.list_table_ids("project1233",
+                                                        "dataset_id",
+                                                        page_token=next_page_token)
+
+        # then
+        self.assertEqual(self.count(tables_ids), 1)
+        self.assertEqual(next_page_token, None)
+
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
+    def test_iterating_tables_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(
+        self, _):
+        # given
+        self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
+
+        # when
+        tables_ids, next_page_token = BigQuery().list_table_ids("projectid",
+                                                                "dataset_id")
+
+        # then
+        self.assertEqual(self.count(tables_ids), 0)
         self.assertEqual(next_page_token, None)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
@@ -104,19 +144,6 @@ class TestBigQuery(unittest.TestCase):
         self.assertEqual(context.exception.resp.status, 503)
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
-    def test_when_dataset_not_exist_then_iterating_tables_should_not_return_any_table(
-            self, _):
-        # given
-        self._create_http.return_value = self.__create_dataset_not_found_during_tables_list_responses()
-
-        # when
-        tables_ids, next_page_token = BigQuery().list_table_ids("projectid", "dataset_id")
-
-        # then
-        self.assertEqual(self.count(tables_ids), 0)
-        self.assertEqual(next_page_token, None)
-
-    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_listing_table_partitions(self, _):
         # given
         self._create_http.return_value = self.__create_table_partititions_list_responses()
@@ -133,8 +160,18 @@ class TestBigQuery(unittest.TestCase):
                          '2017-03-17 14:32:19.289000')
 
     @patch.object(BigQuery, '_create_credentials', return_value=None)
+    def test_listing_table_partitions_when_table_not_exist_should_throw_table_not_found_exception(
+        self, _):
+        # given
+        self._create_http.return_value = self.__create_table_partititions_list_responses_table_404_not_found()
+        # when & then
+        with self.assertRaises(TableNotFoundException) as exception:
+            BigQuery().list_table_partitions("project123", "dataset123",
+                                             "table123")
+
+    @patch.object(BigQuery, '_create_credentials', return_value=None)
     def test_get_dataset_cached_should_only_call_bq_once_but_response_is_cached(
-            self, _):
+        self, _):
         # given
         self._create_http.return_value = \
             self.__create_dataset_responses_with_only_one_response_for_get_dataset()
@@ -301,6 +338,16 @@ class TestBigQuery(unittest.TestCase):
         ])
 
     @staticmethod
+    def __create_table_partititions_list_responses_table_404_not_found():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '404'},
+             content(
+                 'tests/json_samples/bigquery_partition_query_404_table_not_exist.json'))
+        ])
+
+    @staticmethod
     def __create_random_table_responses():
         return HttpMockSequence([(
             {'status': '200'},
@@ -361,3 +408,16 @@ class TestBigQuery(unittest.TestCase):
              content('tests/json_samples/bigquery_v2_test_schema.json')),
             ({'status': '403'},
              content('tests/json_samples/bigquery_access_denied.json')), ])
+
+    @staticmethod
+    def __create_tables_list_responses_with_503():
+        return HttpMockSequence([
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_v2_test_schema.json')),
+            ({'status': '503'},
+             content('tests/json_samples/bigquery_503_error.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_1.json')),
+            ({'status': '200'},
+             content('tests/json_samples/bigquery_table_list_page_last.json'))
+        ])
