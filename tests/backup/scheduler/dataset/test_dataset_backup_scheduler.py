@@ -15,14 +15,7 @@ class TestDatasetBackupScheduler(unittest.TestCase):
     def setUp(self):
         self.testbed = testbed.Testbed()
         self.testbed.activate()
-        self.testbed.init_datastore_v3_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_taskqueue_stub()
-        self.testbed.init_taskqueue_stub(
-            root_path=os.path.join(os.path.dirname(__file__), 'resources'))
         self.task_queue_stub = utils.init_testbed_queue_stub(self.testbed)
-        ndb.get_context().clear_cache()
 
     def tearDown(self):
         self.testbed.deactivate()

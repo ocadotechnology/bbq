@@ -1,6 +1,7 @@
 import unittest
 
-from mock import patch
+from mock import patch, Mock
+
 from src.backup.datastore.Table import Table
 from src.backup.on_demand.on_demand_table_backup import OnDemandTableBackup
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
@@ -10,6 +11,8 @@ from src.commons.table_reference import TableReference
 
 class TestOnDemandTableBackup(unittest.TestCase):
 
+    @patch('src.commons.big_query.big_query.BigQuery.__init__',
+           Mock(return_value=None))
     @patch.object(Table, "get_table", return_value=None)
     @patch('src.commons.big_query.big_query_table_metadata.BigQueryTableMetadata.get_table_by_reference',
            return_value=BigQueryTableMetadata(

@@ -1,0 +1,13 @@
+{
+  "error": {
+    "errors": [
+      {
+        "domain": "global",
+        "reason": "notFound",
+        "message": "Not found: Table proj:dataset.table was not found in location US"
+      }
+    ],
+    "code": 404,
+    "message": "Not found: Table proj:dataset.table was not found in location US"
+  }
+}

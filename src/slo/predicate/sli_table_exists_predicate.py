@@ -1,6 +1,8 @@
 import logging
 
+from src.commons.big_query.big_query import TableNotFoundException
 from src.commons.big_query.big_query_table_metadata import BigQueryTableMetadata
+
 
 class SLITableExistsPredicate(object):
 
@@ -27,7 +29,7 @@ class SLITableExistsPredicate(object):
             return False
 
         if not table_reference.is_partition() or \
-           not table_metadata.has_time_partitioning():
+            not table_metadata.has_time_partitioning():
             logging.info("Non-partitioned table exist: %s", table_reference)
             return True
 
@@ -39,10 +41,14 @@ class SLITableExistsPredicate(object):
         return False
 
     def __is_partition_exists(self, table_reference):
-        partitions = self.big_query.list_table_partitions(
-            project_id=table_reference.project_id,
-            dataset_id=table_reference.dataset_id,
-            table_id=table_reference.table_id)
+        try:
+            partitions = self.big_query.list_table_partitions(
+                project_id=table_reference.project_id,
+                dataset_id=table_reference.dataset_id,
+                table_id=table_reference.table_id)
+        except TableNotFoundException as ex:
+            logging.warning(ex.message)
+            return False
 
         return table_reference.partition_id in [partition['partitionId']
                                                 for partition in partitions]
