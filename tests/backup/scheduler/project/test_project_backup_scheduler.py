@@ -36,10 +36,10 @@ class TestProjectBackupScheduler(unittest.TestCase):
         self.assertEqual(len(tasks), 2)
         self.assertEqual(tasks[0].url, '/tasks/schedulebackup/dataset')
         self.assertEqual(tasks[0].payload,
-                         'projectId=test-project-id&datasetId=dataset_id1&pageToken=None')
+                         'projectId=test-project-id&datasetId=dataset_id1')
         self.assertEqual(tasks[1].url, '/tasks/schedulebackup/dataset')
         self.assertEqual(tasks[1].payload,
-                         'projectId=test-project-id&datasetId=dataset_id2&pageToken=None')
+                         'projectId=test-project-id&datasetId=dataset_id2')
 
     @patch.object(request_correlation_id, 'get', return_value='correlation-id')
     @patch('src.commons.big_query.big_query.BigQuery.list_dataset_ids')
