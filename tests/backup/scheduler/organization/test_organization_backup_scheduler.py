@@ -1,7 +1,6 @@
-import os
 import unittest
 
-from google.appengine.ext import testbed, ndb
+from google.appengine.ext import testbed
 from mock import patch, PropertyMock
 
 from src.backup.scheduler.organization.organization_backup_scheduler import \
@@ -37,10 +36,10 @@ class TestOrganizationBackupScheduler(unittest.TestCase):
         self.assertEqual(len(tasks), 2)
         self.assertEqual(tasks[0].url, '/tasks/schedulebackup/project')
         self.assertEqual(tasks[0].payload,
-                         'projectId=project-id-1&pageToken=None')
+                         'projectId=project-id-1')
         self.assertEqual(tasks[1].url, '/tasks/schedulebackup/project')
         self.assertEqual(tasks[1].payload,
-                         'projectId=project-id-2&pageToken=None')
+                         'projectId=project-id-2')
 
     @patch.object(request_correlation_id, 'get', return_value='correlation-id')
     @patch('src.commons.big_query.big_query.BigQuery.list_project_ids')
@@ -95,10 +94,10 @@ class TestOrganizationBackupScheduler(unittest.TestCase):
         self.assertEqual(len(tasks), 2)
         self.assertEqual(tasks[0].url, '/tasks/schedulebackup/project')
         self.assertEqual(tasks[0].payload,
-                         'projectId=custom-id-1&pageToken=None')
+                         'projectId=custom-id-1')
         self.assertEqual(tasks[1].url, '/tasks/schedulebackup/project')
         self.assertEqual(tasks[1].payload,
-                         'projectId=custom-id-2&pageToken=None')
+                         'projectId=custom-id-2')
 
     @patch.object(request_correlation_id, 'get', return_value='correlation-id')
     @patch.object(Configuration, 'projects_to_skip', new_callable=PropertyMock)
@@ -119,4 +118,4 @@ class TestOrganizationBackupScheduler(unittest.TestCase):
         self.assertEqual(len(tasks), 1)
         self.assertEqual(tasks[0].url, '/tasks/schedulebackup/project')
         self.assertEqual(tasks[0].payload,
-                         'projectId=project-id-1&pageToken=None')
+                         'projectId=project-id-1')

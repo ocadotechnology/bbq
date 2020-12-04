@@ -13,12 +13,14 @@ class TaskCreator(object):
             u'Create Organisation Backup Scheduler task for page_token: %s',
             page_token)
 
+        params = {}
+        if page_token:
+            params['pageToken'] = page_token
+
         return Tasks.create(
             method='GET',
             url='/tasks/schedulebackup/organization',
-            params={
-                'pageToken': page_token
-            })
+            params=params)
 
     @staticmethod
     def create_project_backup_scheduler_task(project_id,
@@ -27,12 +29,13 @@ class TaskCreator(object):
             u'Create Project Backup Scheduler task for %s, page_token: %s',
             project_id, page_token)
 
+        params = {'projectId': project_id}
+        if page_token:
+            params['pageToken'] = page_token
+
         return Tasks.create(
             url='/tasks/schedulebackup/project',
-            params={
-                'projectId': project_id,
-                'pageToken': page_token
-            }
+            params=params
         )
 
     @staticmethod
@@ -42,13 +45,13 @@ class TaskCreator(object):
             u'Create Dataset Backup Scheduler task for %s:%s, page_token: %s',
             project_id, dataset_id, page_token)
 
+        params = {'projectId': project_id, 'datasetId': dataset_id}
+        if page_token:
+            params['pageToken'] = page_token
+
         return Tasks.create(
             url='/tasks/schedulebackup/dataset',
-            params={
-                'projectId': project_id,
-                'datasetId': dataset_id,
-                'pageToken': page_token
-            })
+            params=params)
 
     @staticmethod
     def create_table_backup_task(project_id, dataset_id, table_id):

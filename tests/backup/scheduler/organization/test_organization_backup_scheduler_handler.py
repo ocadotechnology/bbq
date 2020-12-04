@@ -31,13 +31,15 @@ class TestOrganizationBackupSchedulerHandler(unittest.TestCase):
     def test_that_organization_backup_scheduler_parse_arguments_correctly(self,
         scheduler):
         # when
-        self.under_test.get(url='/tasks/schedulebackup/organization?pageToken=somevalue')
+        self.under_test.get(
+            url='/tasks/schedulebackup/organization?pageToken=somevalue')
 
         # then
         scheduler.called_only_once_with(page_token="somevalue")
 
     @patch.object(OrganizationBackupScheduler, "schedule_backup")
-    def test_that_organization_backup_scheduler_parse_arguments_correctly(self,
+    def test_that_organization_backup_scheduler_parse_arguments_for_cron_correctly(
+        self,
         scheduler):
         # when
         self.under_test.get(url='/cron/backup')
