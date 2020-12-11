@@ -38,3 +38,9 @@ class QualityQuerySpecification(object):
                               dataset_id=table['datasetId'],
                               table_id=table['tableId'],
                               partition_id=partition_id)
+
+    @staticmethod
+    def to_backup_table_reference(table):
+        return TableReference(project_id=configuration.backup_project_id,
+                              dataset_id=table['backupDatasetId'],
+                              table_id=table['backupTableId'])
