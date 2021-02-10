@@ -14,6 +14,6 @@ rsa==3.4.2
 six==1.11.0
 uritemplate==3.0.0
 PyJWT==1.6.4
-cryptography==3.2
+cryptography==3.3.2
 flask==1.0.2
 jsonpickle==0.9.5
