@@ -1,7 +1,7 @@
 GoogleAppEngineCloudStorageClient==1.9.22.1
 python-dateutil==2.6.0
 stringcase==1.2.0
-jinja2==2.10.1
+jinja2==2.11.3
 cachetools==2.1.0
 google-api-python-client==1.6.7
 google-auth==1.4.1
