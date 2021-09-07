@@ -28,14 +28,9 @@ Below button opens [Setup.md](./SETUP.md) in Google Cloud Shell, where you could
 
 [Google BigQuery](https://cloud.google.com/bigquery/) is fast, highly scalable, cost-effective and fully-managed enterprise data warehouse for analytics at any scale. BigQuery automatically replicates data and keeps a 7-day history of changes.
 
-Restoring data from existing table can be done using [snapshot decorators](https://cloud.google.com/bigquery/table-decorators#snapshot_decorators).
-However when tables are deleted there are [some limitations](https://cloud.google.com/bigquery/docs/managing-tables#undeletetable): 
-> It's possible to restore a table within 2 days of deletion. By leveraging snapshot decorator functionality, one may be able reference a table prior to the deletion event and then copy it. However, there are two primary caveats to creating a reference in this fashion:
-> * You cannot reference a deleted table if a table bearing the same ID in the dataset was created after the deletion time.
-> * You cannot reference a deleted table if the encapsulating dataset was also deleted/recreated since the table deletion event.
+BBQ development started in 2016. BigQuery supported only [snapshot decorators](https://cloud.google.com/bigquery/table-decorators#snapshot_decorators), which had some limitations when tables and datasets were recreated. Currently BigQuery [time travel](https://cloud.google.com/bigquery/docs/time-travel) feature allows you to access the data from any point within the last seven days. If this feature is sufficient for you, then you don't need BBQ at all. 
 
-It is common that data streaming solutions require destination resource to be always present. If such resource (dataset or table entity) is deleted, intentionally or not, then default would be to re-create the same, but empty entity.
-In such scenario we're not able to restore data using BigQuery build-in features.
+Current main use case of BBQ is to create BigQuery backups for longer than 7 days.  
 
 ### Our motivation for building BBQ was to:
 * protect crucial data against application bug, user error or malicious attack,
