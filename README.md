@@ -1,3 +1,10 @@
+# DEPRECATED
+## Backup Big Query (BBQ) has been deprecated and is no longer supported.
+### We recommend utilizing the [Time Travel and Fail Safe](https://cloud.google.com/bigquery/docs/time-travel) features in Google Cloud Platform's Big Query instead. 
+### If you require extended backup retention, we encourage you to opt for [Big Query Snapshots](https://cloud.google.com/bigquery/docs/table-snapshots-intro) as an alternative to using BQ Copy jobs.
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
 [![Build Status](https://travis-ci.org/ocadotechnology/bbq.svg?branch=master)](https://travis-ci.org/ocadotechnology/bbq)
 [![Coverage Status](https://coveralls.io/repos/github/ocadotechnology/bbq/badge.svg?branch=master)](https://coveralls.io/github/ocadotechnology/bbq?branch=master)
 
